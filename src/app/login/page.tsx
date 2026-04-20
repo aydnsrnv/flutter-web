@@ -1,31 +1,25 @@
 import { login } from './actions';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { LoginForm } from './login-form';
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: { error?: string; success?: string };
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect('/home');
+  }
+
+  const error = searchParams?.error;
+  const success = searchParams?.success;
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6">
-      <h1 className="mb-6 text-2xl font-semibold">Login</h1>
-      <form action={login} className="flex flex-col gap-3">
-        <input
-          name="email"
-          type="email"
-          required
-          placeholder="Email"
-          className="rounded-md border px-3 py-2"
-        />
-        <input
-          name="password"
-          type="password"
-          required
-          placeholder="Password"
-          className="rounded-md border px-3 py-2"
-        />
-        <button
-          type="submit"
-          className="rounded-md bg-black px-3 py-2 text-white"
-        >
-          Sign in
-        </button>
-      </form>
-    </div>
+    <LoginForm action={login} error={error} successKey={success} />
   );
 }
