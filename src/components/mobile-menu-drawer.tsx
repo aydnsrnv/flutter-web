@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { HambergerMenu, CloseSquare } from 'iconsax-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export function MobileMenuDrawer({
@@ -31,7 +33,15 @@ export function MobileMenuDrawer({
 
       {isOpen ? (
         <div className="fixed inset-0 z-[99999] flex flex-col bg-background lg:hidden">
-          <div className="flex items-center justify-end border-b border-border p-4">
+          <div className="flex items-center justify-between border-b border-border p-4">
+            <Link href="/home" className="flex items-center gap-2">
+              <div className="h-8 w-8 overflow-hidden rounded-full bg-white">
+                <Image src="/jobly_icon.jpg" alt="Jobly" width={32} height={32} />
+              </div>
+              <div className="text-[22px] font-bold leading-none" style={{ color: '#245BEB' }}>
+                Jobly
+              </div>
+            </Link>
             <button
               onClick={() => setIsOpen(false)}
               className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"

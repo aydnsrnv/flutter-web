@@ -69,7 +69,7 @@ function AppHeaderInner({
   }, []);
 
   return (
-    <header className="flex items-center justify-between">
+    <header className="relative flex items-center justify-between">
       <div className="flex items-center gap-2 sm:gap-4">
         <MobileMenuDrawer leftPanel={<DesktopLeftPanel />} rightPanel={aside} />
         {showBrand ? (
@@ -122,7 +122,10 @@ function AppHeaderInner({
           </Link>
           )
         ) : (
-          <div className="text-[18px] font-bold" style={{ color: 'var(--jobly-main, #245BEB)' }}>
+          <div
+            className="absolute left-1/2 -translate-x-1/2 text-[18px] font-bold text-center max-w-[60vw] truncate lg:static lg:left-auto lg:max-w-none lg:translate-x-0"
+            style={{ color: 'var(--jobly-main, #245BEB)' }}
+          >
             {pathname.includes('/candidates') ? t('nav_candidates')
               : pathname.includes('/companies') ? t('nav_companies')
               : pathname.includes('/categories') ? t('nav_categories')
