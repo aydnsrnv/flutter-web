@@ -1,4 +1,3 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 const PROTECTED_PREFIXES = ['/create', '/my', '/profile', '/menu', '/wallet', '/job/add', '/resume', '/payments-history', '/wallet-transactions'];
@@ -42,6 +41,7 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
+    const { createServerClient } = await import('@supabase/ssr');
     const supabase = createServerClient(
       supabaseUrl,
       supabaseAnonKey,
@@ -81,5 +81,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|favicon.png|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|map)$).*)',
+  ],
 };
