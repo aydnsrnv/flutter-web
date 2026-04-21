@@ -20,9 +20,23 @@ export async function middleware(request: NextRequest) {
   
   response.headers.set('x-pathname', pathname);
 
+  const supabaseUrl =
+    (process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')
+      .trim();
+  const supabaseAnonKey =
+    (process.env.SUPABASE_ANON_KEY ??
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+      '').trim();
+
+  // On Vercel Edge, missing env vars will crash the middleware. Fail open to
+  // keep public pages working; protected routes will be handled by the page.
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
