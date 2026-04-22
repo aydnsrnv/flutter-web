@@ -48,7 +48,7 @@ export function PopularJobListItem({
   const href = job.job_number != null ? `/job/${job.job_number}` : `/jobs/${job.id}`;
   return (
     <Link href={href} className="block w-full">
-      <div className="px-[10px] py-2">
+      <div className="py-2">
         <div className="flex items-center gap-3">
           <LogoSquare src={job.company_logo} alt={job.company_name} />
 

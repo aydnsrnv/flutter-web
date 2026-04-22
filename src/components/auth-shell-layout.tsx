@@ -1,5 +1,6 @@
-import { DesktopLeftPanel } from '@/components/desktop-left-panel';
-import { AppHeader } from '@/components/app-header';
+import { DesktopLeftPanel } from "@/components/desktop-left-panel";
+import { AppHeader } from "@/components/app-header";
+import { BottomNav } from "@/components/bottom-nav";
 
 export function AuthShellLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,18 +9,27 @@ export function AuthShellLayout({ children }: { children: React.ReactNode }) {
         <div className="hidden lg:grid lg:grid-cols-[20%_50%_30%] lg:gap-6">
           <DesktopLeftPanel />
           <main className="min-w-0">
-            <div className="min-h-[calc(100vh-3rem)]">
-              <div className="mb-5"><AppHeader /></div>
+            <div className="min-h-[calc(100vh-3rem)] pb-24">
+              <div className="mb-5">
+                <AppHeader />
+              </div>
               {children}
             </div>
+            <BottomNav variant="desktop" />
           </main>
           <aside className="min-w-0" />
         </div>
 
         <div className="lg:hidden">
-          <div className="mb-4"><AppHeader /></div>
+          <div className="mb-4">
+            <AppHeader />
+          </div>
           {children}
         </div>
+      </div>
+
+      <div className="lg:hidden">
+        <BottomNav />
       </div>
     </div>
   );

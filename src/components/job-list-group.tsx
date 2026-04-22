@@ -21,7 +21,7 @@ export function JobListGroup({
         <div key={j.id}>
           <JobListItem job={j} premium={premium} />
           {i < jobs.length - 1 ? (
-            <div className="px-[10px]">
+            <div>
               <div
                 className="h-px"
                 style={{ backgroundColor: dividerColor, opacity: 0.8 }}

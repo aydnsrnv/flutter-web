@@ -96,7 +96,7 @@ export function FlutterJobItem({
   const cityLabel = job.city ? t(job.city) : '';
 
   return (
-    <Link href={href} className="block px-4 py-3">
+    <Link href={href} className="block py-3">
       <div className="flex items-start gap-3">
         <LogoCircle src={job.company_logo} alt={job.company_name} />
 

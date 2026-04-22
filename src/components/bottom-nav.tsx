@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTransition } from 'react';
+import { HambergerMenu } from 'iconsax-react';
 import { cn } from '@/lib/utils';
 
 import { useI18n } from '@/lib/i18n/client';
@@ -32,8 +33,10 @@ const items = [
 
 export function BottomNav({
   variant = 'mobile',
+  onMenuOpen,
 }: {
   variant?: 'mobile' | 'desktop';
+  onMenuOpen?: () => void;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -49,7 +52,7 @@ export function BottomNav({
     <nav className={navClassName} data-bottom-nav>
       <div className="shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
         <div className="overflow-hidden rounded-t-2xl">
-          <div className="grid grid-cols-4 bg-background dark:bg-card">
+          <div className={cn('grid bg-background dark:bg-card', variant === 'mobile' ? 'grid-cols-5' : 'grid-cols-4')}>
         {items.map((it) => {
           const active = pathname === it.href || pathname.startsWith(it.href + '/');
           const iconClass = active ? it.icon.active : it.icon.inactive;
@@ -100,6 +103,22 @@ export function BottomNav({
             </Link>
           );
         })}
+
+        {variant === 'mobile' ? (
+          <button
+            type="button"
+            onClick={() => onMenuOpen?.()}
+            className={cn('flex flex-col items-center justify-center gap-1 px-2 py-2 text-xs')}
+            aria-label="Open Menu"
+          >
+            <span className={cn('inline-flex rounded-2xl px-[18px] py-[2px]')} style={{ backgroundColor: 'transparent' }}>
+              <HambergerMenu size={24} variant="Outline" color="currentColor" />
+            </span>
+            <span className={cn('leading-none text-[12px] font-medium text-[rgba(0,0,0,0.54)] dark:text-[rgba(255,255,255,0.70)]')}>
+              Menu
+            </span>
+          </button>
+        ) : null}
           </div>
         </div>
       </div>

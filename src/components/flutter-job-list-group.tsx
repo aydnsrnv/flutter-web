@@ -30,7 +30,7 @@ export function FlutterJobListGroup({
               <FlutterJobItem job={j} premium={premium} />
             </div>
             {!isLast ? (
-              <div className="px-[10px]">
+              <div>
                 <div className="h-px" style={{ backgroundColor: dividerColor, opacity: 0.8 }} />
               </div>
             ) : null}

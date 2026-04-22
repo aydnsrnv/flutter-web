@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import { ShellLayoutClient } from '@/components/shell-layout-client';
-import { BottomNav } from '@/components/bottom-nav';
 import { StatsPanel } from '@/components/stats-panel';
 
 function StatsPanelSkeleton() {
@@ -37,9 +36,6 @@ export default function ShellLayout({
           </Suspense>
         }
       />
-      <div className="lg:hidden">
-        <BottomNav />
-      </div>
     </>
   );
 }

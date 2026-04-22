@@ -13,7 +13,7 @@ export function PopularJobListGroup({
         <div key={j.id}>
           <PopularJobListItem job={j} />
           {i < jobs.length - 1 ? (
-            <div className="px-[10px]">
+            <div>
               <div className="h-px" style={{ backgroundColor: dividerColor, opacity: 0.8 }} />
             </div>
           ) : null}

@@ -9,12 +9,24 @@ import { usePathname } from 'next/navigation';
 export function MobileMenuDrawer({
   leftPanel,
   rightPanel,
+  open,
+  onOpenChange,
+  showTrigger = true,
 }: {
   leftPanel: React.ReactNode;
   rightPanel?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (v: boolean) => void;
+  showTrigger?: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const pathname = usePathname();
+
+  const isOpen = open ?? uncontrolledOpen;
+  const setIsOpen = (v: boolean) => {
+    if (onOpenChange) onOpenChange(v);
+    if (open === undefined) setUncontrolledOpen(v);
+  };
 
   useEffect(() => {
     setIsOpen(false);
@@ -22,14 +34,16 @@ export function MobileMenuDrawer({
 
   return (
     <>
-      <button
-        type="button"
-        className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20 lg:hidden"
-        onClick={() => setIsOpen(true)}
-        aria-label="Open Menu"
-      >
-        <HambergerMenu size={24} variant="Outline" color="currentColor" />
-      </button>
+      {showTrigger ? (
+        <button
+          type="button"
+          className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20 lg:hidden"
+          onClick={() => setIsOpen(true)}
+          aria-label="Open Menu"
+        >
+          <HambergerMenu size={24} variant="Outline" color="currentColor" />
+        </button>
+      ) : null}
 
       {isOpen ? (
         <div className="fixed inset-0 z-[99999] flex flex-col bg-background lg:hidden">

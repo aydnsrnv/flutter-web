@@ -1,10 +1,12 @@
 'use client';
 
 import { usePathname, useSelectedLayoutSegment } from 'next/navigation';
+import { useState } from 'react';
 
 import { BottomNav } from '@/components/bottom-nav';
 import { DesktopLeftPanel } from '@/components/desktop-left-panel';
 import { AppHeader } from '@/components/app-header';
+import { MobileMenuDrawer } from '@/components/mobile-menu-drawer';
 
 const NAVBAR_PATHS = ['/home', '/candidates', '/companies', '/categories'];
 
@@ -19,6 +21,7 @@ export function ShellLayoutClient({
 }) {
   const pathname = usePathname() ?? '';
   const detailSegment = useSelectedLayoutSegment('detail');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const isNavbarPage = NAVBAR_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`));
   
@@ -51,6 +54,17 @@ export function ShellLayoutClient({
           <div className="mb-4"><AppHeader aside={aside} /></div>
           {mainContent}
         </div>
+      </div>
+
+      <div className="lg:hidden">
+        <MobileMenuDrawer
+          leftPanel={<DesktopLeftPanel />}
+          rightPanel={aside}
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
+          showTrigger={false}
+        />
+        <BottomNav onMenuOpen={() => setMobileMenuOpen(true)} />
       </div>
     </div>
   );

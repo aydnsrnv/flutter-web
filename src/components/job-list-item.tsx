@@ -52,7 +52,7 @@ export function JobListItem({
         border: borderWidth ? `${borderWidth}px solid ${borderColor}` : undefined,
       }}
     >
-      <div className="px-4 py-3">
+      <div className="py-3">
         <div className="flex items-start gap-3">
           <Logo src={job.company_logo} alt={job.company_name} />
 
