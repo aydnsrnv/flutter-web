@@ -8,18 +8,22 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n/client";
 import { Input } from "@/components/ui/input";
 
-export function HomeSearchBar() {
+export function HomeSearchBar({
+  initialQuery = "",
+}: {
+  initialQuery?: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { t } = useI18n();
 
   const currentQuery = (searchParams.get("q") ?? "").trim();
-  const [q, setQ] = useState(currentQuery);
+  const [q, setQ] = useState(currentQuery || initialQuery);
 
   useEffect(() => {
-    setQ(currentQuery);
-  }, [currentQuery]);
+    setQ(currentQuery || initialQuery);
+  }, [currentQuery, initialQuery]);
 
   useEffect(() => {
     const trimmed = q.trim();

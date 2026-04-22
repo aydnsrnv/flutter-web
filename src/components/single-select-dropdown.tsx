@@ -1,11 +1,21 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
-import { useI18n } from '@/lib/i18n/client';
-import { Input } from '@/components/ui/input';
+import { CloseCircle } from "iconsax-react";
 
-const mainColor = '#245BEB';
+import { useI18n } from "@/lib/i18n/client";
+import { Input } from "@/components/ui/input";
+
+const mainColor = "#245BEB";
 
 type Option = {
   value: string;
@@ -13,50 +23,15 @@ type Option = {
   right?: ReactNode;
 };
 
-function XIcon({ size = 22, color = '#EF4444' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M6 6L18 18"
-        stroke={color}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M18 6L6 18"
-        stroke={color}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function CheckBox({ checked }: { checked: boolean }) {
+  if (!checked) return null;
+
   return (
-    <div
-      className={`grid place-items-center rounded-xl border ${checked ? '' : 'border-border'}`}
-      style={{
-        width: 26,
-        height: 26,
-        borderColor: checked ? mainColor : undefined,
-        backgroundColor: checked ? 'rgba(36, 91, 235, 0.10)' : 'transparent',
-      }}
-    >
-      {checked ? (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M20 6L9 17L4 12"
-            stroke={mainColor}
-            strokeWidth="2.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ) : null}
-    </div>
+    <i
+      className="ri-checkbox-circle-fill text-[21px]"
+      style={{ color: mainColor }}
+      aria-hidden="true"
+    />
   );
 }
 
@@ -78,13 +53,13 @@ export function SingleSelectDropdown({
   const searchable = Boolean(searchPlaceholder);
 
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
 
   const selectedLabel = useMemo(() => {
     const opt = options.find((o) => o.value === value) ?? null;
-    return opt?.label ?? '';
+    return opt?.label ?? "";
   }, [options, value]);
 
   const close = useCallback(() => setOpen(false), []);
@@ -92,7 +67,7 @@ export function SingleSelectDropdown({
   useEffect(() => {
     if (!open) return;
     if (!searchable) return;
-    setQuery('');
+    setQuery("");
     const raf = requestAnimationFrame(() => {
       searchRef.current?.focus();
     });
@@ -102,18 +77,13 @@ export function SingleSelectDropdown({
   useEffect(() => {
     if (!open) return;
 
-    const onDocDown = (e: MouseEvent | TouchEvent) => {
-      const el = rootRef.current;
-      if (!el) return;
-      if (e.target instanceof Node && el.contains(e.target)) return;
-      setOpen(false);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
     };
 
-    document.addEventListener('mousedown', onDocDown);
-    document.addEventListener('touchstart', onDocDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('mousedown', onDocDown);
-      document.removeEventListener('touchstart', onDocDown);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
 
@@ -124,11 +94,6 @@ export function SingleSelectDropdown({
     },
     [close, onChange],
   );
-
-  const onReset = useCallback(() => {
-    onChange('');
-    close();
-  }, [close, onChange]);
 
   const filteredOptions = useMemo(() => {
     if (!searchable) return options;
@@ -142,12 +107,20 @@ export function SingleSelectDropdown({
       <button
         id={id}
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className={`flex h-12 w-full items-center justify-between rounded-[21px] border border-input bg-black/5 px-4 text-[14px] outline-none dark:bg-white/5 ${value ? 'text-foreground/80' : 'text-foreground/50'}`}
+        onClick={() => setOpen(true)}
+        className={`flex h-12 w-full items-center justify-between rounded-[21px] border border-input bg-black/5 px-4 text-[14px] outline-none dark:bg-white/5 ${value ? "text-foreground/80" : "text-foreground/50"}`}
       >
-        <div className="min-w-0 flex-1 truncate text-left">{value ? selectedLabel : placeholder}</div>
+        <div className="min-w-0 flex-1 truncate text-left">
+          {value ? selectedLabel : placeholder}
+        </div>
         <div className="ml-3 shrink-0 text-muted-foreground">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M6 9L12 15L18 9"
               stroke="currentColor"
@@ -160,63 +133,82 @@ export function SingleSelectDropdown({
       </button>
 
       {open ? (
-        <div
-          className="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-2xl border border-border bg-card"
-          style={{ boxShadow: '0 14px 30px rgba(0,0,0,0.10)' }}
-          role="listbox"
-          aria-labelledby={id}
-        >
+        <div className="fixed inset-0 z-[10001]">
           <button
             type="button"
-            onClick={onReset}
-            className="flex w-full items-center gap-3 px-4 py-4 text-left"
-          >
-            <div className="shrink-0">
-              <XIcon />
-            </div>
-            <div className="text-[18px] font-medium text-foreground">
-              {t('clear')}
-            </div>
-          </button>
-
-          <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.06)' }} />
-
-          {searchable ? (
-            <>
-              <div className="px-4 py-3">
-                <Input
-                  ref={searchRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={searchPlaceholder ?? t('search_title')}
-                />
+            className="absolute inset-0"
+            onClick={close}
+            style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+            aria-label={t("close")}
+          />
+          <div className="absolute left-0 right-0 top-1/2 mx-auto w-full max-w-[360px] -translate-y-1/2 px-4">
+            <div
+              className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
+              role="listbox"
+              aria-labelledby={id}
+            >
+              <div className="flex items-center justify-between px-4 py-3">
+                <div className="truncate pr-4 text-[16px] font-semibold text-foreground">
+                  {placeholder}
+                </div>
+                <button type="button" onClick={close} aria-label={t("close")}>
+                  <CloseCircle
+                    size={22}
+                    variant="Linear"
+                    color="rgba(0,0,0,0.55)"
+                  />
+                </button>
               </div>
 
-              <div className="h-px bg-border" />
-            </>
-          ) : null}
+              <div className="h-[0.35px] w-full bg-black/15 dark:bg-white/15" />
 
-          <div className="max-h-[360px] overflow-auto">
-            {filteredOptions.map((o) => {
-              const checked = o.value === value;
-              return (
-                <button
-                  key={o.value}
-                  type="button"
-                  onClick={() => onSelect(o.value)}
-                  className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
-                >
-                  <div
-                    className="min-w-0 flex-1 truncate text-[16px] text-foreground"
-                  >
-                    {o.label}
+              {searchable ? (
+                <>
+                  <div className="px-4 py-3">
+                    <Input
+                      ref={searchRef}
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={searchPlaceholder ?? t("search_title")}
+                    />
                   </div>
-                  <div className="shrink-0">
-                    <CheckBox checked={checked} />
-                  </div>
-                </button>
-              );
-            })}
+
+                  <div className="h-px bg-border" />
+                </>
+              ) : null}
+
+              <div className="max-h-[360px] overflow-auto p-2">
+                {filteredOptions.map((o) => {
+                  const checked = o.value === value;
+                  return (
+                    <button
+                      key={o.value}
+                      type="button"
+                      onClick={() => onSelect(o.value)}
+                      className="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-3 text-left"
+                      style={{
+                        backgroundColor: checked
+                          ? "rgba(36, 91, 235, 0.10)"
+                          : "transparent",
+                      }}
+                    >
+                      <div
+                        className="min-w-0 flex-1 truncate text-[16px]"
+                        style={{
+                          color: checked ? mainColor : "inherit",
+                          fontWeight: checked ? 700 : 400,
+                        }}
+                      >
+                        {o.label}
+                      </div>
+                      <div className="shrink-0">
+                        <CheckBox checked={checked} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       ) : null}

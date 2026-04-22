@@ -2,6 +2,7 @@ import {
   ResumeListItem,
   type ResumeListItemData,
 } from "@/components/resume-list-item";
+import { EmptyState } from "@/components/empty-state";
 import { CandidatesSearchBar } from "@/components/candidates-search-bar";
 import {
   ResumePopularItem,
@@ -142,6 +143,9 @@ export default async function CandidatesPage({
   const popularRows = (popularResumes ?? []) as ResumeRow[];
   const premiumRows = (premiumResumes ?? []) as ResumeRow[];
   let latestRows = (latestResumes ?? []) as ResumeRow[];
+
+  const hasAnyResumeData =
+    popularRows.length > 0 || premiumRows.length > 0 || latestRows.length > 0;
 
   if (q) {
     const ql = q.toLowerCase();
@@ -285,72 +289,70 @@ export default async function CandidatesPage({
             </div>
           ) : null}
         </div>
-      ) : null}
-
-      {!hasActiveResumeFilters && popularRows.length > 0 ? (
-        <div>
-          <SectionHeader
-            title={t("home_popular_resumes")}
-            titleKey="home_popular_resumes"
-          />
-          <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
-            {popularRows.slice(0, 10).map((r) => (
-              <div key={String(r.id)} className="w-[150px] shrink-0">
-                <ResumePopularItem resume={toPopular(r)} />
-              </div>
-            ))}
-          </div>
-          <div className="h-4" />
-        </div>
-      ) : null}
-
-      {!hasActiveResumeFilters && premiumRows.length > 0 ? (
-        <div>
-          <SectionHeader
-            title={t("home_premium_resumes")}
-            titleKey="home_premium_resumes"
-          />
-          <div className="mt-3">
-            {premiumRows.map((r, idx) => {
-              const isLast = idx === premiumRows.length - 1;
-              return (
-                <div key={String(r.id)}>
-                  <ResumeListItem resume={toItem(r)} />
-                  {!isLast ? <div className="h-px bg-border/60" /> : null}
-                </div>
-              );
-            })}
-          </div>
-          <div className="h-4" />
-        </div>
-      ) : null}
-
-      <SectionHeader
-        title={t("home_latest_resumes")}
-        titleKey="home_latest_resumes"
-        href="/latest-resumes"
-      />
-
-      {latestError ? (
-        <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">
-          {latestError.message}
-        </div>
-      ) : latestRows.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">
-          {t("no_data")}
-        </div>
+      ) : !hasAnyResumeData ? (
+        <EmptyState label={t("no_data")} />
       ) : (
-        <div className="mt-3">
-          {latestRows.slice(0, 10).map((r, idx) => {
-            const isLast = idx === Math.min(latestRows.length, 10) - 1;
-            return (
-              <div key={String(r.id)}>
-                <ResumeListItem resume={toItem(r)} />
-                {!isLast ? <div className="h-px bg-border/60" /> : null}
+        <>
+          {!hasActiveResumeFilters && popularRows.length > 0 ? (
+            <div>
+              <SectionHeader
+                title={t("home_popular_resumes")}
+                titleKey="home_popular_resumes"
+              />
+              <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
+                {popularRows.slice(0, 10).map((r) => (
+                  <div key={String(r.id)} className="w-[150px] shrink-0">
+                    <ResumePopularItem resume={toPopular(r)} />
+                  </div>
+                ))}
               </div>
-            );
-          })}
-        </div>
+              <div className="h-4" />
+            </div>
+          ) : null}
+
+          {!hasActiveResumeFilters && premiumRows.length > 0 ? (
+            <div>
+              <SectionHeader
+                title={t("home_premium_resumes")}
+                titleKey="home_premium_resumes"
+              />
+              <div className="mt-3">
+                {premiumRows.map((r, idx) => {
+                  const isLast = idx === premiumRows.length - 1;
+                  return (
+                    <div key={String(r.id)}>
+                      <ResumeListItem resume={toItem(r)} />
+                      {!isLast ? <div className="h-px bg-border/60" /> : null}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="h-4" />
+            </div>
+          ) : null}
+
+          <SectionHeader
+            title={t("home_latest_resumes")}
+            titleKey="home_latest_resumes"
+            href="/latest-resumes"
+          />
+
+          {latestRows.length === 0 ? (
+            <EmptyState label={t("no_data")} />
+          ) : (
+            <div className="mt-3">
+              {latestRows.slice(0, 10).map((r, idx) => {
+                const isLast = idx === Math.min(latestRows.length, 10) - 1;
+                return (
+                  <div key={String(r.id)}>
+                    <ResumeListItem resume={toItem(r)} />
+                    {!isLast ? <div className="h-px bg-border/60" /> : null}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

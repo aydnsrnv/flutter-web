@@ -1,14 +1,15 @@
-import type { ResumeListItemData } from '@/components/resume-list-item';
-import { createClient } from '@/lib/supabase/server';
+import type { ResumeListItemData } from "@/components/resume-list-item";
+import { EmptyState } from "@/components/empty-state";
+import { createClient } from "@/lib/supabase/server";
 
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getLocaleFromCookies } from '@/lib/i18n/server';
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocaleFromCookies } from "@/lib/i18n/server";
 
-import { ResumeFilterResultsClient } from '@/app/(shell)/resume-filter-results/resume-filter-results-client';
+import { ResumeFilterResultsClient } from "@/app/(shell)/resume-filter-results/resume-filter-results-client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store";
 
 type ResumeRow = {
   id: string | number;
@@ -41,14 +42,14 @@ function parsePositiveNumber(value: string | undefined) {
 }
 
 function tokenizeFilterValue(value: string | undefined) {
-  return String(value ?? '')
+  return String(value ?? "")
     .split(/[;,]/)
     .map((part) => part.trim().toLowerCase())
     .filter(Boolean);
 }
 
 function desiredSalaryNumber(value?: string | null) {
-  const digitsOnly = String(value ?? '').replace(/\D+/g, '');
+  const digitsOnly = String(value ?? "").replace(/\D+/g, "");
   const n = Number(digitsOnly);
   return Number.isFinite(n) && n > 0 ? n : null;
 }
@@ -89,9 +90,9 @@ function matchesResumeFilters(
 
   if (q) {
     const ql = q.toLowerCase();
-    const pos = String(row.desired_position ?? '').toLowerCase();
-    const name = String(row.full_name ?? '').toLowerCase();
-    const resumeNo = String(row.resume_number ?? '').toLowerCase();
+    const pos = String(row.desired_position ?? "").toLowerCase();
+    const name = String(row.full_name ?? "").toLowerCase();
+    const resumeNo = String(row.resume_number ?? "").toLowerCase();
     if (!pos.includes(ql) && !name.includes(ql) && !resumeNo.includes(ql)) {
       return false;
     }
@@ -99,15 +100,19 @@ function matchesResumeFilters(
 
   if (positionContains) {
     const ql = positionContains.toLowerCase();
-    if (!String(row.desired_position ?? '').toLowerCase().includes(ql)) {
+    if (
+      !String(row.desired_position ?? "")
+        .toLowerCase()
+        .includes(ql)
+    ) {
       return false;
     }
   }
 
-  if (city && (row.city ?? '') !== city) return false;
-  if (education && (row.education_key ?? '') !== education) return false;
-  if (experience && (row.experience_key ?? '') !== experience) return false;
-  if (gender && (row.gender_key ?? '') !== gender) return false;
+  if (city && (row.city ?? "") !== city) return false;
+  if (education && (row.education_key ?? "") !== education) return false;
+  if (experience && (row.experience_key ?? "") !== experience) return false;
+  if (gender && (row.gender_key ?? "") !== gender) return false;
   if (premiumOnly && !Boolean(row.is_premium)) return false;
 
   const nowYear = new Date().getFullYear();
@@ -139,14 +144,14 @@ function matchesResumeFilters(
   }
 
   if (skillTokens.length > 0) {
-    const haystack = String(row.skills ?? '').toLowerCase();
+    const haystack = String(row.skills ?? "").toLowerCase();
     if (!skillTokens.every((token) => haystack.includes(token))) {
       return false;
     }
   }
 
   if (languageTokens.length > 0) {
-    const haystack = String(row.languages ?? '').toLowerCase();
+    const haystack = String(row.languages ?? "").toLowerCase();
     if (!languageTokens.every((token) => haystack.includes(token))) {
       return false;
     }
@@ -187,21 +192,21 @@ export default async function ResumeFilterResultsPage({
 
   const sp = await Promise.resolve(searchParams ?? {});
 
-  const q = (firstParam(sp.q) ?? '').trim();
-  const positionContains = (firstParam(sp.positionContains) ?? '').trim();
-  const city = (firstParam(sp.city) ?? '').trim();
-  const education = (firstParam(sp.education) ?? '').trim();
-  const experience = (firstParam(sp.experience) ?? '').trim();
-  const gender = (firstParam(sp.gender) ?? '').trim();
-  const premiumOnly = firstParam(sp.premiumOnly) === '1';
+  const q = (firstParam(sp.q) ?? "").trim();
+  const positionContains = (firstParam(sp.positionContains) ?? "").trim();
+  const city = (firstParam(sp.city) ?? "").trim();
+  const education = (firstParam(sp.education) ?? "").trim();
+  const experience = (firstParam(sp.experience) ?? "").trim();
+  const gender = (firstParam(sp.gender) ?? "").trim();
+  const premiumOnly = firstParam(sp.premiumOnly) === "1";
 
   const minAge = parsePositiveNumber(firstParam(sp.minAge));
   const maxAge = parsePositiveNumber(firstParam(sp.maxAge));
   const minSalary = parsePositiveNumber(firstParam(sp.minSalary));
   const maxSalary = parsePositiveNumber(firstParam(sp.maxSalary));
 
-  const skillsRaw = (firstParam(sp.skills) ?? '').trim();
-  const languagesRaw = (firstParam(sp.languages) ?? '').trim();
+  const skillsRaw = (firstParam(sp.skills) ?? "").trim();
+  const languagesRaw = (firstParam(sp.languages) ?? "").trim();
 
   const skillTokens = tokenizeFilterValue(skillsRaw);
   const languageTokens = tokenizeFilterValue(languagesRaw);
@@ -227,12 +232,12 @@ export default async function ResumeFilterResultsPage({
   const sourceLimit = 80;
 
   const { data, error } = await supabase
-    .from('resumes')
+    .from("resumes")
     .select(
-      'id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, experience_key, education_key, experiences, skills, languages, avatar, view_count, create_time, is_premium, status',
+      "id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, experience_key, education_key, experiences, skills, languages, avatar, view_count, create_time, is_premium, status",
     )
-    .eq('status', true)
-    .order('create_time', { ascending: false })
+    .eq("status", true)
+    .order("create_time", { ascending: false })
     .limit(sourceLimit);
 
   const rows = ((data ?? []) as ResumeRow[]).filter((row) =>
@@ -248,13 +253,13 @@ export default async function ResumeFilterResultsPage({
           {error.message}
         </div>
       ) : initialItems.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">
-          {t('resumesSearchNotFound')}
-        </div>
+        <EmptyState label={t("resumesSearchNotFound")} />
       ) : (
         <ResumeFilterResultsClient
           initialItems={initialItems}
-          initialHasMore={rows.length > limit || (data?.length ?? 0) >= sourceLimit}
+          initialHasMore={
+            rows.length > limit || (data?.length ?? 0) >= sourceLimit
+          }
           limit={limit}
           initialSourceOffset={data?.length ?? 0}
           filters={filters}

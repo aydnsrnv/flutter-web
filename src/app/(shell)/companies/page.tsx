@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n/client";
 import { PageShimmer } from "@/components/page-shimmer";
 import { Input } from "@/components/ui/input";
 import { RequestCompanyFab } from "@/components/request-company-fab";
+import { EmptyState } from "@/components/empty-state";
 
 type CompanyRow = {
   id: string | number;
@@ -130,9 +131,7 @@ export default function CompaniesPage() {
             {t("company_load_error").replace("{error}", error)}
           </div>
         ) : !loading && items.length === 0 ? (
-          <div className="px-4 py-6 text-center text-[14px] text-foreground/80">
-            {t("no_company")}
-          </div>
+          <EmptyState label={t("no_company")} />
         ) : (
           <div>
             {items.map((c, idx) => {

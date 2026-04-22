@@ -1,15 +1,16 @@
-import type { ResumeListItemData } from '@/components/resume-list-item';
-import { SectionHeader } from '@/components/section-header';
-import { createClient } from '@/lib/supabase/server';
+import type { ResumeListItemData } from "@/components/resume-list-item";
+import { SectionHeader } from "@/components/section-header";
+import { EmptyState } from "@/components/empty-state";
+import { createClient } from "@/lib/supabase/server";
 
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getLocaleFromCookies } from '@/lib/i18n/server';
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocaleFromCookies } from "@/lib/i18n/server";
 
-import { LatestResumesClient } from '@/app/(shell)/latest-resumes/latest-resumes-client';
+import { LatestResumesClient } from "@/app/(shell)/latest-resumes/latest-resumes-client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store";
 
 type ResumeRow = {
   id: string | number;
@@ -38,10 +39,12 @@ export default async function LatestResumesPage() {
   const limit = 20;
 
   const { data, error } = await supabase
-    .from('resumes')
-    .select('id, resume_number, full_name, desired_position, desired_salary, city, birth_year, experience_key, education_key, experiences, avatar, view_count, create_time, is_premium, status')
-    .eq('status', true)
-    .order('create_time', { ascending: false })
+    .from("resumes")
+    .select(
+      "id, resume_number, full_name, desired_position, desired_salary, city, birth_year, experience_key, education_key, experiences, avatar, view_count, create_time, is_premium, status",
+    )
+    .eq("status", true)
+    .order("create_time", { ascending: false })
     .limit(limit);
 
   const rows = (data ?? []) as ResumeRow[];
@@ -66,11 +69,17 @@ export default async function LatestResumesPage() {
   return (
     <div className="flex flex-col gap-4">
       {error ? (
-        <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">{error.message}</div>
+        <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">
+          {error.message}
+        </div>
       ) : rows.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">{t('no_data')}</div>
+        <EmptyState label={t("no_data")} />
       ) : (
-        <LatestResumesClient initialItems={rows.map(toItem)} initialHasMore={rows.length >= limit} limit={limit} />
+        <LatestResumesClient
+          initialItems={rows.map(toItem)}
+          initialHasMore={rows.length >= limit}
+          limit={limit}
+        />
       )}
     </div>
   );

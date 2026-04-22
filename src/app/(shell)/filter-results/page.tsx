@@ -3,6 +3,7 @@ import type { FlutterJobItemData } from "@/components/flutter-job-item";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocaleFromCookies } from "@/lib/i18n/server";
+import { EmptyState } from "@/components/empty-state";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -128,9 +129,7 @@ export default async function FilterResultsPage({
             {error.message}
           </div>
         ) : jobs.length === 0 ? (
-          <div className="px-4 py-4 text-sm text-muted-foreground">
-            {t("no_data")}
-          </div>
+          <EmptyState label={t("no_data")} />
         ) : (
           <div className="p-2">
             <FlutterJobListGroup jobs={jobs.map(toFlutterJobItem)} />

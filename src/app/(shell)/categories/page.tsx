@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
 
 import {
   Airplane,
@@ -163,9 +164,7 @@ export default async function CategoriesPage() {
             </pre>
           </div>
         ) : rows.length === 0 ? (
-          <div className="px-4 py-6 text-center text-[14px] text-foreground/80">
-            {t("no_category")}
-          </div>
+          <EmptyState label={t("no_category")} />
         ) : (
           <div>
             {rows.map((c, idx) => {

@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
+import { useParams } from "next/navigation";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { FlutterJobListGroup } from '@/components/flutter-job-list-group';
-import type { FlutterJobItemData } from '@/components/flutter-job-item';
-import { SectionHeader } from '@/components/section-header';
-import { useI18n } from '@/lib/i18n/client';
-import { createClient } from '@/lib/supabase/browser';
-import { PageShimmer } from '@/components/page-shimmer';
-import { Input } from '@/components/ui/input';
+import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
+import type { FlutterJobItemData } from "@/components/flutter-job-item";
+import { SectionHeader } from "@/components/section-header";
+import { useI18n } from "@/lib/i18n/client";
+import { createClient } from "@/lib/supabase/browser";
+import { PageShimmer } from "@/components/page-shimmer";
+import { Input } from "@/components/ui/input";
 
 type JobRow = {
   id: string | number;
@@ -40,8 +41,8 @@ export default function CategoryViewPage() {
   const listId = safeParseNumber(params?.list_id) ?? 0;
   const categoryKey = `category${listId}`;
 
-  const [inputValue, setInputValue] = useState('');
-  const [queryValue, setQueryValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
+  const [queryValue, setQueryValue] = useState("");
 
   const pageSize = 20;
   const [items, setItems] = useState<FlutterJobItemData[]>([]);
@@ -67,7 +68,7 @@ export default function CategoryViewPage() {
     const v = inputValue.trim();
     const handle = window.setTimeout(() => {
       if (v.length >= 3) setQueryValue(v);
-      else setQueryValue('');
+      else setQueryValue("");
     }, 350);
     return () => window.clearTimeout(handle);
   }, [inputValue]);
@@ -89,15 +90,17 @@ export default function CategoryViewPage() {
       if (nextOffset === 0) setInitialLoading(true);
       try {
         let q = supabase
-          .from('jobs')
-          .select('id, job_number, title, company_name, company_logo, city, create_time, min_salary, max_salary, view_count, applied_count')
-          .eq('status', true)
-          .eq('category_name', categoryKey)
-          .order('create_time', { ascending: false })
+          .from("jobs")
+          .select(
+            "id, job_number, title, company_name, company_logo, city, create_time, min_salary, max_salary, view_count, applied_count",
+          )
+          .eq("status", true)
+          .eq("category_name", categoryKey)
+          .order("create_time", { ascending: false })
           .range(nextOffset, nextOffset + pageSize - 1);
 
         if (queryValue) {
-          q = q.filter('title', 'ilike', `%${queryValue}%`);
+          q = q.filter("title", "ilike", `%${queryValue}%`);
         }
 
         const { data, error: qErr } = await q;
@@ -122,7 +125,12 @@ export default function CategoryViewPage() {
         setOffset(nextOffset + rows.length);
         setHasMore(rows.length === pageSize);
       } catch (e: any) {
-        setError(t('category_jobs_load_error').replace('{error}', e?.message ?? String(e)));
+        setError(
+          t("category_jobs_load_error").replace(
+            "{error}",
+            e?.message ?? String(e),
+          ),
+        );
         setHasMore(false);
       } finally {
         setLoading(false);
@@ -149,7 +157,7 @@ export default function CategoryViewPage() {
         if (!hasMoreRef.current) return;
         void loadMore(offset);
       },
-      { root: null, rootMargin: '200px', threshold: 0 },
+      { root: null, rootMargin: "200px", threshold: 0 },
     );
 
     obs.observe(el);
@@ -169,15 +177,15 @@ export default function CategoryViewPage() {
         <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder={t('search_job')}
+          placeholder={t("search_job")}
           className="pl-11 pr-11"
         />
         {inputValue.trim() ? (
           <button
             type="button"
-            onClick={() => setInputValue('')}
+            onClick={() => setInputValue("")}
             className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full"
-            aria-label={t('clear')}
+            aria-label={t("clear")}
           >
             <div className="grid h-8 w-8 place-items-center rounded-full bg-muted">
               <i className="ri-close-line text-[18px] text-muted-foreground" />
@@ -190,16 +198,12 @@ export default function CategoryViewPage() {
 
       {error ? (
         <div className="py-4 text-sm text-muted-foreground">{error}</div>
-      ) : (!loading && items.length === 0) ? (
-        <div className="py-10 text-center text-[14px] text-muted-foreground">
-          {t('no_job_in_category')}
-        </div>
+      ) : !loading && items.length === 0 ? (
+        <EmptyState label={t("no_job_in_category")} />
       ) : (
         <div>
           <FlutterJobListGroup jobs={items} />
-            {hasMore ? (
-              <div ref={sentinelRef} className="py-4" />
-            ) : null}
+          {hasMore ? <div ref={sentinelRef} className="py-4" /> : null}
         </div>
       )}
     </div>

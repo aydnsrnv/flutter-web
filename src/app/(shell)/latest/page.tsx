@@ -1,11 +1,12 @@
-import { SectionHeader } from '@/components/section-header';
-import { createClient } from '@/lib/supabase/server';
-import type { FlutterJobItemData } from '@/components/flutter-job-item';
+import { SectionHeader } from "@/components/section-header";
+import { createClient } from "@/lib/supabase/server";
+import type { FlutterJobItemData } from "@/components/flutter-job-item";
+import { EmptyState } from "@/components/empty-state";
 
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getLocaleFromCookies } from '@/lib/i18n/server';
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocaleFromCookies } from "@/lib/i18n/server";
 
-import { LatestJobsClient } from '@/app/(shell)/latest/latest-client';
+import { LatestJobsClient } from "@/app/(shell)/latest/latest-client";
 
 type JobRow = {
   id: string | number;
@@ -28,12 +29,12 @@ export default async function LatestPage() {
   const supabase = await createClient();
   const limit = 20;
   const { data, error } = await supabase
-    .from('jobs')
+    .from("jobs")
     .select(
-      'id, job_number, title, company_name, company_logo, city, view_count, create_time, min_salary, max_salary',
+      "id, job_number, title, company_name, company_logo, city, view_count, create_time, min_salary, max_salary",
     )
-    .eq('status', true)
-    .order('create_time', { ascending: false })
+    .eq("status", true)
+    .order("create_time", { ascending: false })
     .limit(limit);
 
   const jobs = (data ?? []) as JobRow[];
@@ -43,7 +44,7 @@ export default async function LatestPage() {
     job_number: j.job_number,
     title: j.title,
     company_name: j.company_name,
-    company_logo: j.company_logo ?? '',
+    company_logo: j.company_logo ?? "",
     city: j.city,
     create_time: j.create_time,
     min_salary: j.min_salary,
@@ -58,9 +59,7 @@ export default async function LatestPage() {
             {error.message}
           </div>
         ) : jobs.length === 0 ? (
-          <div className="px-4 py-4 text-sm text-muted-foreground">
-            {t('no_data')}
-          </div>
+          <EmptyState label={t("no_data")} />
         ) : (
           <LatestJobsClient
             initialJobs={jobs.map(toFlutterJobItem)}

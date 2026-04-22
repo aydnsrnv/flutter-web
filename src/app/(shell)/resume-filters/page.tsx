@@ -53,8 +53,7 @@ export default function ResumeFiltersPage() {
   const [maxSalary, setMaxSalary] = useState("");
   const [skills, setSkills] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [languageName, setLanguageName] = useState("");
-  const [languageLevel, setLanguageLevel] = useState("");
+  const [pendingLanguageName, setPendingLanguageName] = useState("");
 
   const cityOptions: Opt[] = useMemo(() => {
     const keys = [
@@ -198,17 +197,16 @@ export default function ResumeFiltersPage() {
     [selectedLanguages],
   );
 
-  function addLanguage() {
-    const name = languageName.trim();
-    const level = languageLevel.trim();
-    if (!name || !level) return;
+  function addLanguageWithLevel(name: string, level: string) {
+    const normalizedName = name.trim();
+    const normalizedLevel = level.trim();
+    if (!normalizedName || !normalizedLevel) return;
 
-    const entry = `${name} (${level})`;
+    const entry = `${normalizedName} (${normalizedLevel})`;
     setSelectedLanguages((prev) =>
       prev.includes(entry) ? prev : [...prev, entry],
     );
-    setLanguageName("");
-    setLanguageLevel("");
+    setPendingLanguageName("");
   }
 
   function removeLanguage(entry: string) {
@@ -228,8 +226,7 @@ export default function ResumeFiltersPage() {
     setMaxSalary("");
     setSkills("");
     setSelectedLanguages([]);
-    setLanguageName("");
-    setLanguageLevel("");
+    setPendingLanguageName("");
   }
 
   function applyFilters() {
@@ -389,32 +386,23 @@ export default function ResumeFiltersPage() {
             </div>
             <div className="grid gap-3">
               <SingleSelectDropdown
-                value={languageName}
-                onChange={setLanguageName}
+                value={pendingLanguageName}
+                onChange={setPendingLanguageName}
                 placeholder={t("filtersSelectLanguage")}
                 options={languageOptions}
               />
 
-              <SingleSelectDropdown
-                value={languageLevel}
-                onChange={setLanguageLevel}
-                placeholder={t("filtersSelectLevel")}
-                options={languageLevelOptions}
-              />
-
-              <button
-                type="button"
-                onClick={addLanguage}
-                className="h-11 rounded-[14px] border"
-                style={{
-                  borderColor: "#245BEB",
-                  color: "#245BEB",
-                  fontWeight: 600,
-                  backgroundColor: "transparent",
-                }}
-              >
-                {t("add")}
-              </button>
+              {pendingLanguageName ? (
+                <SingleSelectDropdown
+                  value=""
+                  onChange={(level) => {
+                    if (!pendingLanguageName || !level) return;
+                    addLanguageWithLevel(pendingLanguageName, level);
+                  }}
+                  placeholder={t("filtersSelectLevel")}
+                  options={languageLevelOptions}
+                />
+              ) : null}
 
               {selectedLanguages.length > 0 ? (
                 <div className="flex flex-wrap gap-2">

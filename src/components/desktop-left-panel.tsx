@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Archive,
@@ -11,24 +11,24 @@ import {
   Moon,
   SecuritySafe,
   Sun1,
-} from 'iconsax-react';
+} from "iconsax-react";
 
-import { useI18n } from '@/lib/i18n/client';
-import type { Locale } from '@/lib/i18n/types';
+import { useI18n } from "@/lib/i18n/client";
+import type { Locale } from "@/lib/i18n/types";
 
-type ThemeMode = 'light' | 'dark';
+type ThemeMode = "light" | "dark";
 
 function getInitialTheme(): ThemeMode {
-  if (typeof document === 'undefined') return 'light';
+  if (typeof document === "undefined") return "light";
 
   const cookie = document.cookie
-    .split(';')
+    .split(";")
     .map((p) => p.trim())
-    .find((p) => p.startsWith('jobly_theme='));
-  const cookieValue = cookie?.split('=')[1];
-  if (cookieValue === 'dark' || cookieValue === 'light') return cookieValue;
+    .find((p) => p.startsWith("jobly_theme="));
+  const cookieValue = cookie?.split("=")[1];
+  if (cookieValue === "dark" || cookieValue === "light") return cookieValue;
 
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
 }
 
 function setThemeCookie(next: ThemeMode) {
@@ -38,40 +38,54 @@ function setThemeCookie(next: ThemeMode) {
 export function DesktopLeftPanel() {
   const { t, locale, setLocale } = useI18n();
 
-  const [theme, setTheme] = useState<ThemeMode>('light');
+  const [theme, setTheme] = useState<ThemeMode>("light");
   const [langOpen, setLangOpen] = useState(false);
 
   useEffect(() => {
     const initial = getInitialTheme();
     setTheme(initial);
     const root = document.documentElement;
-    if (initial === 'dark') root.classList.add('dark');
-    else root.classList.remove('dark');
+    if (initial === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
     setThemeCookie(initial);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    const next: ThemeMode = theme === 'dark' ? 'light' : 'dark';
+    const next: ThemeMode = theme === "dark" ? "light" : "dark";
     setTheme(next);
 
     const root = document.documentElement;
-    if (next === 'dark') root.classList.add('dark');
-    else root.classList.remove('dark');
+    if (next === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
 
     setThemeCookie(next);
   }, [theme]);
 
-  const locales = useMemo<Array<{ value: Locale; label: string }>>(
+  const locales = useMemo<
+    Array<{ value: Locale; label: string; flagSrc: string }>
+  >(
     () => [
-      { value: 'az', label: t('resume_wizard_lang_azerbaijani') },
-      { value: 'en', label: t('resume_wizard_lang_english') },
-      { value: 'ru', label: t('resume_wizard_lang_russian') },
+      {
+        value: "az",
+        label: t("resume_wizard_lang_azerbaijani"),
+        flagSrc: "/flags/az.png",
+      },
+      {
+        value: "en",
+        label: t("resume_wizard_lang_english"),
+        flagSrc: "/flags/usa.png",
+      },
+      {
+        value: "ru",
+        label: t("resume_wizard_lang_russian"),
+        flagSrc: "/flags/rus.png",
+      },
     ],
     [t],
   );
 
-  const iconBg = 'rgba(36,91,235,0.10)';
-  const iconColor = 'var(--jobly-main, #245BEB)';
+  const iconBg = "rgba(36,91,235,0.10)";
+  const iconColor = "var(--jobly-main, #245BEB)";
 
   function Separator() {
     return <div className="h-[0.35px] w-full bg-black/15 dark:bg-white/15" />;
@@ -122,7 +136,7 @@ export function DesktopLeftPanel() {
         onClick={onClick}
         onKeyDown={(e) => {
           if (!onClick) return;
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             onClick();
           }
@@ -159,13 +173,13 @@ export function DesktopLeftPanel() {
         <div className="overflow-hidden rounded-2xl">
           <RowContainer
             icon={
-              theme === 'dark' ? (
+              theme === "dark" ? (
                 <Sun1 size={34} variant="Linear" color={iconColor} />
               ) : (
                 <Moon size={34} variant="Linear" color={iconColor} />
               )
             }
-            title={theme === 'dark' ? t('menuLightMode') : t('menuDarkMode')}
+            title={theme === "dark" ? t("menuLightMode") : t("menuDarkMode")}
             trailing={
               <div className="flex items-center">
                 <button
@@ -177,14 +191,16 @@ export function DesktopLeftPanel() {
                   className="relative h-6 w-11 rounded-full"
                   style={{
                     backgroundColor:
-                      theme === 'dark' ? 'var(--jobly-main, #245BEB)' : 'rgba(0,0,0,0.20)',
+                      theme === "dark"
+                        ? "var(--jobly-main, #245BEB)"
+                        : "rgba(0,0,0,0.20)",
                   }}
-                  aria-label={t('toggle_theme')}
+                  aria-label={t("toggle_theme")}
                 >
                   <span
                     className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-[left]"
                     style={{
-                      left: theme === 'dark' ? 22 : 2,
+                      left: theme === "dark" ? 22 : 2,
                     }}
                   />
                 </button>
@@ -196,50 +212,87 @@ export function DesktopLeftPanel() {
 
           <RowContainer
             icon={<Global size={34} variant="Linear" color={iconColor} />}
-            title={t('changeLanguage')}
-            trailing={<i className="ri-arrow-right-s-line text-[22px]" style={{ color: '#9CA3AF' }} />}
+            title={t("changeLanguage")}
+            trailing={
+              <i
+                className="ri-arrow-right-s-line text-[22px]"
+                style={{ color: "#9CA3AF" }}
+              />
+            }
             onClick={() => setLangOpen(true)}
           />
           <Separator />
 
           <RowContainer
             icon={<Archive size={34} variant="Linear" color={iconColor} />}
-            title={t('menuFavorites')}
-            trailing={<i className="ri-arrow-right-s-line text-[22px]" style={{ color: '#9CA3AF' }} />}
+            title={t("menuFavorites")}
+            trailing={
+              <i
+                className="ri-arrow-right-s-line text-[22px]"
+                style={{ color: "#9CA3AF" }}
+              />
+            }
             href="/favorites"
           />
           <Separator />
 
           <RowContainer
             icon={<InfoCircle size={34} variant="Linear" color={iconColor} />}
-            title={t('aboutUs')}
-            trailing={<i className="ri-arrow-right-s-line text-[22px]" style={{ color: '#9CA3AF' }} />}
+            title={t("aboutUs")}
+            trailing={
+              <i
+                className="ri-arrow-right-s-line text-[22px]"
+                style={{ color: "#9CA3AF" }}
+              />
+            }
             href="/about-us"
           />
           <Separator />
 
           <RowContainer
             icon={<SecuritySafe size={34} variant="Linear" color={iconColor} />}
-            title={t('privacyPolicyTitle')}
-            trailing={<i className="ri-arrow-right-s-line text-[22px]" style={{ color: '#9CA3AF' }} />}
+            title={t("privacyPolicyTitle")}
+            trailing={
+              <i
+                className="ri-arrow-right-s-line text-[22px]"
+                style={{ color: "#9CA3AF" }}
+              />
+            }
             href="/privacy-policy"
           />
         </div>
 
         <div className="mt-3 rounded-2xl px-4 py-5">
-          <div className="text-center text-[18px] font-medium">{t('social_media_title')}</div>
+          <div className="text-center text-[18px] font-medium">
+            {t("social_media_title")}
+          </div>
           <div className="mt-4 flex items-center justify-center gap-6">
             <SocialCircle
               href="https://www.linkedin.com/company/jobly-app/"
-              icon={<i className="ri-linkedin-fill text-[22px]" aria-label={t('social_linkedin')} />}
+              icon={
+                <i
+                  className="ri-linkedin-fill text-[22px]"
+                  aria-label={t("social_linkedin")}
+                />
+              }
             />
             <SocialCircle
               href="https://www.instagram.com/jobly_official"
-              icon={<i className="ri-instagram-fill text-[22px]" aria-label={t('social_instagram')} />}
+              icon={
+                <i
+                  className="ri-instagram-fill text-[22px]"
+                  aria-label={t("social_instagram")}
+                />
+              }
             />
             <SocialCircle
               href="https://t.me/jobly_official"
-              icon={<i className="ri-telegram-fill text-[22px]" aria-label={t('social_telegram')} />}
+              icon={
+                <i
+                  className="ri-telegram-fill text-[22px]"
+                  aria-label={t("social_telegram")}
+                />
+              }
             />
           </div>
         </div>
@@ -251,14 +304,24 @@ export function DesktopLeftPanel() {
             type="button"
             className="absolute inset-0"
             onClick={() => setLangOpen(false)}
-            style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
+            style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
           />
           <div className="absolute left-0 right-0 top-1/2 mx-auto w-full max-w-[360px] -translate-y-1/2 px-4">
             <div className="rounded-2xl border border-border bg-card shadow-2xl">
               <div className="flex items-center justify-between px-4 py-3">
-                <div className="text-[16px] font-semibold">{t('selectLang')}</div>
-                <button type="button" onClick={() => setLangOpen(false)} aria-label={t('close')}>
-                  <CloseCircle size={22} variant="Linear" color="rgba(0,0,0,0.55)" />
+                <div className="text-[16px] font-semibold">
+                  {t("selectLang")}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setLangOpen(false)}
+                  aria-label={t("close")}
+                >
+                  <CloseCircle
+                    size={22}
+                    variant="Linear"
+                    color="rgba(0,0,0,0.55)"
+                  />
                 </button>
               </div>
               <div className="h-[0.35px] w-full bg-black/15 dark:bg-white/15" />
@@ -276,22 +339,33 @@ export function DesktopLeftPanel() {
                         setLangOpen(false);
                       }}
                       style={{
-                        backgroundColor: selected ? iconBg : 'transparent',
+                        backgroundColor: selected ? iconBg : "transparent",
                       }}
                     >
-                      <div
-                        className="text-[15px]"
-                        style={{
-                          color: selected ? iconColor : 'inherit',
-                          fontWeight: selected ? 700 : 400,
-                        }}
-                      >
-                        {l.label}
+                      <div className="flex items-center gap-3">
+                        <div className="overflow-hidden rounded-md">
+                          <img
+                            src={l.flagSrc}
+                            alt={l.label}
+                            className="h-[30px] w-[30px] object-cover"
+                          />
+                        </div>
+                        <div
+                          className="text-[16px]"
+                          style={{
+                            color: selected ? iconColor : "inherit",
+                            fontWeight: selected ? 700 : 400,
+                          }}
+                        >
+                          {l.label}
+                        </div>
                       </div>
                       {selected ? (
-                        <div className="text-[12px] font-semibold" style={{ color: iconColor }}>
-                          ✓
-                        </div>
+                        <i
+                          className="ri-checkbox-circle-fill text-[21px]"
+                          style={{ color: iconColor }}
+                          aria-hidden="true"
+                        />
                       ) : null}
                     </button>
                   );

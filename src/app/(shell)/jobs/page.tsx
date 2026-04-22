@@ -1,14 +1,15 @@
-import { FlutterJobListGroup } from '@/components/flutter-job-list-group';
-import type { FlutterJobItemData } from '@/components/flutter-job-item';
-import { SectionHeader } from '@/components/section-header';
-import { createClient } from '@/lib/supabase/server';
+import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
+import { EmptyState } from "@/components/empty-state";
+import type { FlutterJobItemData } from "@/components/flutter-job-item";
+import { SectionHeader } from "@/components/section-header";
+import { createClient } from "@/lib/supabase/server";
 
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getLocaleFromCookies } from '@/lib/i18n/server';
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocaleFromCookies } from "@/lib/i18n/server";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store";
 
 type JobRow = {
   id: string | number;
@@ -75,7 +76,7 @@ export default async function JobsPage({
   const experience = sp?.experience?.trim();
   const education = sp?.education?.trim();
   const gender = sp?.gender?.trim();
-  const premiumOnly = sp?.premiumOnly === '1';
+  const premiumOnly = sp?.premiumOnly === "1";
   const minAge = sp?.minAge?.trim();
   const maxAge = sp?.maxAge?.trim();
   const minSalary = sp?.minSalary?.trim();
@@ -83,33 +84,34 @@ export default async function JobsPage({
   const positionContains = sp?.positionContains?.trim();
 
   let query = supabase
-    .from('jobs')
+    .from("jobs")
     .select(
-      'id, job_number, title, company_name, company_logo, city, create_time, min_salary, max_salary',
+      "id, job_number, title, company_name, company_logo, city, create_time, min_salary, max_salary",
     )
-    .eq('status', true);
+    .eq("status", true);
 
   // Flutter parity: title ilike
-  if (q) query = query.filter('title', 'ilike', `%${q}%`);
-  if (positionContains) query = query.filter('title', 'ilike', `%${positionContains}%`);
+  if (q) query = query.filter("title", "ilike", `%${q}%`);
+  if (positionContains)
+    query = query.filter("title", "ilike", `%${positionContains}%`);
 
-  if (city) query = query.eq('city', city);
-  if (categoryKey) query = query.eq('category_name', categoryKey);
-  if (companyName) query = query.eq('company_name', companyName);
-  if (jobType) query = query.eq('job_type', jobType);
-  if (experience) query = query.eq('experience', experience);
-  if (education) query = query.eq('education', education);
-  if (gender) query = query.eq('gender', gender);
-  if (premiumOnly) query = query.eq('is_premium', true);
+  if (city) query = query.eq("city", city);
+  if (categoryKey) query = query.eq("category_name", categoryKey);
+  if (companyName) query = query.eq("company_name", companyName);
+  if (jobType) query = query.eq("job_type", jobType);
+  if (experience) query = query.eq("experience", experience);
+  if (education) query = query.eq("education", education);
+  if (gender) query = query.eq("gender", gender);
+  if (premiumOnly) query = query.eq("is_premium", true);
 
-  if (minAge) query = query.gte('min_age', minAge);
-  if (maxAge) query = query.lte('max_age', maxAge);
-  if (minSalary) query = query.gte('min_salary', minSalary);
-  if (maxSalary) query = query.lte('max_salary', maxSalary);
+  if (minAge) query = query.gte("min_age", minAge);
+  if (maxAge) query = query.lte("max_age", maxAge);
+  if (minSalary) query = query.gte("min_salary", minSalary);
+  if (maxSalary) query = query.lte("max_salary", maxSalary);
 
   const { data, error } = await query
-    .order('is_premium', { ascending: false })
-    .order('create_time', { ascending: false })
+    .order("is_premium", { ascending: false })
+    .order("create_time", { ascending: false })
     .limit(50);
 
   const jobs = (data ?? []) as JobRow[];
@@ -129,12 +131,42 @@ export default async function JobsPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-border bg-card">
-        {(q || positionContains || city || categoryKey || companyName || jobType || experience || education || gender || premiumOnly || minAge || maxAge || minSalary || maxSalary) ? (
+        {q ||
+        positionContains ||
+        city ||
+        categoryKey ||
+        companyName ||
+        jobType ||
+        experience ||
+        education ||
+        gender ||
+        premiumOnly ||
+        minAge ||
+        maxAge ||
+        minSalary ||
+        maxSalary ? (
           <div className="px-4 pt-3 text-xs text-muted-foreground">
-            {q ? <span>{t('search_label')}: <span className="font-semibold">{q}</span></span> : null}
-            {positionContains ? <span className="ml-3">{t('position_label')}: <span className="font-semibold">{positionContains}</span></span> : null}
-            {companyName ? <span className="ml-3">{t('company_label')}: <span className="font-semibold">{companyName}</span></span> : null}
-            <span className="ml-3">{t('results_label')}: <span className="font-semibold">{jobs.length}</span></span>
+            {q ? (
+              <span>
+                {t("search_label")}: <span className="font-semibold">{q}</span>
+              </span>
+            ) : null}
+            {positionContains ? (
+              <span className="ml-3">
+                {t("position_label")}:{" "}
+                <span className="font-semibold">{positionContains}</span>
+              </span>
+            ) : null}
+            {companyName ? (
+              <span className="ml-3">
+                {t("company_label")}:{" "}
+                <span className="font-semibold">{companyName}</span>
+              </span>
+            ) : null}
+            <span className="ml-3">
+              {t("results_label")}:{" "}
+              <span className="font-semibold">{jobs.length}</span>
+            </span>
           </div>
         ) : null}
         {error ? (
@@ -142,9 +174,7 @@ export default async function JobsPage({
             {error.message}
           </div>
         ) : jobs.length === 0 ? (
-          <div className="px-4 py-4 text-sm text-muted-foreground">
-            {t('no_data')}
-          </div>
+          <EmptyState label={t("no_data")} />
         ) : (
           <div className="p-2">
             <FlutterJobListGroup jobs={jobs.map(toFlutterJobItem)} />
