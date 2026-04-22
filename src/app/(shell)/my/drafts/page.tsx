@@ -46,7 +46,6 @@ export default async function MyDraftsPage() {
   const userType = (userData?.user_type ?? "candidate").toLowerCase();
   const isCandidate = userType === "candidate";
   const draftType = isCandidate ? "resume" : "job";
-  const draftType = isCandidate ? "resume" : "job";
 
   const result = isCandidate
     ? await supabase
