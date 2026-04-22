@@ -46,19 +46,23 @@ export default async function MyDraftsInterceptPage() {
   const userType = (userData?.user_type ?? "candidate").toLowerCase();
   const isCandidate = userType === "candidate";
   const draftType = isCandidate ? "resume" : "job";
-  const tableName = isCandidate ? "resume_drafts" : "job_drafts";
+  const queryResult = isCandidate
+    ? await supabase
+        .from("resume_drafts")
+        .select("id, title, city, create_time")
+        .eq("creator_id", uid)
+        .order("create_time", { ascending: false })
+        .limit(50)
+    : await supabase
+        .from("job_drafts")
+        .select(
+          "id, title, city, company_name, company_logo, min_salary, max_salary, create_time",
+        )
+        .eq("creator_id", uid)
+        .order("create_time", { ascending: false })
+        .limit(50);
 
-  const selectColumns = isCandidate
-    ? "id, title, city, create_time"
-    : "id, title, city, company_name, company_logo, min_salary, max_salary, create_time";
-
-  const { data, error } = await supabase
-    .from(tableName)
-    .select(selectColumns)
-    .eq("creator_id", uid)
-    .order("create_time", { ascending: false })
-    .limit(50);
-
+  const { data, error } = queryResult;
   const drafts = (data ?? []) as DraftRow[];
 
   return (
