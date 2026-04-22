@@ -1,20 +1,23 @@
-import { JobDetailPanel, type JobDetailPanelData } from '@/components/job-detail-panel';
-import { createClient } from '@/lib/supabase/server';
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getLocaleFromCookies } from '@/lib/i18n/server';
-import { incrementJobViewCount } from '@/app/actions/stats';
-import type { Metadata } from 'next';
+import {
+  JobDetailPanel,
+  type JobDetailPanelData,
+} from "@/components/job-detail-panel";
+import { createClient } from "@/lib/supabase/server";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocaleFromCookies } from "@/lib/i18n/server";
+import { incrementJobViewCount } from "@/app/actions/stats";
+import type { Metadata } from "next";
 
 function toSnakeCase(input: string) {
   return input
-    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
-    .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1_$2")
     .toLowerCase();
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store";
 
 type PageParams = { job_number: string };
 
@@ -30,16 +33,20 @@ export async function generateMetadata({
   const jobNumber = Number.isFinite(parsed) ? parsed : job_number;
 
   const { data } = await supabase
-    .from('jobs')
-    .select('title, company_name, city')
-    .eq('job_number', jobNumber)
+    .from("jobs")
+    .select("title, company_name, city")
+    .eq("job_number", jobNumber)
     .maybeSingle();
 
-  const title = (data as any)?.title ? String((data as any).title) : 'Vakansiya';
-  const company = (data as any)?.company_name ? String((data as any).company_name) : 'Jobly';
-  const city = (data as any)?.city ? String((data as any).city) : '';
+  const title = (data as any)?.title
+    ? String((data as any).title)
+    : "Vakansiya";
+  const company = (data as any)?.company_name
+    ? String((data as any).company_name)
+    : "Jobly";
+  const city = (data as any)?.city ? String((data as any).city) : "";
 
-  const base = new URL('https://jobly.az');
+  const base = new URL("https://jobly.az");
   const canonical = `/job/${encodeURIComponent(String(job_number))}`;
   const desc = city
     ? `${title} vakansiyası — ${company}. Şəhər: ${city}. Jobly-da vakansiyalara bax, iş tap və iş axtar.`
@@ -50,9 +57,33 @@ export async function generateMetadata({
     description: desc,
     alternates: { canonical },
     openGraph: {
+      type: "website",
+      siteName: "Jobly",
       title: `${title} — ${company}`,
       description: desc,
       url: new URL(canonical, base),
+      images: [
+        {
+          url: new URL(
+            `/job/${encodeURIComponent(String(job_number))}/opengraph-image`,
+            base,
+          ),
+          width: 1200,
+          height: 630,
+          alt: `${title} — ${company}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} — ${company}`,
+      description: desc,
+      images: [
+        new URL(
+          `/job/${encodeURIComponent(String(job_number))}/opengraph-image`,
+          base,
+        ),
+      ],
     },
   };
 }
@@ -113,11 +144,11 @@ export default async function JobByNumberPage({
   const jobNumber = Number.isFinite(parsed) ? parsed : job_number;
 
   const { data, error } = await supabase
-    .from('jobs')
+    .from("jobs")
     .select(
-      'id, job_number, title, job_type, category_name, company_id, company_name, company_logo, city, create_time, expiration_date, min_age, max_age, education, experience, gender, min_salary, max_salary, view_count, applied_count, request, about, number, mail, apply_link',
+      "id, job_number, title, job_type, category_name, company_id, company_name, company_logo, city, create_time, expiration_date, min_age, max_age, education, experience, gender, min_salary, max_salary, view_count, applied_count, request, about, number, mail, apply_link",
     )
-    .eq('job_number', jobNumber)
+    .eq("job_number", jobNumber)
     .maybeSingle();
 
   const job = data as JobRow | null;
@@ -133,7 +164,9 @@ export default async function JobByNumberPage({
   if (!job) {
     return (
       <div className="rounded-2xl border border-border bg-card p-4">
-        <div className="text-sm text-muted-foreground">{t('job_not_found')}</div>
+        <div className="text-sm text-muted-foreground">
+          {t("job_not_found")}
+        </div>
       </div>
     );
   }
@@ -143,14 +176,14 @@ export default async function JobByNumberPage({
   job.view_count = (job.view_count || 0) + 1;
 
   const { data: similarData } = await supabase
-    .from('jobs')
+    .from("jobs")
     .select(
-      'id, job_number, title, company_name, company_logo, city, create_time, min_salary, max_salary',
+      "id, job_number, title, company_name, company_logo, city, create_time, min_salary, max_salary",
     )
-    .eq('status', true)
-    .eq('category_name', job.category_name ?? '')
-    .neq('id', job.id)
-    .order('create_time', { ascending: false })
+    .eq("status", true)
+    .eq("category_name", job.category_name ?? "")
+    .neq("id", job.id)
+    .order("create_time", { ascending: false })
     .limit(5);
 
   const similarJobs = (similarData ?? []) as SimilarJobRow[];
@@ -163,7 +196,7 @@ export default async function JobByNumberPage({
     category_name: job.category_name ?? null,
     company_id: job.company_id,
     company_name: job.company_name,
-    company_logo: job.company_logo ?? '',
+    company_logo: job.company_logo ?? "",
     city: job.city ?? null,
     create_time: job.create_time ?? null,
     expiration_date: job.expiration_date ?? null,
@@ -194,32 +227,35 @@ export default async function JobByNumberPage({
     })),
   };
 
-  const base = 'https://jobly.az';
+  const base = "https://jobly.az";
   const jobUrl = `${base}/job/${encodeURIComponent(String(job_number))}`;
   const ldJson = {
-    '@context': 'https://schema.org',
-    '@type': 'JobPosting',
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
     title: job.title,
     datePosted: job.create_time ?? undefined,
     validThrough: job.expiration_date ?? undefined,
     hiringOrganization: {
-      '@type': 'Organization',
+      "@type": "Organization",
       name: job.company_name,
-      sameAs: job.company_id ? `${base}/company/${encodeURIComponent(String(job.company_id))}` : undefined,
+      sameAs: job.company_id
+        ? `${base}/company/${encodeURIComponent(String(job.company_id))}`
+        : undefined,
       logo: job.company_logo ?? undefined,
     },
     jobLocation: job.city
       ? {
-          '@type': 'Place',
+          "@type": "Place",
           address: {
-            '@type': 'PostalAddress',
+            "@type": "PostalAddress",
             addressLocality: job.city,
-            addressCountry: 'AZ',
+            addressCountry: "AZ",
           },
         }
       : undefined,
     url: jobUrl,
-    description: [job.about, job.request].filter(Boolean).join('\n\n') || undefined,
+    description:
+      [job.about, job.request].filter(Boolean).join("\n\n") || undefined,
   };
 
   return (

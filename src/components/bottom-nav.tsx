@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { usePathname } from "next/navigation";
 import { HambergerMenu } from "iconsax-react";
 import { cn } from "@/lib/utils";
 
@@ -39,8 +38,6 @@ export function BottomNav({
   onMenuOpen?: () => void;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [, startTransition] = useTransition();
   const { t } = useI18n();
 
   const navClassName =
@@ -67,13 +64,6 @@ export function BottomNav({
                   key={it.href}
                   href={it.href}
                   prefetch
-                  onClick={(e) => {
-                    e.preventDefault();
-                    startTransition(() => {
-                      router.push(it.href);
-                      setTimeout(() => router.refresh(), 0);
-                    });
-                  }}
                   className={cn(
                     "flex flex-col items-center justify-center gap-1 px-2 py-2 text-xs",
                   )}

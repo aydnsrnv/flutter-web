@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import { ShellLayoutClient } from '@/components/shell-layout-client';
-import { StatsPanel } from '@/components/stats-panel';
+import { Suspense } from "react";
+import { ShellLayoutClient } from "@/components/shell-layout-client";
+import { StatsPanel } from "@/components/stats-panel";
 
 function StatsPanelSkeleton() {
   return (
@@ -11,7 +11,11 @@ function StatsPanelSkeleton() {
       <div className="mx-4 mb-3 h-9 rounded-2xl bg-muted" />
       <div className="grid grid-cols-2 gap-3 px-4 pb-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="rounded-2xl bg-muted" style={{ minHeight: 110 }} />
+          <div
+            key={i}
+            className="rounded-2xl bg-muted"
+            style={{ minHeight: 110 }}
+          />
         ))}
       </div>
     </div>
@@ -28,14 +32,15 @@ export default function ShellLayout({
   return (
     <>
       <ShellLayoutClient
-        children={children}
         detail={detail}
         aside={
           <Suspense fallback={<StatsPanelSkeleton />}>
             <StatsPanel />
           </Suspense>
         }
-      />
+      >
+        {children}
+      </ShellLayoutClient>
     </>
   );
 }

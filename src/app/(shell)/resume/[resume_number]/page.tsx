@@ -1,20 +1,28 @@
-import { ResumeDetailPanel, type ResumeDetailPanelData } from '@/components/resume-detail-panel';
-import { createClient } from '@/lib/supabase/server';
-import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getLocaleFromCookies } from '@/lib/i18n/server';
-import { incrementResumeViewCount } from '@/app/actions/stats';
-import type { Metadata } from 'next';
+import {
+  ResumeDetailPanel,
+  type ResumeDetailPanelData,
+} from "@/components/resume-detail-panel";
+import { createClient } from "@/lib/supabase/server";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocaleFromCookies } from "@/lib/i18n/server";
+import { incrementResumeViewCount } from "@/app/actions/stats";
+import type { Metadata } from "next";
+
+const siteName = "Jobly";
+const siteUrl = "https://jobly.az";
+const siteHost = "jobly.az";
+const siteLogo = `${siteUrl}/jobly_icon.jpg`;
 
 function toSnakeCase(input: string) {
   return input
-    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
-    .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1_$2")
     .toLowerCase();
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store";
 
 type PageParams = { resume_number: string };
 
@@ -30,29 +38,56 @@ export async function generateMetadata({
   const resumeNumber = Number.isFinite(parsed) ? parsed : resume_number;
 
   const { data } = await supabase
-    .from('resumes')
-    .select('full_name, desired_position, city')
-    .eq('resume_number', resumeNumber)
+    .from("resumes")
+    .select("full_name, desired_position, city")
+    .eq("resume_number", resumeNumber)
     .maybeSingle();
 
-  const fullName = (data as any)?.full_name ? String((data as any).full_name) : 'CV';
-  const position = (data as any)?.desired_position ? String((data as any).desired_position) : 'CV';
-  const city = (data as any)?.city ? String((data as any).city) : '';
+  const fullName = (data as any)?.full_name
+    ? String((data as any).full_name)
+    : "CV";
+  const position = (data as any)?.desired_position
+    ? String((data as any).desired_position)
+    : "CV";
+  const city = (data as any)?.city ? String((data as any).city) : "";
 
-  const base = new URL('https://jobly.az');
+  const base = new URL(siteUrl);
   const canonical = `/resume/${encodeURIComponent(String(resume_number))}`;
+  const absoluteUrl = new URL(canonical, base);
   const desc = city
     ? `${fullName} — ${position}. Şəhər: ${city}. Jobly-da CV-lərə bax və namizədlər tap.`
     : `${fullName} — ${position}. Jobly-da CV-lərə bax və namizədlər tap.`;
+  const ogTitle = `${fullName} — ${position}`;
+  const ogDescription = desc;
+  const ogImages = [
+    {
+      url: new URL(
+        `/resume/${encodeURIComponent(String(resume_number))}/opengraph-image`,
+        base,
+      ),
+      width: 1200,
+      height: 630,
+      alt: `${ogTitle} | ${siteHost}`,
+    },
+  ];
 
   return {
-    title: `${fullName} — ${position}`,
-    description: desc,
+    title: ogTitle,
+    description: ogDescription,
     alternates: { canonical },
     openGraph: {
-      title: `${fullName} — ${position}`,
-      description: desc,
-      url: new URL(canonical, base),
+      type: "profile",
+      siteName,
+      title: ogTitle,
+      description: ogDescription,
+      url: absoluteUrl,
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description: ogDescription,
+      images: ogImages.map((image) => image.url),
     },
   };
 }
@@ -102,11 +137,11 @@ export default async function ResumeByNumberPage({
   const resumeNumber = Number.isFinite(parsed) ? parsed : resume_number;
 
   const { data, error } = await supabase
-    .from('resumes')
+    .from("resumes")
     .select(
-      'id, user_id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, marital_status, education_key, experience_key, skills, languages, about, experiences, educations, certifications, avatar, email, phone, view_count, applied_count, create_time, expiration_date, is_premium',
+      "id, user_id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, marital_status, education_key, experience_key, skills, languages, about, experiences, educations, certifications, avatar, email, phone, view_count, applied_count, create_time, expiration_date, is_premium",
     )
-    .eq('resume_number', resumeNumber)
+    .eq("resume_number", resumeNumber)
     .maybeSingle();
 
   const resume = data as ResumeRow | null;
@@ -122,7 +157,9 @@ export default async function ResumeByNumberPage({
   if (!resume) {
     return (
       <div className="rounded-2xl border border-border bg-card p-4">
-        <div className="text-sm text-muted-foreground">{t('resume_detail_not_found')}</div>
+        <div className="text-sm text-muted-foreground">
+          {t("resume_detail_not_found")}
+        </div>
       </div>
     );
   }
@@ -132,9 +169,13 @@ export default async function ResumeByNumberPage({
 
   const { data: authData } = await supabase.auth.getUser();
   const authUserId = authData?.user?.id ?? null;
-  let authUserType = 'candidate';
+  let authUserType = "candidate";
   if (authUserId) {
-    const { data: userData } = await supabase.from('users').select('user_type').eq('user_id', authUserId).maybeSingle();
+    const { data: userData } = await supabase
+      .from("users")
+      .select("user_type")
+      .eq("user_id", authUserId)
+      .maybeSingle();
     if (userData?.user_type) {
       authUserType = String(userData.user_type).toLowerCase();
     }
@@ -170,19 +211,19 @@ export default async function ResumeByNumberPage({
     authUserType,
   };
 
-  const base = 'https://jobly.az';
+  const base = "https://jobly.az";
   const resumeUrl = `${base}/resume/${encodeURIComponent(String(resume_number))}`;
   const ldJson = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
+    "@context": "https://schema.org",
+    "@type": "Person",
     name: resume.full_name,
     url: resumeUrl,
     image: resume.avatar ?? undefined,
     address: resume.city
       ? {
-          '@type': 'PostalAddress',
+          "@type": "PostalAddress",
           addressLocality: resume.city,
-          addressCountry: 'AZ',
+          addressCountry: "AZ",
         }
       : undefined,
     jobTitle: resume.desired_position ?? undefined,

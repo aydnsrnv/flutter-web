@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { usePathname, useSelectedLayoutSegment } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 
-import { BottomNav } from '@/components/bottom-nav';
-import { DesktopLeftPanel } from '@/components/desktop-left-panel';
-import { AppHeader } from '@/components/app-header';
-import { MobileMenuDrawer } from '@/components/mobile-menu-drawer';
+import { BottomNav } from "@/components/bottom-nav";
+import { DesktopLeftPanel } from "@/components/desktop-left-panel";
+import { AppHeader } from "@/components/app-header";
+import { MobileMenuDrawer } from "@/components/mobile-menu-drawer";
 
-const NAVBAR_PATHS = ['/home', '/candidates', '/companies', '/categories'];
+const NAVBAR_PATHS = ["/home", "/candidates", "/companies", "/categories"];
 
 export function ShellLayoutClient({
   children,
@@ -19,17 +19,30 @@ export function ShellLayoutClient({
   detail: React.ReactNode;
   aside?: React.ReactNode;
 }) {
-  const pathname = usePathname() ?? '';
-  const detailSegment = useSelectedLayoutSegment('detail');
+  const pathname = usePathname() ?? "";
+  const detailSegment = useSelectedLayoutSegment("detail");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  const isNavbarPage = NAVBAR_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`));
-  
+  const [mounted, setMounted] = useState(false);
+
+  const isNavbarPage = NAVBAR_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+
   // If detailSegment exists and is not the default fallback, we have an active detail view.
   // Next.js returns `__DEFAULT__` for default.tsx, or null if no segment.
-  const hasActiveDetail = !!detailSegment && detailSegment !== '__DEFAULT__';
-  
-  const mainContent = isNavbarPage ? children : (hasActiveDetail ? detail : children);
+  const hasActiveDetail = !!detailSegment && detailSegment !== "__DEFAULT__";
+
+  const mainContent = !mounted
+    ? children
+    : isNavbarPage
+      ? children
+      : hasActiveDetail
+        ? detail
+        : children;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,7 +51,9 @@ export function ShellLayoutClient({
           <DesktopLeftPanel />
           <main className="min-w-0">
             <div className="min-h-[calc(100vh-3rem)] pb-24">
-              <div className="mb-5"><AppHeader /></div>
+              <div className="mb-5">
+                <AppHeader />
+              </div>
               {mainContent}
             </div>
             <BottomNav variant="desktop" />
@@ -51,7 +66,9 @@ export function ShellLayoutClient({
         </div>
 
         <div className="lg:hidden">
-          <div className="mb-4"><AppHeader aside={aside} /></div>
+          <div className="mb-4">
+            <AppHeader aside={aside} />
+          </div>
           {mainContent}
         </div>
       </div>

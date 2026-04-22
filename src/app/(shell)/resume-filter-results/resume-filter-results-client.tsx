@@ -1,10 +1,13 @@
-'use client';
+"use client";
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from "react";
 
-import { InfiniteScrollSentinel } from '@/components/infinite-scroll-sentinel';
-import { ResumeListItem, type ResumeListItemData } from '@/components/resume-list-item';
-import { createClient } from '@/lib/supabase/browser';
+import { InfiniteScrollSentinel } from "@/components/infinite-scroll-sentinel";
+import {
+  ResumeListItem,
+  type ResumeListItemData,
+} from "@/components/resume-list-item";
+import { createClient } from "@/lib/supabase/browser";
 
 type ResumeRow = {
   id: string | number;
@@ -63,14 +66,14 @@ function toItem(r: ResumeRow): ResumeListItemData {
 }
 
 function tokenizeFilterValue(value?: string) {
-  return String(value ?? '')
+  return String(value ?? "")
     .split(/[;,]/)
     .map((part) => part.trim().toLowerCase())
     .filter(Boolean);
 }
 
 function desiredSalaryNumber(value?: string | null) {
-  const digitsOnly = String(value ?? '').replace(/\D+/g, '');
+  const digitsOnly = String(value ?? "").replace(/\D+/g, "");
   const n = Number(digitsOnly);
   return Number.isFinite(n) && n > 0 ? n : null;
 }
@@ -82,26 +85,39 @@ function matchesResume(
   skillTokens: string[],
   languageTokens: string[],
 ) {
-  const q = String(filters.q ?? '').trim().toLowerCase();
+  const q = String(filters.q ?? "")
+    .trim()
+    .toLowerCase();
   if (q) {
-    const pos = String(resume.desired_position ?? '').toLowerCase();
-    const name = String(resume.full_name ?? '').toLowerCase();
-    const resumeNo = String(resume.resume_number ?? '').toLowerCase();
+    const pos = String(resume.desired_position ?? "").toLowerCase();
+    const name = String(resume.full_name ?? "").toLowerCase();
+    const resumeNo = String(resume.resume_number ?? "").toLowerCase();
     if (!pos.includes(q) && !name.includes(q) && !resumeNo.includes(q)) {
       return false;
     }
   }
 
-  const positionContains = String(filters.positionContains ?? '').trim().toLowerCase();
+  const positionContains = String(filters.positionContains ?? "")
+    .trim()
+    .toLowerCase();
   if (positionContains) {
-    const pos = String(resume.desired_position ?? '').toLowerCase();
+    const pos = String(resume.desired_position ?? "").toLowerCase();
     if (!pos.includes(positionContains)) return false;
   }
 
-  if (filters.city && String(resume.city ?? '') !== filters.city) return false;
-  if (filters.education && String(resume.education_key ?? '') !== filters.education) return false;
-  if (filters.experience && String(resume.experience_key ?? '') !== filters.experience) return false;
-  if (filters.gender && String(resume.gender_key ?? '') !== filters.gender) return false;
+  if (filters.city && String(resume.city ?? "") !== filters.city) return false;
+  if (
+    filters.education &&
+    String(resume.education_key ?? "") !== filters.education
+  )
+    return false;
+  if (
+    filters.experience &&
+    String(resume.experience_key ?? "") !== filters.experience
+  )
+    return false;
+  if (filters.gender && String(resume.gender_key ?? "") !== filters.gender)
+    return false;
   if (filters.premiumOnly && !resume.is_premium) return false;
 
   if (filters.minAge != null) {
@@ -131,13 +147,14 @@ function matchesResume(
   }
 
   if (skillTokens.length > 0) {
-    const haystack = String(resume.skills ?? '').toLowerCase();
+    const haystack = String(resume.skills ?? "").toLowerCase();
     if (!skillTokens.every((token) => haystack.includes(token))) return false;
   }
 
   if (languageTokens.length > 0) {
-    const haystack = String(resume.languages ?? '').toLowerCase();
-    if (!languageTokens.every((token) => haystack.includes(token))) return false;
+    const haystack = String(resume.languages ?? "").toLowerCase();
+    if (!languageTokens.every((token) => haystack.includes(token)))
+      return false;
   }
 
   return true;
@@ -147,24 +164,34 @@ export function ResumeFilterResultsClient({
   initialItems,
   initialHasMore,
   limit,
+  initialSourceOffset,
   sourcePageSize = 60,
   filters,
 }: {
   initialItems: ResumeListItemData[];
   initialHasMore: boolean;
   limit: number;
+  initialSourceOffset?: number;
   sourcePageSize?: number;
   filters: ResumeFilterParams;
 }) {
   const supabase = useMemo(() => createClient(), []);
   const [items, setItems] = useState<ResumeListItemData[]>(initialItems);
-  const [sourceOffset, setSourceOffset] = useState(initialItems.length > 0 ? sourcePageSize : 0);
+  const [sourceOffset, setSourceOffset] = useState(
+    initialSourceOffset ?? (initialItems.length > 0 ? sourcePageSize : 0),
+  );
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loadingMore, setLoadingMore] = useState(false);
 
   const nowYear = useMemo(() => new Date().getFullYear(), []);
-  const skillTokens = useMemo(() => tokenizeFilterValue(filters.skills), [filters.skills]);
-  const languageTokens = useMemo(() => tokenizeFilterValue(filters.languages), [filters.languages]);
+  const skillTokens = useMemo(
+    () => tokenizeFilterValue(filters.skills),
+    [filters.skills],
+  );
+  const languageTokens = useMemo(
+    () => tokenizeFilterValue(filters.languages),
+    [filters.languages],
+  );
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore) return;
@@ -178,21 +205,25 @@ export function ResumeFilterResultsClient({
 
       while (collected.length < limit && canContinue) {
         const { data, error } = await supabase
-          .from('resumes')
+          .from("resumes")
           .select(
-            'id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, experience_key, education_key, experiences, skills, languages, avatar, view_count, create_time, is_premium, status',
+            "id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, experience_key, education_key, experiences, skills, languages, avatar, view_count, create_time, is_premium, status",
           )
-          .eq('status', true)
-          .order('create_time', { ascending: false })
+          .eq("status", true)
+          .order("create_time", { ascending: false })
           .range(currentOffset, currentOffset + sourcePageSize - 1);
 
         if (error) throw error;
 
-        const rows = (Array.isArray(data) ? (data as ResumeRow[]) : []).filter(Boolean);
+        const rows = (Array.isArray(data) ? (data as ResumeRow[]) : []).filter(
+          Boolean,
+        );
         currentOffset += rows.length;
 
         const filtered = rows
-          .filter((row) => matchesResume(row, filters, nowYear, skillTokens, languageTokens))
+          .filter((row) =>
+            matchesResume(row, filters, nowYear, skillTokens, languageTokens),
+          )
           .map(toItem);
 
         const remaining = limit - collected.length;
