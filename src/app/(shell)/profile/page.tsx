@@ -204,7 +204,7 @@ export default async function ProfilePage() {
             {isCandidate ? (
               <div className="mt-4 w-full">
                 <Link
-                  href="/create/resume/add"
+                  href="/create/cv/add"
                   className="block h-12 w-full rounded-xl text-center text-[16px] font-semibold leading-[48px]"
                   style={{
                     color: '#fff',
@@ -260,7 +260,7 @@ export default async function ProfilePage() {
           <MenuRow
             title={isCandidate ? t('profile_my_cvs') : t('menu_my_jobs')}
             icon={<Briefcase size={34} variant="Linear" />}
-            href={isCandidate ? '/my/resumes' : '/my/jobs'}
+            href={isCandidate ? '/my/cvs' : '/my/jobs'}
           />
           <Separator />
           <MenuRow

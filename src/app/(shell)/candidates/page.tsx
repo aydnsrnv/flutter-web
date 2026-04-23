@@ -334,7 +334,7 @@ export default async function CandidatesPage({
           <SectionHeader
             title={t("home_latest_resumes")}
             titleKey="home_latest_resumes"
-            href="/latest-resumes"
+            href="/latest-cvs"
           />
 
           {latestRows.length === 0 ? (

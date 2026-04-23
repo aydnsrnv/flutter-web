@@ -28,5 +28,5 @@ export default async function CreateGatePage() {
     redirect('/create/job/add');
   }
 
-  redirect('/create/resume/add');
+  redirect('/create/cv/add');
 }

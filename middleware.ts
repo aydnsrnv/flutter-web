@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PROTECTED_PREFIXES = ['/create', '/my', '/profile', '/menu', '/wallet', '/job/add', '/resume', '/payments-history', '/wallet-transactions'];
+const PROTECTED_PREFIXES = ['/create', '/my', '/profile', '/menu', '/wallet', '/job/add', '/cv', '/payments-history', '/wallet-transactions'];
 
 function isProtectedPath(pathname: string) {
   if (pathname === '/logout') return true;

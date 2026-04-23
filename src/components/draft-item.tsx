@@ -76,7 +76,7 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
 
   const handleEdit = () => {
     if (draftType === 'resume') {
-      router.push(`/resume?draft_id=${draft.id}`);
+      router.push(`/cv?draft_id=${draft.id}`);
     } else {
       router.push(`/job/add?draft_id=${draft.id}`);
     }

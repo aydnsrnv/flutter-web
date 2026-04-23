@@ -64,7 +64,7 @@ function AppHeaderInner({
         if (!error && userType === "employer") {
           setCreateHref("/create/job/add");
         } else if (!error && userType === "candidate") {
-          setCreateHref("/create/resume/add");
+          setCreateHref("/create/cv/add");
         } else {
           setCreateHref("/create");
         }
@@ -168,11 +168,11 @@ function AppHeaderInner({
                     ? t("nav_categories")
                     : pathname.includes("/favorites")
                       ? t("nav_favorites")
-                      : pathname.includes("/latest-resumes")
+                      : pathname.includes("/latest-cvs")
                         ? t("home_latest_resumes")
-                        : pathname.includes("/my/resumes")
+                        : pathname.includes("/my/cvs")
                           ? t("profile_my_cvs")
-                          : pathname.includes("/resumes")
+                          : pathname.includes("/cvs")
                             ? t("menu_tab_cvs")
                             : pathname.includes("/my/jobs")
                               ? t("menu_my_jobs")
@@ -186,8 +186,8 @@ function AppHeaderInner({
                                       ? t("spendings_title")
                                       : pathname.includes("/notifications")
                                         ? t("notifications_title")
-                                        : pathname.endsWith("/resume/add") ||
-                                            pathname.endsWith("/resume")
+                                        : pathname.endsWith("/cv/add") ||
+                                            pathname.endsWith("/cv")
                                           ? isEditMode
                                             ? t("edit_resume")
                                             : t("resume_wizard_title")
@@ -199,13 +199,13 @@ function AppHeaderInner({
                                               ? t("latest_vacancies_title")
                                               : pathname.includes("/filters") ||
                                                   pathname.includes(
-                                                    "/resume-filters",
+                                                    "/cv-filters",
                                                   ) ||
                                                   pathname.includes(
                                                     "/filter-results",
                                                   ) ||
                                                   pathname.includes(
-                                                    "/resume-filter-results",
+                                                    "/cv-filter-results",
                                                   )
                                                 ? t("detailed_search")
                                                 : pathname.includes("/profile")

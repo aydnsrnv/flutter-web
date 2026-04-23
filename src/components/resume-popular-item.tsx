@@ -158,8 +158,8 @@ export function ResumePopularItem({
   const { t } = useI18n();
   const href =
     resume.resume_number != null
-      ? `/resume/${resume.resume_number}`
-      : `/resumes/${resume.id}`;
+      ? `/cv/${resume.resume_number}`
+      : `/cvs/${resume.id}`;
   const desiredPosition =
     resume.desired_position ?? t("resume_detail_position_not_specified");
   const expTextRaw = localizedExperienceTextFromResume(resume, t);

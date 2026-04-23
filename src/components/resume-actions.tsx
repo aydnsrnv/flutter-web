@@ -180,7 +180,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
   };
 
   const handleEdit = () => {
-    router.push(`/resume?id=${resumeId}`);
+    router.push(`/cv?id=${resumeId}`);
   };
 
   const handleDelete = async () => {

@@ -36,7 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${base}/resumes`,
+      url: `${base}/cvs`,
       lastModified: now,
       changeFrequency: 'hourly',
       priority: 0.8,
@@ -54,7 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     },
     {
-      url: `${base}/resume-filters`,
+      url: `${base}/cv-filters`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.4,

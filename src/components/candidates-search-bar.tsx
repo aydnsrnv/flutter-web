@@ -74,7 +74,7 @@ export function CandidatesSearchBar({
       </div>
 
       <Link
-        href="/resume-filters"
+        href="/cv-filters"
         aria-label={t("aria_filters")}
         className="absolute right-3 top-1/2 -translate-y-1/2"
         prefetch

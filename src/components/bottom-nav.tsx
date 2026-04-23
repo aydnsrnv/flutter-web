@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HambergerMenu } from "iconsax-react";
+
 import { cn } from "@/lib/utils";
 
 import { useI18n } from "@/lib/i18n/client";
@@ -115,11 +115,7 @@ export function BottomNav({
                   className={cn("inline-flex rounded-2xl px-[18px] py-[2px]")}
                   style={{ backgroundColor: "transparent" }}
                 >
-                  <HambergerMenu
-                    size={24}
-                    variant="Outline"
-                    color="currentColor"
-                  />
+                  <i className="ri-menu-2-line text-[27px] leading-none" />
                 </span>
                 <span
                   className={cn(

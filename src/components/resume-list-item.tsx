@@ -241,8 +241,8 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
   const { t } = useI18n();
   const href =
     resume.resume_number != null
-      ? `/resume/${resume.resume_number}`
-      : `/resumes/${resume.id}`;
+      ? `/cv/${resume.resume_number}`
+      : `/cvs/${resume.id}`;
 
   const manatSymbol = t("currency_azn_symbol");
 
