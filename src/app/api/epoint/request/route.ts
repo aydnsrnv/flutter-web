@@ -4,6 +4,11 @@ import crypto from "crypto";
 
 import { createClient } from "@/lib/supabase/server";
 
+type PendingPaymentRow = {
+  id: string;
+  transaction_code?: number | null;
+};
+
 function random8DigitCode() {
   return 10000000 + Math.floor(Math.random() * 90000000);
 }
@@ -21,6 +26,31 @@ async function generateUniqueTransactionCode(
     if (!error && Array.isArray(data) && data.length === 0) return code;
   }
   return random8DigitCode();
+}
+
+async function findPendingPaymentByRequestKey(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  requestKey: string,
+) {
+  const { data, error } = await supabase
+    .from("payments")
+    .select("id, transaction_code")
+    .eq("request_key", requestKey)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) return null;
+
+  const row = data as PendingPaymentRow | null;
+  const transactionCode = Number(row?.transaction_code ?? 0);
+  if (!row?.id || !Number.isFinite(transactionCode) || transactionCode <= 0) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    transactionCode,
+  };
 }
 
 function encodeData(payload: Record<string, unknown>) {
@@ -49,14 +79,29 @@ export async function POST(req: Request) {
 
     const body = (await req.json().catch(() => null)) as any;
     const amount = Number(body?.amount);
+    const requestKey = String(body?.requestKey ?? "").trim();
+
     if (!Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json({ message: "Invalid amount" }, { status: 400 });
+    }
+
+    if (!requestKey) {
+      return NextResponse.json(
+        { message: "Missing requestKey" },
+        { status: 400 },
+      );
     }
 
     const publicKey = process.env.EPOINT_PUBLIC_KEY;
     if (!publicKey) throw new Error("EPOINT_PUBLIC_KEY is not set");
 
-    const transactionCode = await generateUniqueTransactionCode(supabase);
+    const existingPayment = await findPendingPaymentByRequestKey(
+      supabase,
+      requestKey,
+    );
+    const transactionCode =
+      existingPayment?.transactionCode ??
+      (await generateUniqueTransactionCode(supabase));
     const orderId = String(transactionCode);
 
     const configuredBaseUrl = String(
@@ -121,13 +166,16 @@ export async function POST(req: Request) {
 
     const userEmail = (userRow as any)?.email ?? user.email ?? null;
 
-    await supabase.from("payments").insert({
-      user_id: user.id,
-      user_email: userEmail,
-      amount: Math.round(amount),
-      transaction_code: transactionCode,
-      is_applied: false,
-    });
+    if (!existingPayment) {
+      await supabase.from("payments").insert({
+        user_id: user.id,
+        user_email: userEmail,
+        amount: Math.round(amount),
+        transaction_code: transactionCode,
+        request_key: requestKey,
+        is_applied: false,
+      });
+    }
 
     return NextResponse.json({ redirectUrl, orderId });
   } catch (e: any) {
