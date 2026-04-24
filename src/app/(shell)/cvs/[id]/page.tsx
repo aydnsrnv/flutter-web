@@ -3,6 +3,7 @@ import { ResumeDetailPanel, type ResumeDetailPanelData } from '@/components/resu
 import { redirect } from 'next/navigation';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { getLocaleFromCookies } from '@/lib/i18n/server';
+import type { Metadata } from 'next';
 
 function toSnakeCase(input: string) {
   return input
@@ -14,6 +15,65 @@ function toSnakeCase(input: string) {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }> | { id: string };
+}): Promise<Metadata> {
+  const { id } = await Promise.resolve(params);
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from('resumes')
+    .select('full_name, desired_position, city')
+    .eq('id', id)
+    .maybeSingle();
+
+  const fullName = (data as any)?.full_name
+    ? String((data as any).full_name)
+    : 'CV';
+  const position = (data as any)?.desired_position
+    ? String((data as any).desired_position)
+    : 'CV';
+  const city = (data as any)?.city ? String((data as any).city) : '';
+
+  const base = new URL('https://jobly.az');
+  const canonical = `/cvs/${encodeURIComponent(String(id))}`;
+  const desc = city
+    ? `${fullName} — ${position}. Şəhər: ${city}. Jobly-da CV-lərə bax və namizədlər tap.`
+    : `${fullName} — ${position}. Jobly-da CV-lərə bax və namizədlər tap.`;
+  const ogTitle = `${fullName} — ${position}`;
+  const ogDescription = desc;
+  const ogImages = [
+    {
+      url: new URL(`/cvs/${encodeURIComponent(String(id))}/opengraph-image`, base),
+      width: 1200,
+      height: 630,
+      alt: `${ogTitle} | jobly.az`,
+    },
+  ];
+
+  return {
+    title: ogTitle,
+    description: ogDescription,
+    alternates: { canonical },
+    openGraph: {
+      type: 'profile',
+      siteName: 'Jobly',
+      title: ogTitle,
+      description: ogDescription,
+      url: new URL(canonical, base),
+      images: ogImages,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: ogTitle,
+      description: ogDescription,
+      images: ogImages.map((image) => image.url),
+    },
+  };
+}
 
 type ResumeRow = {
   id: string | number;

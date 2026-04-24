@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -9,25 +8,20 @@ export const size = {
   height: 630,
 };
 
-type PageParams = { resume_number: string };
+type PageParams = { id: string };
 
 export default async function Image({
   params,
 }: {
   params: Promise<PageParams> | PageParams;
 }) {
-  const { resume_number } = await Promise.resolve(params);
+  const { id } = await Promise.resolve(params);
   const supabase = await createClient();
-
-  const parsed = Number(resume_number);
-  const normalizedResumeNumber = Number.isFinite(parsed)
-    ? parsed
-    : resume_number;
 
   const { data } = await supabase
     .from("resumes")
     .select("full_name, desired_position, avatar")
-    .eq("resume_number", normalizedResumeNumber)
+    .eq("id", id)
     .maybeSingle();
 
   const fullName =

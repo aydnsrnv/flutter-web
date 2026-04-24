@@ -8,23 +8,20 @@ export const size = {
 };
 export const contentType = "image/png";
 
-type PageParams = { job_number: string };
+type PageParams = { id: string };
 
 export default async function Image({
   params,
 }: {
   params: Promise<PageParams> | PageParams;
 }) {
-  const { job_number } = await Promise.resolve(params);
+  const { id } = await Promise.resolve(params);
   const supabase = await createClient();
-
-  const parsed = Number(job_number);
-  const jobNumber = Number.isFinite(parsed) ? parsed : job_number;
 
   const { data } = await supabase
     .from("jobs")
     .select("title, company_name, company_logo, city")
-    .eq("job_number", jobNumber)
+    .eq("id", id)
     .maybeSingle();
 
   const title =
@@ -142,20 +139,6 @@ export default async function Image({
             <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                marginBottom: "18px",
-                color: "#245BEB",
-                fontSize: "24px",
-                fontWeight: 700,
-                letterSpacing: "0.02em",
-              }}
-            >
-              Jobly paylaşımı
-            </div>
-
-            <div
-              style={{
-                display: "flex",
                 fontSize: "58px",
                 lineHeight: 1.12,
                 fontWeight: 800,
@@ -199,7 +182,8 @@ export default async function Image({
       </div>
     ),
     {
-      ...size,
+      width: 1200,
+      height: 630,
     },
   );
 }

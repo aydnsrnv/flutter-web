@@ -3,6 +3,7 @@ import { JobDetailPanel, type JobDetailPanelData } from '@/components/job-detail
 import { redirect } from 'next/navigation';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { getLocaleFromCookies } from '@/lib/i18n/server';
+import type { Metadata } from 'next';
 
 function toSnakeCase(input: string) {
   return input
@@ -14,6 +15,62 @@ function toSnakeCase(input: string) {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }> | { id: string };
+}): Promise<Metadata> {
+  const { id } = await Promise.resolve(params);
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from('jobs')
+    .select('title, company_name, city')
+    .eq('id', id)
+    .maybeSingle();
+
+  const title = (data as any)?.title
+    ? String((data as any).title)
+    : 'Vakansiya';
+  const company = (data as any)?.company_name
+    ? String((data as any).company_name)
+    : 'Jobly';
+  const city = (data as any)?.city ? String((data as any).city) : '';
+
+  const base = new URL('https://jobly.az');
+  const canonical = `/jobs/${encodeURIComponent(String(id))}`;
+  const desc = city
+    ? `${title} vakansiyası — ${company}. Şəhər: ${city}. Jobly-da vakansiyalara bax, iş tap və iş axtar.`
+    : `${title} vakansiyası — ${company}. Jobly-da vakansiyalara bax, iş tap və iş axtar.`;
+
+  return {
+    title: `${title} — ${company}`,
+    description: desc,
+    alternates: { canonical },
+    openGraph: {
+      type: 'website',
+      siteName: 'Jobly',
+      title: `${title} — ${company}`,
+      description: desc,
+      url: new URL(canonical, base),
+      images: [
+        {
+          url: new URL(`/jobs/${encodeURIComponent(String(id))}/opengraph-image`, base),
+          width: 1200,
+          height: 630,
+          alt: `${title} — ${company}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} — ${company}`,
+      description: desc,
+      images: [new URL(`/jobs/${encodeURIComponent(String(id))}/opengraph-image`, base)],
+    },
+  };
+}
 
 type JobRow = {
   id: string | number;
