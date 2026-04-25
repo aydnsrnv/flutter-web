@@ -44,6 +44,10 @@ export const metadata: Metadata = {
     "azerbaycan iş elanları",
     "azerbaycan cv",
   ],
+  icons: {
+    icon: "/jobly_icon.jpg",
+    apple: "/jobly_icon.jpg",
+  },
   alternates: {
     canonical: "/",
   },
