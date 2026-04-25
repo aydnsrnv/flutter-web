@@ -21,6 +21,7 @@ type Option = {
   value: string;
   label: string;
   right?: ReactNode;
+  image?: string | null;
 };
 
 function CheckBox({ checked }: { checked: boolean }) {
@@ -57,10 +58,13 @@ export function SingleSelectDropdown({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
 
-  const selectedLabel = useMemo(() => {
-    const opt = options.find((o) => o.value === value) ?? null;
-    return opt?.label ?? "";
+  const selectedOption = useMemo(() => {
+    return options.find((o) => o.value === value) ?? null;
   }, [options, value]);
+
+  const selectedLabel = useMemo(() => {
+    return selectedOption?.label ?? "";
+  }, [selectedOption]);
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -108,10 +112,21 @@ export function SingleSelectDropdown({
         id={id}
         type="button"
         onClick={() => setOpen(true)}
-        className={`flex h-12 w-full items-center justify-between rounded-[21px] border border-input bg-black/5 px-4 text-[14px] outline-none dark:bg-white/5 ${value ? "text-foreground/80" : "text-foreground/50"}`}
+        className={`flex h-12 w-full items-center justify-between gap-2 rounded-[21px] border border-input bg-black/5 px-4 text-[14px] outline-none dark:bg-white/5 ${value ? "text-foreground/80" : "text-foreground/50"}`}
       >
-        <div className="min-w-0 flex-1 truncate text-left">
-          {value ? selectedLabel : placeholder}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          {value && selectedOption?.image ? (
+            <div className="shrink-0 h-8 w-8 rounded-full overflow-hidden bg-muted">
+              <img
+                src={selectedOption.image}
+                alt={selectedLabel}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : null}
+          <div className="min-w-0 flex-1 truncate text-left">
+            {value ? selectedLabel : placeholder}
+          </div>
         </div>
         <div className="ml-3 shrink-0 text-muted-foreground">
           <svg
@@ -192,14 +207,25 @@ export function SingleSelectDropdown({
                           : "transparent",
                       }}
                     >
-                      <div
-                        className="min-w-0 flex-1 truncate text-[16px]"
-                        style={{
-                          color: checked ? mainColor : "inherit",
-                          fontWeight: checked ? 700 : 400,
-                        }}
-                      >
-                        {o.label}
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        {o.image ? (
+                          <div className="shrink-0 h-8 w-8 rounded-full overflow-hidden bg-muted">
+                            <img
+                              src={o.image}
+                              alt={o.label}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        ) : null}
+                        <div
+                          className="min-w-0 flex-1 truncate text-[16px]"
+                          style={{
+                            color: checked ? mainColor : "inherit",
+                            fontWeight: checked ? 700 : 400,
+                          }}
+                        >
+                          {o.label}
+                        </div>
                       </div>
                       <div className="shrink-0">
                         <CheckBox checked={checked} />

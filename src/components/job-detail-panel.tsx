@@ -248,16 +248,24 @@ function DetailSection({
           const trimmed = raw.trim();
           if (!trimmed) return <div key={idx} className="h-3" />;
 
-          const isSlash = trimmed.startsWith("/");
-          const text = isSlash ? trimmed.slice(1).trim() : trimmed;
+          const startsWithSlash = trimmed.startsWith("/");
+          const text = startsWithSlash ? trimmed.slice(1).trim() : trimmed;
 
           return (
             <div key={idx} className="flex items-start gap-2">
+              {!startsWithSlash && (
+                <div
+                  className="mt-[6px] h-[6px] w-[6px] rounded-full"
+                  style={{ backgroundColor: "var(--jobly-main)" }}
+                />
+              )}
               <div
-                className="mt-[6px] h-[6px] w-[6px] rounded-full"
-                style={{ backgroundColor: "var(--jobly-main)" }}
-              />
-              <div className="flex-1" style={{ whiteSpace: "pre-wrap" }}>
+                className="flex-1"
+                style={{
+                  whiteSpace: "pre-wrap",
+                  fontWeight: startsWithSlash ? "bold" : "normal",
+                }}
+              >
                 {text}
               </div>
             </div>
@@ -658,11 +666,6 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
         >
           {job.company_name}
         </div>
-        {cityLabel ? (
-          <div className="mt-1 text-[13px]" style={{ color: "#9CA3AF" }}>
-            {cityLabel}
-          </div>
-        ) : null}
 
         <div
           className="mt-3 rounded-xl"

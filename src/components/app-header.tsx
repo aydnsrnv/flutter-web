@@ -79,7 +79,11 @@ function AppHeaderInner({
       <div className="flex items-center gap-2 sm:gap-4">
         {showBrand && (pathname === "/home" || pathname === "/") ? (
           <>
-            <Link href="/home" className="hidden lg:flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="hidden lg:flex items-center gap-2 bg-transparent border-0 cursor-pointer"
+            >
               <div className="h-7 w-7 overflow-hidden rounded-full bg-white">
                 <Image
                   src="/jobly_icon.jpg"
@@ -94,9 +98,13 @@ function AppHeaderInner({
               >
                 {title ?? t("app_name")}
               </div>
-            </Link>
+            </button>
 
-            <Link href="/home" className="flex lg:hidden items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="flex lg:hidden items-center gap-2 bg-transparent border-0 cursor-pointer"
+            >
               <div className="h-7 w-7 overflow-hidden rounded-full bg-white">
                 <Image
                   src="/jobly_icon.jpg"
@@ -111,7 +119,7 @@ function AppHeaderInner({
               >
                 {t("app_name")}
               </div>
-            </Link>
+            </button>
           </>
         ) : null}
       </div>

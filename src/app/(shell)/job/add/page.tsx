@@ -357,7 +357,11 @@ export default function JobAddPage() {
   }, [categories, t]);
 
   const companyOptions = useMemo(() => {
-    return companies.map((c) => ({ value: String(c.id), label: c.company_name }));
+    return companies.map((c) => ({ 
+      value: String(c.id), 
+      label: c.company_name,
+      image: c.company_logo ?? null,
+    }));
   }, [companies]);
 
   const validate = useCallback((): string | null => {
@@ -693,9 +697,14 @@ export default function JobAddPage() {
               <Call size={18} variant="Linear" className="absolute left-4 top-3" color={mainColor} />
               <Input
                 value={number}
-                onChange={(e) => setNumber(stripEmojis(e.target.value))}
+                onChange={(e) => {
+                  let raw = e.target.value.replace(/\D/g, '');
+                  raw = raw.slice(0, 10);
+                  setNumber(raw);
+                }}
                 placeholder={t('phone')}
                 className="pl-11 pr-4"
+                maxLength={10}
               />
             </div>
             <TextInput value={applyLink} onChange={setApplyLink} placeholder={t('apply_link')} />
