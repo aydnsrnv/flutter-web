@@ -62,12 +62,8 @@ export async function signup(formData: FormData) {
     redirect(`/signup?error=${encodeURIComponent('signup_general_error')}`);
   }
 
-  const userId = data.user?.id;
-  if (userId) {
-    await supabase
-      .from('users')
-      .upsert({ user_id: userId, email, full_name: fullName, user_type: userType }, { onConflict: 'user_id' });
-  }
+  // Note: User record in 'users' table is created by Supabase trigger
+  // when auth user is confirmed. Do not insert here as email is not yet confirmed.
 
   redirect('/login?success=signup_succes_email_required');
 }
