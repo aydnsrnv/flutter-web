@@ -437,7 +437,7 @@ export default function ResumeWizardPage() {
       if (!Number.isFinite(age) || age < 15) return "Yaşınız 15-dən kiçikdir. CV əlavə etmək üçün ən az 15 yaşınız olmalıdır.";
     }
     const p = phone.trim();
-    if (p && p !== '0') {
+    if (p) {
       if (!/^0\d{9}$/.test(p)) return t('resume_wizard_error_phone_invalid');
     }
     const em = email.trim();

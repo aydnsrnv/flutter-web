@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { Sms, Lock } from 'iconsax-react';
 
 import { useI18n } from '@/lib/i18n/client';
 import { Input } from '@/components/ui/input';
@@ -38,12 +39,12 @@ export function LoginForm({
 
   return (
     <div className="flex flex-col gap-4">
-      <img src={loginImg.src} alt="login" className="mx-auto w-28 h-28 object-contain rounded-xl" />
+      <img src={loginImg.src} alt="login" className="mx-auto w-[269px] h-[269px] object-contain rounded-xl" />
       {/* Page title — same style as SectionHeader */}
-      <div className="text-xl font-semibold" style={{ color: mainColor }}>
+      <div className="text-xl font-semibold text-black dark:text-white text-center">
         {t('login_welcome')}
       </div>
-      <div className="text-[14px] text-foreground/60">
+      <div className="text-[14px] text-black/80 dark:text-white/80 text-center">
         {t('login_subtitle')}
       </div>
 
@@ -67,25 +68,30 @@ export function LoginForm({
 
       <div className="rounded-2xl border border-border bg-card p-4">
         <form action={action} className="grid gap-3">
-          <Input
-            name="email"
-            type="email"
-            required
-            placeholder={t('email')}
-          />
+          <div className="relative text-black dark:text-white">
+              <Sms size={18} variant="Linear" className="absolute left-4 top-3 text-gray-600 dark:text-gray-300 z-10" />
+            <Input
+              name="email"
+              type="email"
+              required
+              placeholder={t('email')}
+              className="pl-11 text-black dark:text-white"
+            />
+          </div>
 
-          <div className="relative">
+          <div className="relative text-black dark:text-white">
+              <Lock size={18} variant="Linear" className="absolute left-4 top-3 text-gray-600 dark:text-gray-300 z-10" />
             <Input
               name="password"
               type={showPassword ? 'text' : 'password'}
               required
               placeholder={t('password')}
-              className="pr-12"
+              className="pr-12 pl-11 text-black dark:text-white"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-3 grid h-6 w-6 place-items-center text-foreground/60"
+              className="absolute right-3 top-3 grid h-6 w-6 place-items-center text-gray-600 dark:text-gray-300"
               aria-label={t('toggle_password_visibility')}
             >
               <i className={showPassword ? 'ri-eye-off-line' : 'ri-eye-line'} />
@@ -93,7 +99,7 @@ export function LoginForm({
           </div>
 
           <div className="-mt-1 text-right text-[14px]">
-            <Link href="/forgot-password" className="font-semibold" style={{ color: mainColor }}>
+            <Link href="/forgot-password" className="font-semibold text-black dark:text-white">
               {t('forgot_password')}
             </Link>
           </div>
@@ -105,9 +111,9 @@ export function LoginForm({
             {t('login')}
           </Button>
 
-          <div className="mt-2 text-center text-[14px] text-foreground/60">
+          <div className="mt-2 text-center text-[14px] text-black/70 dark:text-white/70">
             {t('no_account')}{' '}
-            <Link href="/signup" className="font-semibold" style={{ color: mainColor }}>
+            <Link href="/signup" className="font-semibold text-black dark:text-white">
               {t('signup')}
             </Link>
           </div>

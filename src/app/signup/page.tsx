@@ -8,7 +8,7 @@ import { SignupForm } from './signup-form';
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams?: { error?: string };
+  searchParams?: Promise<{ error?: string }> | { error?: string };
 }) {
   const supabase = await createClient();
   const {
@@ -19,7 +19,8 @@ export default async function SignupPage({
     redirect('/me');
   }
 
-  const error = searchParams?.error;
+  const sp = await Promise.resolve(searchParams ?? {});
+  const error = sp?.error;
 
   return <SignupForm action={signup} errorKey={error} />;
 }

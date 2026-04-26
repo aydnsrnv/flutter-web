@@ -6,7 +6,9 @@ import { LoginForm } from './login-form';
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams?: { error?: string; success?: string };
+  searchParams?:
+    | Promise<{ error?: string; success?: string }>
+    | { error?: string; success?: string };
 }) {
   const supabase = await createClient();
   const {
@@ -17,8 +19,9 @@ export default async function LoginPage({
     redirect('/home');
   }
 
-  const error = searchParams?.error;
-  const success = searchParams?.success;
+  const sp = await Promise.resolve(searchParams ?? {});
+  const error = sp?.error;
+  const success = sp?.success;
   return (
     <LoginForm action={login} error={error} successKey={success} />
   );
