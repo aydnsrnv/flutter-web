@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClient } from "@/lib/supabase/browser";
+import { slugify } from '@/lib/utils';
 import { useI18n } from "@/lib/i18n/client";
 import { PageShimmer } from "@/components/page-shimmer";
 import { Input } from "@/components/ui/input";
@@ -138,8 +139,8 @@ export default function CompaniesPage() {
               const name = (c.company_name ?? "").trim();
               const logo = c.company_logo ?? null;
               const count = c.job_count ?? 0;
-              const companyKey =
-                String((c as any)?.slug ?? "").trim() || String(c.id);
+              const rawSlug = String((c as any)?.slug ?? "").trim();
+              const companyKey = slugify(name) || slugify(rawSlug) || String(c.id);
               const href = `/company/${encodeURIComponent(companyKey)}`;
 
               return (

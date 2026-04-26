@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { useI18n } from '@/lib/i18n/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-
+import loginImg from '../login.png';
 const mainColor = '#245BEB';
 
 export function LoginForm({
@@ -38,6 +38,7 @@ export function LoginForm({
 
   return (
     <div className="flex flex-col gap-4">
+      <img src={loginImg.src} alt="login" className="mx-auto w-28 h-28 object-contain rounded-xl" />
       {/* Page title — same style as SectionHeader */}
       <div className="text-xl font-semibold" style={{ color: mainColor }}>
         {t('login_welcome')}

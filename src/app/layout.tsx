@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+// @ts-ignore
 import "./globals.css";
 
 import { cookies } from "next/headers";
@@ -61,11 +62,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
       "max-video-preview": -1,
     },
-  },
-  icons: {
-    icon: "/jobly_icon.jpg",
-    shortcut: "/jobly_icon.jpg",
-    apple: "/jobly_icon.jpg",
   },
   openGraph: {
     type: "website",

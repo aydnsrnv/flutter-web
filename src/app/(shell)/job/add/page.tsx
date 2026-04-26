@@ -373,10 +373,14 @@ export default function JobAddPage() {
     if (!educationKey) return t('select_education');
     if (!experienceKey) return t('select_experience');
     if (!request.trim()) return t('enter_request');
+
+    // require age range
+    if (!minAge.trim() || !maxAge.trim()) return 'Yaş aralığını doldurun.';
     if (!about.trim()) return t('enter_about');
 
     const email = mail.trim();
-    if (!email || !email.includes('@')) return t('invalid_email');
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRe.test(email)) return t('invalid_email');
 
     const phone = number.trim();
     if (phone && phone !== '0') {
@@ -500,6 +504,41 @@ export default function JobAddPage() {
         }
 
         if (Number.isFinite(parsedJobNumber) && parsedJobNumber > 0) {
+          // increment category and company job_count
+          try {
+            if (categoryId) {
+              const { data: catRow, error: cErr } = await supabase
+                .from('categories')
+                .select('job_count')
+                .eq('id', categoryId)
+                .maybeSingle();
+              if (!cErr) {
+                const current = Number((catRow as any)?.job_count ?? 0);
+                const next = current + 1;
+                await supabase.from('categories').update({ job_count: next } as any).eq('id', categoryId);
+              }
+            }
+          } catch {
+            // ignore count update failure
+          }
+
+          try {
+            if (companyId) {
+              const { data: compRow, error: pErr } = await supabase
+                .from('companies')
+                .select('job_count')
+                .eq('id', companyId)
+                .maybeSingle();
+              if (!pErr) {
+                const current = Number((compRow as any)?.job_count ?? 0);
+                const next = current + 1;
+                await supabase.from('companies').update({ job_count: next } as any).eq('id', companyId);
+              }
+            }
+          } catch {
+            // ignore count update failure
+          }
+
           router.push(`/job/${createdJobNumber}`);
         } else {
           throw new Error(t('job_create_failed'));
@@ -699,12 +738,16 @@ export default function JobAddPage() {
                 value={number}
                 onChange={(e) => {
                   let raw = e.target.value.replace(/\D/g, '');
-                  raw = raw.slice(0, 10);
+                  // ensure leading 0 is present
+                  if (!raw.startsWith('0')) raw = '0' + raw;
+                  // limit to 10 digits including leading 0
+                  if (raw.length > 10) raw = raw.slice(0, 10);
                   setNumber(raw);
                 }}
                 placeholder={t('phone')}
                 className="pl-11 pr-4"
                 maxLength={10}
+                inputMode="numeric"
               />
             </div>
             <TextInput value={applyLink} onChange={setApplyLink} placeholder={t('apply_link')} />

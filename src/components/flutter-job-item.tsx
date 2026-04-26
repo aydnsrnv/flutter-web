@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Calendar2, Location } from 'iconsax-react';
+import { ManatIcon } from '@/components/ui/manat-icon';
 import { useI18n } from '@/lib/i18n/client';
 
 export type FlutterJobItemData = {
@@ -125,8 +126,8 @@ export function FlutterJobItem({
             ) : (
               showSalary ? (
                 <div className="shrink-0">
-                  <div className="text-[14px] font-bold" style={{ color: '#245BEB' }}>
-                    {manatSymbol}
+                  <div className="text-[14px] font-bold" style={{ color: 'var(--jobly-main, #245BEB)' }}>
+                    <ManatIcon size={16} color="var(--jobly-main, #245BEB)" />
                   </div>
                 </div>
               ) : null
@@ -144,8 +145,8 @@ export function FlutterJobItem({
             {premium ? (
               showSalary ? (
                 <div className="shrink-0">
-                  <div className="text-[14px] font-bold" style={{ color: '#245BEB' }}>
-                    {manatSymbol}
+                  <div className="text-[14px] font-bold" style={{ color: 'var(--jobly-main, #245BEB)' }}>
+                    <ManatIcon size={16} color="var(--jobly-main, #245BEB)" />
                   </div>
                 </div>
               ) : null

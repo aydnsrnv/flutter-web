@@ -18,15 +18,18 @@ import {
   Archive,
   Call,
   Copy,
-  DocumentText,
+  Briefcase,
+  Element3,
   Eye,
   Flag,
   Link as LinkIcon,
   Message,
+  Sms,
   Money,
   UserTick,
 } from "iconsax-react";
 import { Textarea } from "@/components/ui/textarea";
+import { ManatIcon } from '@/components/ui/manat-icon';
 
 export type JobDetailPanelData = {
   id: string;
@@ -89,11 +92,8 @@ function SalaryText({
       <span>
         {String(min).trim()} - {String(max).trim()}
       </span>
-      <span
-        className="text-[14px] font-bold"
-        style={{ color: "var(--jobly-main)" }}
-      >
-        {currencySymbol}
+      <span className="shrink-0" style={{ color: 'var(--jobly-main)' }}>
+        <ManatIcon size={16} />
       </span>
     </div>
   );
@@ -121,15 +121,7 @@ function ContactTile({
         backgroundColor: tint,
       }}
     >
-      <div
-        className="grid place-items-center"
-        style={{
-          width: 41,
-          height: 41,
-          backgroundColor: "#fff",
-          borderRadius: 10,
-        }}
-      >
+      <div className="shrink-0" style={{ color: 'var(--foreground)' }}>
         {icon}
       </div>
 
@@ -204,9 +196,9 @@ function CopyableContactRow({
       onClick={onCopy}
       className="flex w-full items-center gap-2 text-left"
     >
-      <span className="shrink-0" style={{ color: "var(--jobly-main)" }}>
-        {icon}
-      </span>
+        <div className="shrink-0" style={{ color: 'var(--foreground)' }}>
+          {icon}
+        </div>
       <span
         className="min-w-0 flex-1 truncate font-semibold"
         style={{ color: "var(--foreground)" }}
@@ -312,6 +304,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
     width: number;
   } | null>(null);
   const [bottomOffset, setBottomOffset] = useState(0);
+    const [computedBarStyle, setComputedBarStyle] = useState<Record<string, any> | null>(null);
 
   const labelOrRaw = useCallback(
     (raw?: string | null) => {
@@ -454,11 +447,27 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
     navs.forEach((n) => obs.observe(n));
 
     return () => {
+      obs.disconnect();
       window.removeEventListener("resize", rafCalc);
       window.removeEventListener("scroll", rafCalc);
-      obs.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    // compute bar style only on client after measurements to avoid SSR hydration mismatch
+    if (typeof window === 'undefined') return;
+    const style: Record<string, any> = {};
+    if (barRect) {
+      style.left = barRect.left;
+      style.width = barRect.width;
+      style.right = 'auto';
+    }
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      if (bottomOffset > 0) style.bottom = Math.max(bottomOffset + 1, 1);
+      else style.bottom = 1;
+    }
+    setComputedBarStyle(Object.keys(style).length ? style : null);
+  }, [barRect, bottomOffset]);
 
   useEffect(() => {
     try {
@@ -647,7 +656,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
         </div>
       </div>
 
-      <div className="px-4 pb-24 pt-[60px]">
+      <div className="px-0 md:px-4 pb-24 pt-[60px]">
         <button
           type="button"
           onClick={copyTitle}
@@ -693,11 +702,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
             {jobTypeLabel ? (
               <div className="mt-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <DocumentText
-                    size={20}
-                    variant="Linear"
-                    color="var(--jobly-main)"
-                  />
+                  <Briefcase size={20} variant="Linear" color="var(--jobly-main)" />
                   <div
                     className="text-[14px] font-semibold"
                     style={{ color: "var(--muted-foreground)" }}
@@ -717,11 +722,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
             {categoryLabel ? (
               <div className="mt-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <DocumentText
-                    size={20}
-                    variant="Linear"
-                    color="var(--jobly-main)"
-                  />
+                  <Element3 size={20} variant="Linear" color="var(--jobly-main)" />
                   <div
                     className="text-[14px] font-semibold"
                     style={{ color: "var(--muted-foreground)" }}
@@ -757,11 +758,11 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
 
           <div className="mt-3 grid gap-2">
             <CopyableContactRow
-              icon={<Message size={18} variant="Linear" />}
+              icon={<Sms size={18} variant="Linear" color="currentColor" />}
               value={job.mail ?? null}
             />
             <CopyableContactRow
-              icon={<Call size={18} variant="Linear" />}
+              icon={<Call size={18} variant="Linear" color="currentColor" />}
               value={job.number ?? null}
             />
           </div>
@@ -801,7 +802,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
               />
               <div className="absolute bottom-0 left-0 right-0 mx-auto w-full max-w-[520px]">
                 <div
-                  className="rounded-t-2xl"
+                  className="rounded-2xl"
                   style={{ backgroundColor: "var(--background)" }}
                 >
                   <div className="px-3 pb-3">
@@ -815,9 +816,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                     <div className="mt-3 grid gap-[10px]">
                       {job.number && job.number.trim() && job.number !== "0" ? (
                         <ContactTile
-                          icon={
-                            <Call size={25} variant="Linear" color="#16A34A" />
-                          }
+                          icon={<Call size={25} variant="Linear" color="#16A34A" />}
                           title={t("phone")}
                           subtitle={job.number}
                           tint="rgba(34,197,94,0.12)"
@@ -827,13 +826,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
 
                       {job.mail && job.mail.trim() ? (
                         <ContactTile
-                          icon={
-                            <Message
-                              size={25}
-                              variant="Linear"
-                              color="var(--jobly-main)"
-                            />
-                          }
+                          icon={<Sms size={25} variant="Linear" color="#3B82F6" />}
                           title={t("email")}
                           subtitle={job.mail}
                           tint="rgba(59,130,246,0.12)"
@@ -843,13 +836,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
 
                       {job.apply_link && job.apply_link.trim() ? (
                         <ContactTile
-                          icon={
-                            <LinkIcon
-                              size={25}
-                              variant="Linear"
-                              color="#7C3AED"
-                            />
-                          }
+                          icon={<LinkIcon size={25} variant="Linear" color="#7C3AED" />}
                           title={t("applyLink")}
                           subtitle={job.apply_link.trim()}
                           tint="rgba(168,85,247,0.12)"
@@ -944,19 +931,12 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
       <div
         className="fixed inset-x-0 mx-auto w-full max-w-md z-[60] bottom-0 lg:max-w-none"
         style={{
-          ...(barRect
-            ? { left: barRect.left, width: barRect.width, right: "auto" }
-            : null),
-          ...(typeof window !== "undefined" && window.innerWidth >= 1024
-            ? bottomOffset > 0
-              ? { bottom: Math.max(bottomOffset + 1, 1) }
-              : { bottom: 1 }
-            : null),
+          ...(computedBarStyle ?? null),
         }}
       >
         <div className="pb-[calc(env(safe-area-inset-bottom,0px)+64px)] lg:pb-0">
-          <div
-            className="px-4 bg-card rounded-t-2xl shadow-[0_-4px_25px_rgba(0,0,0,0.08)] border-t border-border"
+                <div
+                  className="px-4 bg-card rounded-2xl shadow-[0_-4px_25px_rgba(0,0,0,0.08)] border-t border-border"
             style={{ paddingTop: 12, paddingBottom: 12 }}
           >
             <div className="flex items-center" style={{ gap: 12 }}>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { cn } from '@/lib/utils';
+import { cn, slugify } from '@/lib/utils';
 
 export type PopularCompany = {
   id: string;
@@ -19,7 +19,9 @@ export function PopularCompanyCard({
 }) {
   const dividerColor = 'rgba(0,0,0,0.06)';
   const bgColor = 'rgba(36, 91, 235, 0.05)';
-  const companyKey = (company.slug ?? '').trim() || company.id;
+  const name = (company.company_name ?? '').trim();
+  const rawSlug = (company.slug ?? '').trim();
+  const companyKey = slugify(name) || slugify(rawSlug) || company.id;
 
   return (
     <Link href={`/company/${encodeURIComponent(companyKey)}`} className="block">

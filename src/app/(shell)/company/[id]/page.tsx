@@ -8,6 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ArrowDown2, Building, Eye, UserTick, Briefcase } from "iconsax-react";
+import { slugify } from '@/lib/utils';
 
 import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
 import type { FlutterJobItemData } from "@/components/flutter-job-item";
@@ -133,13 +134,41 @@ export default function CompanyViewPage() {
 
       if (error) throw error;
 
-      const row = (data as CompanyRow | null) ?? null;
+      let row = (data as CompanyRow | null) ?? null;
+
+      // If not found by slug, try a tolerant lookup by normalizing stored slugs
+      if (!row && !isUuid) {
+        const { data: candidates } = await supabase
+          .from("companies")
+          .select("id, slug, company_name, company_logo, job_count, about")
+          .not("slug", "is", null)
+          .limit(1000);
+
+        const list = (candidates ?? []) as CompanyRow[];
+        const found = list.find((r) => {
+          const s = (r as any)?.slug != null ? String((r as any).slug) : "";
+          const n1 = slugify(s);
+          const n2 = slugify(r.company_name);
+          return n1 === companyKey || n2 === companyKey;
+        });
+
+        if (found) row = found;
+      }
+
       setCompany(row);
       setCompanyUuid(row?.id != null ? String(row.id) : null);
 
       const slug = (row as any)?.slug != null ? String((row as any).slug) : "";
-      if (isUuid && slug && slug !== companyKey) {
-        router.replace(`/company/${encodeURIComponent(slug)}`);
+      const safe = slugify(row?.company_name) || slugify(slug) || slug;
+
+      if (safe) {
+        if (isUuid && slug && slug !== companyKey) {
+          router.replace(`/company/${encodeURIComponent(safe)}`);
+        }
+
+        if (!isUuid && safe !== companyKey) {
+          router.replace(`/company/${encodeURIComponent(safe)}`);
+        }
       }
     } catch (e: any) {
       setCompanyError(
@@ -321,7 +350,7 @@ export default function CompanyViewPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="mx-4 mt-4 mb-7 rounded-3xl border border-border bg-card px-3.5 py-3.5">
+      <div className="mx-0 md:mx-4 mt-4 mb-7 rounded-3xl border border-border bg-card px-3.5 py-3.5">
         <div className="flex flex-col items-center">
           <div className="mx-auto h-[88px] w-[88px] overflow-hidden rounded-full bg-muted">
             {logo ? (
@@ -424,13 +453,13 @@ export default function CompanyViewPage() {
         </div>
       </div>
 
-      <div className="mx-4 mb-2 mt-4">
+      <div className="mx-0 md:mx-4 mb-2 mt-4">
         <h2 className="text-[18px] font-bold text-foreground">
           {t("active_jobs")}
         </h2>
       </div>
 
-      <div className="mx-4 overflow-hidden rounded-lg bg-background">
+      <div className="mx-0 md:mx-4 overflow-hidden rounded-lg bg-background">
         {initialJobsLoading ? null : jobsError ? (
           <div className="px-4 py-4 text-sm text-muted-foreground">
             {jobsError}

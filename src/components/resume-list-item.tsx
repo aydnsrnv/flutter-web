@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { Book, Briefcase, Calendar2 } from "iconsax-react";
+import { ManatIcon } from '@/components/ui/manat-icon';
 
 import { useI18n } from "@/lib/i18n/client";
 
@@ -342,11 +343,8 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
                     style={{ color: "var(--jobly-main, #245BEB)" }}
                   >
                     <span>{resume.desired_salary}</span>
-                    <span
-                      className="text-[18px] font-bold"
-                      style={{ color: "var(--jobly-main, #245BEB)" }}
-                    >
-                      {manatSymbol}
+                    <span className="shrink-0">
+                      <ManatIcon size={18} />
                     </span>
                   </div>
                 ) : null}

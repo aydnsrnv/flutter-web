@@ -303,12 +303,59 @@ export function JobActions({ jobId, isActive, isPremium, onDelete }: JobActionsP
             const uid = auth.user?.id;
             if (!uid) throw new Error(t('profile_login_required'));
 
+            // fetch job row to know category_id and company_id
+            const { data: jobRow, error: jrErr } = await supabase
+              .from('jobs')
+              .select('category_id, company_id')
+              .eq('id', jobId)
+              .eq('creator_id', uid)
+              .maybeSingle();
+            if (jrErr) throw new Error(jrErr.message);
+
             const { error: dErr } = await supabase
               .from('jobs')
               .delete()
               .eq('id', jobId)
               .eq('creator_id', uid);
             if (dErr) throw new Error(dErr.message);
+
+            // decrement category.job_count if applicable
+            try {
+              const catId = jobRow?.category_id ?? null;
+              if (catId) {
+                const { data: catRow, error: cErr } = await supabase
+                  .from('categories')
+                  .select('job_count')
+                  .eq('id', catId)
+                  .maybeSingle();
+                if (!cErr) {
+                  const current = Number((catRow as any)?.job_count ?? 0);
+                  const next = Math.max(0, current - 1);
+                  await supabase.from('categories').update({ job_count: next } as any).eq('id', catId);
+                }
+              }
+            } catch {
+              // ignore count update failure
+            }
+
+            // decrement company.job_count if applicable
+            try {
+              const compId = jobRow?.company_id ?? null;
+              if (compId) {
+                const { data: compRow, error: pErr } = await supabase
+                  .from('companies')
+                  .select('job_count')
+                  .eq('id', compId)
+                  .maybeSingle();
+                if (!pErr) {
+                  const current = Number((compRow as any)?.job_count ?? 0);
+                  const next = Math.max(0, current - 1);
+                  await supabase.from('companies').update({ job_count: next } as any).eq('id', compId);
+                }
+              }
+            } catch {
+              // ignore count update failure
+            }
 
             onDelete?.();
             alert(t('notification_job_deleted'));

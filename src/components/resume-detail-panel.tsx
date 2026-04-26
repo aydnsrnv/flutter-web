@@ -850,7 +850,7 @@ export function ResumeDetailPanel({
               />
               <div className="absolute bottom-0 left-0 right-0 mx-auto w-full max-w-[520px]">
                 <div
-                  className="rounded-t-2xl"
+                  className="rounded-2xl"
                   style={{ backgroundColor: "var(--background)" }}
                 >
                   <div className="px-3 pb-3">
@@ -882,10 +882,7 @@ export function ResumeDetailPanel({
                           className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity ${!canSeeContact ? "opacity-70" : ""}`}
                           style={{ backgroundColor: "rgba(34,197,94,0.12)" }}
                         >
-                          <div
-                            className="grid h-[41px] w-[41px] place-items-center rounded-[10px]"
-                            style={{ backgroundColor: "#fff" }}
-                          >
+                          <div className="shrink-0">
                             <Call size={25} variant="Linear" color="#16A34A" />
                           </div>
                           <div className="min-w-0 flex-1 text-left">
@@ -930,15 +927,8 @@ export function ResumeDetailPanel({
                           className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity ${!canSeeContact ? "opacity-70" : ""}`}
                           style={{ backgroundColor: "rgba(36,91,235,0.12)" }}
                         >
-                          <div
-                            className="grid h-[41px] w-[41px] place-items-center rounded-[10px]"
-                            style={{ backgroundColor: "#fff" }}
-                          >
-                            <Sms
-                              size={25}
-                              variant="Linear"
-                              color="var(--jobly-main, #245BEB)"
-                            />
+                          <div className="shrink-0">
+                            <Sms size={25} variant="Linear" color="#3B82F6" />
                           </div>
                           <div className="min-w-0 flex-1 text-left">
                             <div
@@ -1129,7 +1119,7 @@ export function ResumeDetailPanel({
         </div>
       </div>
 
-      <div className="px-4 pb-24 pt-3">
+      <div className="px-0 md:px-4 pb-24 pt-3">
         {avatarErrorMsg ? (
           <div
             className="mb-3 rounded-2xl border border-border px-4 py-3 text-[14px]"
@@ -1576,7 +1566,7 @@ export function ResumeDetailPanel({
       >
         <div className="pb-[calc(env(safe-area-inset-bottom,0px)+64px)] lg:pb-0">
           <div
-            className="px-4 bg-card rounded-t-2xl shadow-[0_-4px_25px_rgba(0,0,0,0.08)] border-t border-border"
+            className="px-4 bg-card rounded-2xl shadow-[0_-4px_25px_rgba(0,0,0,0.08)] border-t border-border"
             style={{ paddingTop: 12, paddingBottom: 12 }}
           >
             <div className="flex items-center gap-3">

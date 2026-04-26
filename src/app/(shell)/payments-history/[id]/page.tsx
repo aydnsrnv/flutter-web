@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { getLocaleFromCookies } from '@/lib/i18n/server';
+import { ManatIcon } from '@/components/ui/manat-icon';
 
 function toSnakeCase(input: string) {
   return input
@@ -119,7 +120,7 @@ export default async function PaymentDetailPage({
             {amountLabel}
           </div>
           <div className="pb-[6px] text-[28px] font-bold text-foreground">
-            {t('currency_azn_symbol')}
+            <ManatIcon size={28} color="var(--jobly-main, #245BEB)" />
           </div>
         </div>
         <div className="mt-2 text-[16px] text-muted-foreground">

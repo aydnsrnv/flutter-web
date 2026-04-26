@@ -429,13 +429,24 @@ export default function ResumeWizardPage() {
     if (!fullName.trim()) return t('resume_wizard_error_full_name_required');
     if (!desiredPosition.trim()) return t('resume_wizard_error_desired_position_required');
     const by = birthYear.trim();
-    if (by && !/^\d{4}$/.test(by)) return t('resume_wizard_error_birth_year_invalid');
+    if (by) {
+      if (!/^\d{4}$/.test(by)) return t('resume_wizard_error_birth_year_invalid');
+      const year = Number(by);
+      const nowYear = new Date().getFullYear();
+      const age = nowYear - year;
+      if (!Number.isFinite(age) || age < 15) return "Yaşınız 15-dən kiçikdir. CV əlavə etmək üçün ən az 15 yaşınız olmalıdır.";
+    }
     const p = phone.trim();
     if (p && p !== '0') {
       if (!/^0\d{9}$/.test(p)) return t('resume_wizard_error_phone_invalid');
     }
+    const em = email.trim();
+    if (em) {
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRe.test(em)) return t('invalid_email');
+    }
     return null;
-  }, [birthYear, desiredPosition, fullName, phone, t]);
+  }, [birthYear, desiredPosition, fullName, phone, email, t]);
 
   const submitImpl = useCallback(async () => {
     setError(null);
@@ -703,21 +714,50 @@ export default function ResumeWizardPage() {
           <SectionTitle title={t('resume_wizard_step_basic_title')} />
           <div className="mt-4 grid gap-3">
             <TextInput value={desiredPosition} onChange={setDesiredPosition} placeholder={t('resume_wizard_hint_desired_position')} />
-            <TextInput value={desiredSalary} onChange={setDesiredSalary} placeholder={t('resume_wizard_hint_desired_salary')} />
+            <TextInput value={desiredSalary} onChange={setDesiredSalary} placeholder={t('resume_wizard_hint_desired_salary')} type="number" />
           </div>
         </div>
 
         <div className="rounded-2xl border border-border p-4">
           <SectionTitle title={t('resume_wizard_step_demographics_title')} />
-          <div className="mt-4 grid gap-3">
+            <div className="mt-4 grid gap-3">
             <TextInput value={fullName} onChange={setFullName} placeholder={t('resume_wizard_hint_full_name')} />
-            <TextInput value={birthYear} onChange={setBirthYear} placeholder={t('resume_wizard_hint_birth_year')} type="number" />
-            <SingleSelectDropdown
-              value={genderKey}
-              onChange={setGenderKey}
-              placeholder={t('gender')}
-              options={genderKeys.map((k) => ({ value: k, label: t(k) }))}
+            {/* birth year: only digits, max 4 chars, validated against minimum age 15 */}
+            <Input
+              value={birthYear}
+              onChange={(e) => {
+                let v = (e.target.value ?? '').replace(/\D/g, '');
+                if (v.length > 4) v = v.slice(0, 4);
+                setBirthYear(v);
+              }}
+              placeholder={t('resume_wizard_hint_birth_year')}
+              inputMode="numeric"
             />
+
+            {/* gender: two-button style same as resume filters (male / female) */}
+            <div>
+              <div className="mb-1 text-[14px] font-semibold">{t('gender')}</div>
+              <div className="grid grid-cols-2 gap-3">
+                {['male', 'female'].map((g) => {
+                  const selected = genderKey === g;
+                  return (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setGenderKey(selected ? '' : g)}
+                      className="h-12 rounded-[16px] border text-[14px] font-semibold transition-colors"
+                      style={{
+                        borderColor: selected ? '#245BEB' : 'var(--border)',
+                        backgroundColor: selected ? 'rgba(36, 91, 235, 0.10)' : 'transparent',
+                        color: selected ? '#245BEB' : 'var(--foreground)'
+                      }}
+                    >
+                      {t(g)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <SingleSelectDropdown
               value={maritalStatus}
               onChange={setMaritalStatus}
@@ -750,9 +790,17 @@ export default function ResumeWizardPage() {
               <Call size={18} variant="Linear" className="absolute left-4 top-3" color={mainColor} />
               <Input
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  let v = (e.target.value ?? '').replace(/\D/g, '');
+                  // Ensure leading 0 is always present and cannot be removed
+                  if (!v.startsWith('0')) v = '0' + v;
+                  // limit to 10 digits total (including leading 0)
+                  if (v.length > 10) v = v.slice(0, 10);
+                  setPhone(v);
+                }}
                 placeholder={t('resume_wizard_hint_phone_optional')}
                 className="pl-11 pr-4"
+                inputMode="numeric"
               />
             </div>
           </div>

@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { useI18n } from '@/lib/i18n/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-
+import signupImg from '../signup.jpeg';
 const mainColor = '#245BEB';
 
 export function SignupForm({
@@ -29,6 +29,7 @@ export function SignupForm({
 
   return (
     <div className="flex flex-col gap-4">
+      <img src={signupImg.src} alt="signup" className="mx-auto w-28 h-28 object-contain rounded-xl" />
       <div className="text-xl font-semibold" style={{ color: mainColor }}>
         {t('signup_title')}
       </div>
