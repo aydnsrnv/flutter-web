@@ -157,6 +157,22 @@ function localizedExperienceTextFromResume(
 function formatDateDayMonth(iso: string, t: (key: string) => string) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
+
+  const now = new Date();
+  const isSameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (isSameDay) return t("today");
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    d.getFullYear() === yesterday.getFullYear() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getDate() === yesterday.getDate();
+  if (isYesterday) return t("yesterday");
+
   const day = d.getDate();
   const monthIdx = d.getMonth();
   const monthKeys = [

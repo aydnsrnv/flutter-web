@@ -379,16 +379,37 @@ export default function JobAddPage() {
     if (!about.trim()) return t('enter_about');
 
     const email = mail.trim();
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRe.test(email)) return t('invalid_email');
-
     const phone = number.trim();
-    if (phone && phone !== '0') {
-      if (!/^0\d{9}$/.test(phone)) return t('phone_length_invalid');
-    }
+    const link = applyLink.trim();
+
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const hasEmail = !!email;
+    const isEmailValid = !hasEmail || emailRe.test(email);
+    if (!isEmailValid) return t('invalid_email');
+
+    const isPhoneEmpty = !phone || phone === '0';
+    const isPhoneValid = isPhoneEmpty || /^0\d{9}$/.test(phone);
+    if (!isPhoneValid) return t('phone_length_invalid');
+
+    const hasLink = !!link;
+    const isLinkValid =
+      !hasLink ||
+      (() => {
+        try {
+          const u = new URL(link);
+          return u.protocol === 'http:' || u.protocol === 'https:';
+        } catch {
+          return false;
+        }
+      })();
+    if (!isLinkValid) return t('invalidApplyLink');
+
+    const hasAnyContact =
+      (hasEmail && isEmailValid) || (!isPhoneEmpty && isPhoneValid) || (hasLink && isLinkValid);
+    if (!hasAnyContact) return t('enterContactInfo');
 
     return null;
-  }, [about, categoryId, cityKey, companyId, educationKey, experienceKey, jobTypeKey, mail, number, request, t, title]);
+  }, [about, applyLink, categoryId, cityKey, companyId, educationKey, experienceKey, jobTypeKey, mail, number, request, t, title]);
 
   const submitImpl = useCallback(async () => {
     setError(null);
@@ -425,8 +446,9 @@ export default function JobAddPage() {
         experience: experienceKey,
         education: educationKey,
         gender: genderKey,
-        mail: mail.trim(),
-        number: number.trim() && number.trim() !== '0' ? number.trim() : null,
+        mail: mail.trim() ? mail.trim() : null,
+        // "0" means empty but is allowed if other contact exists
+        number: number.trim() ? number.trim() : '0',
         apply_link: applyLink.trim() ? applyLink.trim() : null,
         request: request.trim(),
         about: about.trim(),

@@ -100,7 +100,9 @@ async function getStatsDataUncached(): Promise<StatsData> {
 
   const startOfWeek = new Date(now);
   const dayOfWeek = startOfWeek.getDay(); // 0=Sun
-  startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);
+  // Week should start on Monday.
+  const diffToMonday = (dayOfWeek + 6) % 7; // Mon=0, Tue=1, ... Sun=6
+  startOfWeek.setDate(startOfWeek.getDate() - diffToMonday);
   startOfWeek.setHours(0, 0, 0, 0);
 
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -132,13 +134,13 @@ async function getStatsDataUncached(): Promise<StatsData> {
     resumesMonth,
   ] = await Promise.all([
     count("jobs", { status: true }),
-    count("jobs", { from: todayStr }),
-    count("jobs", { from: weekStr }),
-    count("jobs", { from: monthStr }),
+    count("jobs", { status: true, from: todayStr }),
+    count("jobs", { status: true, from: weekStr }),
+    count("jobs", { status: true, from: monthStr }),
     count("resumes", { status: true }),
-    count("resumes", { from: todayStr }),
-    count("resumes", { from: weekStr }),
-    count("resumes", { from: monthStr }),
+    count("resumes", { status: true, from: todayStr }),
+    count("resumes", { status: true, from: weekStr }),
+    count("resumes", { status: true, from: monthStr }),
   ]);
 
   return {

@@ -966,7 +966,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                   opacity: hasContact ? 1 : 0.5,
                 }}
               >
-                {t("apply")}
+                {t("apply_job")}
               </button>
             </div>
           </div>

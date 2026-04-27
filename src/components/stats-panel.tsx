@@ -8,17 +8,19 @@ export async function StatsPanel() {
   const locale = await getLocaleFromCookies();
   const dict = getDictionary(locale);
 
+  const t = (key: string) => dict[key] ?? key;
+
   return (
     <StatsWidget
       data={data}
       labels={{
-        active: dict.active ?? "active",
-        today: dict.today ?? "today",
-        thisWeek: dict.thisWeek ?? "thisWeek",
-        thisMonth: dict.thisMonth ?? "thisMonth",
-        statistics: dict.statistics ?? "statistics",
-        jobs: dict.menuTabVacancies ?? "jobs",
-        resumes: dict.menuTabCvs ?? "resumes",
+        active: t("active"),
+        today: t("today"),
+        thisWeek: t("thisWeek"),
+        thisMonth: t("thisMonth"),
+        statistics: t("statistics"),
+        jobs: t("menu_tab_vacancies"),
+        resumes: t("menu_tab_cvs"),
       }}
     />
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { InfiniteScrollSentinel } from '@/components/infinite-scroll-sentinel';
 import { ResumeActions } from '@/components/resume-actions';
@@ -58,6 +58,12 @@ export function MyResumesClient({
   const [rows, setRows] = useState<(ResumeRow & { status?: boolean | null })[]>(initialResumes);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => {
+    setRows(initialResumes);
+    setHasMore(initialHasMore);
+    setLoadingMore(false);
+  }, [initialHasMore, initialResumes, isActive]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore) return;

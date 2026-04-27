@@ -113,7 +113,19 @@ export default async function HomeTabPage({
             "id, job_number, title, company_name, company_logo, city, view_count, create_time, min_salary, max_salary",
           )
           .eq("status", true)
-          .ilike("title", `%${searchQuery}%`)
+          .or(
+            (() => {
+              const escaped = searchQuery.replace(/,/g, " ");
+              const parsed = Number(escaped);
+              const isNumber = Number.isFinite(parsed);
+              const parts = [
+                `title.ilike.%${escaped}%`,
+                `company_name.ilike.%${escaped}%`,
+                ...(isNumber ? [`job_number.eq.${parsed}`] : []),
+              ];
+              return parts.join(",");
+            })(),
+          )
           .order("is_premium", { ascending: false })
           .order("create_time", { ascending: false })
           .limit(20)

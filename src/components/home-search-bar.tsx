@@ -60,7 +60,7 @@ export function HomeSearchBar({
     >
       <Input
         style={{ paddingLeft: 55, paddingRight: 58 }}
-        placeholder={t("search_job_placeholder")}
+        placeholder={t("search_job")}
         value={q}
         onChange={(e) => setQ(e.target.value)}
         onKeyDown={(e) => {

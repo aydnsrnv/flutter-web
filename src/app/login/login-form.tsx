@@ -69,7 +69,12 @@ export function LoginForm({
       <div className="rounded-2xl border border-border bg-card p-4">
         <form action={action} className="grid gap-3">
           <div className="relative text-black dark:text-white">
-              <Sms size={18} variant="Linear" className="absolute left-4 top-3 text-gray-600 dark:text-gray-300 z-10" />
+            <Sms
+              size={18}
+              variant="Linear"
+              color={mainColor}
+              className="absolute left-4 top-3 z-10"
+            />
             <Input
               name="email"
               type="email"
@@ -80,7 +85,12 @@ export function LoginForm({
           </div>
 
           <div className="relative text-black dark:text-white">
-              <Lock size={18} variant="Linear" className="absolute left-4 top-3 text-gray-600 dark:text-gray-300 z-10" />
+            <Lock
+              size={18}
+              variant="Linear"
+              color={mainColor}
+              className="absolute left-4 top-3 z-10"
+            />
             <Input
               name="password"
               type={showPassword ? 'text' : 'password'}

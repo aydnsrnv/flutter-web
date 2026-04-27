@@ -287,6 +287,22 @@ function localizedExperienceTextFromKey(
 function formatDateDayMonth(iso: string, t: (key: string) => string) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
+
+  const now = new Date();
+  const isSameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (isSameDay) return t("today");
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    d.getFullYear() === yesterday.getFullYear() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getDate() === yesterday.getDate();
+  if (isYesterday) return t("yesterday");
+
   const day = d.getDate();
   const monthIdx = d.getMonth();
   const monthKeys = [
@@ -391,6 +407,61 @@ function SoftChips({ items }: { items: string[] }) {
           {it}
         </div>
       ))}
+    </div>
+  );
+}
+
+function TimelineItem({
+  title,
+  subtitle,
+  description,
+  showConnector,
+}: {
+  title: string;
+  subtitle?: string | null;
+  description?: string | null;
+  showConnector: boolean;
+}) {
+  const dot = "var(--jobly-main, #245BEB)";
+  const line = "rgba(36, 91, 235, 0.40)";
+
+  return (
+    <div className="relative flex gap-3">
+      <div className="relative w-6 shrink-0">
+        <div
+          className="absolute left-1/2 top-[6px] h-[10px] w-[10px] -translate-x-1/2 rounded-full"
+          style={{ backgroundColor: dot }}
+        />
+        {showConnector ? (
+          <div
+            className="absolute left-1/2 top-[20px] bottom-0 w-[2px] -translate-x-1/2 rounded-full"
+            style={{ backgroundColor: line }}
+          />
+        ) : null}
+      </div>
+
+      <div className="min-w-0 flex-1 pb-3">
+        <div className="text-[15px] font-bold" style={{ color: "var(--foreground)" }}>
+          {title}
+        </div>
+        {subtitle ? (
+          <div className="mt-0.5 text-[12px]" style={{ color: "#9CA3AF" }}>
+            {subtitle}
+          </div>
+        ) : null}
+        {description ? (
+          <div
+            className="mt-1 text-[14px]"
+            style={{
+              color: "var(--muted-foreground)",
+              opacity: 0.78,
+              lineHeight: 1.35,
+            }}
+          >
+            {description}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -762,6 +833,33 @@ export function ResumeDetailPanel({
 
   const experienceItems = useMemo(() => {
     const arr = safeArray<Record<string, unknown>>(resume.experiences);
+    const monthKeys = [
+      "month_january",
+      "month_february",
+      "month_march",
+      "month_april",
+      "month_may",
+      "month_june",
+      "month_july",
+      "month_august",
+      "month_september",
+      "month_october",
+      "month_november",
+      "month_december",
+    ] as const;
+
+    const formatMonthYear = (month: unknown, year: unknown) => {
+      const y = Number(year);
+      if (!Number.isFinite(y) || y <= 0) return "";
+      const m = Number(month);
+      if (Number.isFinite(m) && m >= 1 && m <= 12) {
+        const key = monthKeys[m - 1];
+        const label = key ? t(key) : "";
+        return label && label !== key ? `${label} ${y}` : String(y);
+      }
+      return String(y);
+    };
+
     return arr
       .map((e) => {
         const company = String(e.company ?? "").trim();
@@ -772,16 +870,23 @@ export function ResumeDetailPanel({
         const startMonth = e.start_month ?? e.startMonth;
         const endYear = e.end_year ?? e.endYear;
         const endMonth = e.end_month ?? e.endMonth;
-        const start = startYear
-          ? `${startMonth ? String(startMonth).padStart(2, "0") + "." : ""}${startYear}`
-          : "";
+
+        const start = formatMonthYear(startMonth, startYear);
         const end = endYear
-          ? `${endMonth ? String(endMonth).padStart(2, "0") + "." : ""}${endYear}`
-          : t("resumeDetailOngoing");
+          ? formatMonthYear(endMonth, endYear)
+          : t("resume_detail_ongoing");
         const period = start ? `${start} - ${end}` : null;
+
+        const subtitle =
+          position && company
+            ? period
+              ? `${company} • ${period}`
+              : company
+            : period;
+
         const description =
           typeof e.description === "string" ? e.description : null;
-        return { title, period, description };
+        return { title, period: subtitle, description };
       })
       .filter(Boolean) as Array<{
       title: string;
@@ -803,7 +908,7 @@ export function ResumeDetailPanel({
         const endYear = e.end_year ?? e.endYear;
         const period =
           startYear || endYear
-            ? `${startYear ?? getDashPlaceholder(t)} - ${endYear ?? t("resumeDetailOngoing")}`
+            ? `${startYear ?? getDashPlaceholder(t)} - ${endYear ?? t("resume_detail_ongoing")}`
             : null;
         const description =
           field || (typeof e.description === "string" ? e.description : "");
@@ -1414,37 +1519,13 @@ export function ResumeDetailPanel({
             />
             <div className="px-3 py-3">
               {experienceItems.map((it, idx) => (
-                <div
+                <TimelineItem
                   key={idx}
-                  className={idx === experienceItems.length - 1 ? "" : "pb-3"}
-                >
-                  <div
-                    className="text-[15px] font-bold"
-                    style={{ color: "var(--foreground)" }}
-                  >
-                    {it.title}
-                  </div>
-                  {it.period ? (
-                    <div
-                      className="mt-0.5 text-[12px]"
-                      style={{ color: "#9CA3AF" }}
-                    >
-                      {it.period}
-                    </div>
-                  ) : null}
-                  {it.description ? (
-                    <div
-                      className="mt-1 text-[14px]"
-                      style={{
-                        color: "var(--muted-foreground)",
-                        opacity: 0.78,
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {it.description}
-                    </div>
-                  ) : null}
-                </div>
+                  title={it.title}
+                  subtitle={it.period ?? null}
+                  description={it.description ?? null}
+                  showConnector={experienceItems.length > 1 && idx !== experienceItems.length - 1}
+                />
               ))}
             </div>
           </CardWrap>
@@ -1464,37 +1545,13 @@ export function ResumeDetailPanel({
             />
             <div className="px-3 py-3">
               {educationItems.map((it, idx) => (
-                <div
+                <TimelineItem
                   key={idx}
-                  className={idx === educationItems.length - 1 ? "" : "pb-3"}
-                >
-                  <div
-                    className="text-[15px] font-bold"
-                    style={{ color: "var(--foreground)" }}
-                  >
-                    {it.title}
-                  </div>
-                  {it.period ? (
-                    <div
-                      className="mt-0.5 text-[12px]"
-                      style={{ color: "#9CA3AF" }}
-                    >
-                      {it.period}
-                    </div>
-                  ) : null}
-                  {it.description ? (
-                    <div
-                      className="mt-1 text-[14px]"
-                      style={{
-                        color: "var(--muted-foreground)",
-                        opacity: 0.78,
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {it.description}
-                    </div>
-                  ) : null}
-                </div>
+                  title={it.title}
+                  subtitle={it.period ?? null}
+                  description={it.description ?? null}
+                  showConnector={educationItems.length > 1 && idx !== educationItems.length - 1}
+                />
               ))}
             </div>
           </CardWrap>
@@ -1514,37 +1571,13 @@ export function ResumeDetailPanel({
             />
             <div className="px-3 py-3">
               {certItems.map((it, idx) => (
-                <div
+                <TimelineItem
                   key={idx}
-                  className={idx === certItems.length - 1 ? "" : "pb-3"}
-                >
-                  <div
-                    className="text-[15px] font-bold"
-                    style={{ color: "var(--foreground)" }}
-                  >
-                    {it.title}
-                  </div>
-                  {it.period ? (
-                    <div
-                      className="mt-0.5 text-[12px]"
-                      style={{ color: "#9CA3AF" }}
-                    >
-                      {it.period}
-                    </div>
-                  ) : null}
-                  {it.description ? (
-                    <div
-                      className="mt-1 text-[14px]"
-                      style={{
-                        color: "var(--muted-foreground)",
-                        opacity: 0.78,
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {it.description}
-                    </div>
-                  ) : null}
-                </div>
+                  title={it.title}
+                  subtitle={it.period ?? null}
+                  description={it.description ?? null}
+                  showConnector={certItems.length > 1 && idx !== certItems.length - 1}
+                />
               ))}
             </div>
           </CardWrap>

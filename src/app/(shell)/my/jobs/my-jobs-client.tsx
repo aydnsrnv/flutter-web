@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { FlutterJobItem, type FlutterJobItemData } from '@/components/flutter-job-item';
 import { InfiniteScrollSentinel } from '@/components/infinite-scroll-sentinel';
@@ -49,6 +49,12 @@ export function MyJobsClient({
   const [jobs, setJobs] = useState<JobRow[]>(initialJobs);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => {
+    setJobs(initialJobs);
+    setHasMore(initialHasMore);
+    setLoadingMore(false);
+  }, [initialHasMore, initialJobs, isActive]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore) return;

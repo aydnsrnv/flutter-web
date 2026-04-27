@@ -100,7 +100,15 @@ export default function CategoryViewPage() {
           .range(nextOffset, nextOffset + pageSize - 1);
 
         if (queryValue) {
-          q = q.filter("title", "ilike", `%${queryValue}%`);
+          const escaped = queryValue.replace(/,/g, " "); // avoid breaking .or() CSV
+          const parsed = Number(escaped);
+          const isNumber = Number.isFinite(parsed);
+          const orParts = [
+            `title.ilike.%${escaped}%`,
+            `company_name.ilike.%${escaped}%`,
+            ...(isNumber ? [`job_number.eq.${parsed}`] : []),
+          ];
+          q = q.or(orParts.join(","));
         }
 
         const { data, error: qErr } = await q;

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
+import { Refresh2 } from 'iconsax-react';
 import { useI18n } from '@/lib/i18n/client';
 import { createClient } from '@/lib/supabase/browser';
 import { CustomAlertDialog } from '@/components/custom-alert-dialog';
@@ -24,13 +25,6 @@ const EditIcon = ({ size = 20, className = '' }: { size?: number; className?: st
 const TrashIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <path d="M21 5.98c-3.33-.33-6.68-.5-10.02-.5-1.98 0-3.96.1-5.94.3L3 5.98M8.5 4.97l.22-1.31C8.88 2.71 9 2 10.69 2h2.62c1.69 0 1.82.75 1.97 1.67l.22 1.3M18.85 9.14l-.65 10.07C18.09 20.78 18 22 15.21 22H8.79C6 22 5.91 20.78 5.8 19.21L5.15 9.14M10.33 16.5h3.33M9.5 12.5h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-);
-
-const RepeatIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-    <path d="M14.55 21.67C18.84 20.54 22 16.64 22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.64 3.16 8.54 7.45 9.67" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 16v6l2-2M12 22l-2-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -209,7 +203,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
 
       const priceResume = Number((data as any)?.price_resume ?? 0);
       const days = Number((data as any)?.normal_day_resume ?? 30);
-      if (!Number.isFinite(priceResume) || priceResume <= 0) {
+      if (!Number.isFinite(priceResume) || priceResume < 0) {
         setReactivateMessage(t('resume_wizard_price_not_found'));
         return;
       }
@@ -228,7 +222,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
   };
 
   const confirmReactivate = useCallback(async () => {
-    if (!reactivateReady || reactivatePrice <= 0) return;
+    if (!reactivateReady || reactivatePrice < 0) return;
     setLoading(true);
     try {
       const { data: auth } = await supabase.auth.getUser();
@@ -238,7 +232,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
       const { data: userRow, error: uErr } = await supabase.from('users').select('wallet').eq('user_id', uid).maybeSingle();
       if (uErr) throw new Error(uErr.message);
       const wallet = Number((userRow as any)?.wallet ?? 0) || 0;
-      if (wallet < reactivatePrice) throw new Error(t('resume_wizard_error_balance_not_enough'));
+      if (reactivatePrice > 0 && wallet < reactivatePrice) throw new Error(t('resume_wizard_error_balance_not_enough'));
 
       const { error: rpcErr } = await supabase.rpc('reactivate_resume', {
         p_resume_id: resumeId,
@@ -247,19 +241,23 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
       });
       if (rpcErr) throw new Error(rpcErr.message);
 
-      const nextWallet = wallet - reactivatePrice;
-      const { error: upErr } = await supabase.from('users').update({ wallet: nextWallet } as any).eq('user_id', uid);
-      if (upErr) throw new Error(t('resume_wizard_error_balance_update_failed'));
+      if (reactivatePrice > 0) {
+        const nextWallet = wallet - reactivatePrice;
+        const { error: upErr } = await supabase.from('users').update({ wallet: nextWallet } as any).eq('user_id', uid);
+        if (upErr) throw new Error(t('resume_wizard_error_balance_update_failed'));
+      }
 
       try {
-        await supabase.from('wallet_transactions').insert({
-          user_id: uid,
-          amount: -Math.abs(Math.round(reactivatePrice)),
-          source: 'post_resume',
-          type: 'resume',
-          resume_id: resumeId,
-          created_at: new Date().toISOString(),
-        } as any);
+        if (reactivatePrice > 0) {
+          await supabase.from('wallet_transactions').insert({
+            user_id: uid,
+            amount: -Math.abs(Math.round(reactivatePrice)),
+            source: 'post_resume',
+            type: 'resume',
+            resume_id: resumeId,
+            created_at: new Date().toISOString(),
+          } as any);
+        }
       } catch {
         // ignore wallet tx failure
       }
@@ -331,7 +329,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
         message={reactivateMessage}
         confirmText={t('confirm_button')}
         cancelText={t('cancel_button')}
-        icon={<RepeatIcon size={22} className="" />}
+        icon={<Refresh2 size={22} variant="Linear" color="currentColor" />}
         iconColor="var(--jobly-main, #245BEB)"
         onCancel={() => setReactivateOpen(false)}
         onConfirm={async () => {
@@ -370,7 +368,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
             className="grid h-8 w-8 place-items-center rounded-[10px] bg-primary/12 transition-opacity hover:opacity-80 disabled:opacity-50"
             title={t('confirm')}
           >
-            <RepeatIcon size={20} className="text-primary" />
+            <Refresh2 size={20} variant="Linear" color="currentColor" className="text-primary" />
           </button>
         )}
         <button

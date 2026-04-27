@@ -127,6 +127,7 @@ export default async function ProfilePage() {
       .from('jobs')
       .select('view_count, applied_count')
       .eq('creator_id', uid)
+      .eq('status', true)
       .limit(5000);
     if (statsErr) {
       // keep zeros

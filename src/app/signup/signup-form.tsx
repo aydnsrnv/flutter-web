@@ -51,10 +51,7 @@ export function SignupForm({
         <form action={action} className="grid gap-3">
           <input type="hidden" name="user_type" value={userType} />
 
-              <div className="grid gap-2">
-              <div className="text-[14px] font-semibold text-black dark:text-white">
-              {t('user')}
-            </div>
+          <div className="grid gap-2">
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -65,7 +62,7 @@ export function SignupForm({
                     : 'border-border bg-card text-muted-foreground'
                 }`}
               >
-                <User size={18} variant="Linear" className="mr-2 text-current" />
+                <User size={18} variant="Linear" color="currentColor" className="mr-2" />
                 <span>{t('user_type_candidate')}</span>
               </button>
               <button
@@ -77,14 +74,19 @@ export function SignupForm({
                     : 'border-border bg-card text-muted-foreground'
                 }`}
               >
-                <Briefcase size={18} variant="Linear" className="mr-2 text-current" />
+                <Briefcase size={18} variant="Linear" color="currentColor" className="mr-2" />
                 <span>{t('user_type_employer')}</span>
               </button>
             </div>
           </div>
 
           <div className="relative text-black dark:text-white">
-            <User size={18} variant="Linear" className="absolute left-4 top-3 text-gray-600 dark:text-gray-300 z-10" />
+            <User
+              size={18}
+              variant="Linear"
+              color={mainColor}
+              className="absolute left-4 top-3 z-10"
+            />
             <Input
               name="full_name"
               required
@@ -94,7 +96,12 @@ export function SignupForm({
           </div>
 
           <div className="relative text-black dark:text-white">
-            <Sms size={18} variant="Linear" className="absolute left-4 top-3 text-gray-600 dark:text-gray-300 z-10" />
+            <Sms
+              size={18}
+              variant="Linear"
+              color={mainColor}
+              className="absolute left-4 top-3 z-10"
+            />
             <Input
               name="email"
               type="email"
@@ -105,7 +112,12 @@ export function SignupForm({
           </div>
 
           <div className="relative text-black dark:text-white">
-            <Lock size={18} variant="Linear" className="absolute left-4 top-3 text-foreground/60 z-10" />
+            <Lock
+              size={18}
+              variant="Linear"
+              color={mainColor}
+              className="absolute left-4 top-3 z-10"
+            />
             <Input
               name="password"
               type={showPassword ? 'text' : 'password'}
@@ -124,7 +136,12 @@ export function SignupForm({
           </div>
 
           <div className="relative text-black dark:text-white">
-            <Lock size={18} variant="Linear" className="absolute left-4 top-3 text-foreground/60 z-10" />
+            <Lock
+              size={18}
+              variant="Linear"
+              color={mainColor}
+              className="absolute left-4 top-3 z-10"
+            />
             <Input
               name="confirm_password"
               type={showConfirmPassword ? 'text' : 'password'}

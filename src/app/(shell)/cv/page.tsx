@@ -40,6 +40,24 @@ function sanitizeNonNegativeNumberString(input: string) {
   return cleaned;
 }
 
+function parsePossiblyStringArray(v: any) {
+  if (Array.isArray(v)) return v;
+  if (typeof v === 'string') {
+    try {
+      const parsed = JSON.parse(v);
+      if (Array.isArray(parsed)) return parsed;
+      return [];
+    } catch {
+      return [];
+    }
+  }
+  if (v && typeof v === 'object') {
+    // single object stored instead of array
+    return Array.isArray(v) ? v : [v];
+  }
+  return [];
+}
+
 async function generateUniqueResumeNumber(
   supabase: ReturnType<typeof createClient>,
   t: (key: string) => string,
@@ -272,6 +290,27 @@ export default function ResumeWizardPage() {
     [],
   );
 
+  const monthOptions = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const keyMap = [
+        'month_january',
+        'month_february',
+        'month_march',
+        'month_april',
+        'month_may',
+        'month_june',
+        'month_july',
+        'month_august',
+        'month_september',
+        'month_october',
+        'month_november',
+        'month_december',
+      ];
+      const value = String(i + 1);
+      return { value, label: t(keyMap[i]) };
+    });
+  }, [t]);
+
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [profileRow, setProfileRow] = useState<UserRow | null>(null);
@@ -383,9 +422,9 @@ export default function ResumeWizardPage() {
         setLanguages(String(r.languages ?? ''));
         setAbout(String(r.about ?? ''));
 
-        const exps = Array.isArray(r.experiences) ? r.experiences : [];
-        const edus = Array.isArray(r.educations) ? r.educations : [];
-        const certs = Array.isArray(r.certifications) ? r.certifications : [];
+        const exps = parsePossiblyStringArray(r.experiences);
+        const edus = parsePossiblyStringArray(r.educations);
+        const certs = parsePossiblyStringArray(r.certifications);
         setExperiences(exps.length ? exps : [{ company: '', position: '', start_year: undefined, start_month: undefined, end_year: undefined, end_month: undefined, description: '' }]);
         setEducations(edus.length ? edus : [{ institution: '', degree: '' }]);
         setCertifications(certs.length ? certs : [{ name: '', issuer: '', year: undefined, description: '' }]);
@@ -962,7 +1001,7 @@ export default function ResumeWizardPage() {
                   />
 
                   <div className="grid grid-cols-2 gap-3">
-                    <TextInput
+                    <SingleSelectDropdown
                       value={(e as any).start_month == null ? '' : String((e as any).start_month)}
                       onChange={(v) =>
                         setExperiences((prev) => {
@@ -972,7 +1011,7 @@ export default function ResumeWizardPage() {
                         })
                       }
                       placeholder={t('month_short')}
-                      type="number"
+                      options={monthOptions}
                     />
                     <TextInput
                       value={(e as any).start_year == null ? '' : String((e as any).start_year)}
@@ -989,7 +1028,7 @@ export default function ResumeWizardPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <TextInput
+                    <SingleSelectDropdown
                       value={(e as any).end_month == null ? '' : String((e as any).end_month)}
                       onChange={(v) =>
                         setExperiences((prev) => {
@@ -999,7 +1038,7 @@ export default function ResumeWizardPage() {
                         })
                       }
                       placeholder={t('month_short')}
-                      type="number"
+                      options={monthOptions}
                     />
                     <TextInput
                       value={(e as any).end_year == null ? '' : String((e as any).end_year)}
