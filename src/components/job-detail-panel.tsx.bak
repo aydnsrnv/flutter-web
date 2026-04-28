@@ -93,7 +93,7 @@ function SalaryText({
         {String(min).trim()} - {String(max).trim()}
       </span>
       <span className="shrink-0" style={{ color: 'var(--jobly-main)' }}>
-        <ManatIcon size={20} />
+        <ManatIcon size={16} />
       </span>
     </div>
   );
@@ -156,13 +156,13 @@ function DetailRow({ title, value }: { title: string; value?: string | null }) {
   return (
     <div className="flex items-start gap-3 py-1">
       <div
-        className="min-w-[44%] text-[16px] font-semibold"
+        className="min-w-[44%] text-[14px] font-semibold"
         style={{ color: "var(--foreground)" }}
       >
         {title}:
       </div>
       <div
-        className="flex-1 text-[15px]"
+        className="flex-1 text-[13px]"
         style={{ color: "var(--muted-foreground)" }}
       >
         {value}
@@ -269,7 +269,7 @@ function DetailSection({
 }
 
 function CompanyLogoCircle({ src, alt }: { src?: string | null; alt: string }) {
-  const size = 102;
+  const size = 88;
 
   return (
     <div
@@ -613,7 +613,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
               style={{ backgroundColor: "rgba(255,255,255,0.20)" }}
             >
               <Eye size={16} variant="Linear" color="#fff" />
-              <div className="text-[14px] font-bold" style={{ color: "#fff" }}>
+              <div className="text-[12px] font-bold" style={{ color: "#fff" }}>
                 {String(job.view_count ?? 0)}
               </div>
             </div>
@@ -622,7 +622,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
               style={{ backgroundColor: "rgba(255,255,255,0.20)" }}
             >
               <UserTick size={16} variant="Linear" color="#fff" />
-              <div className="text-[14px] font-bold" style={{ color: "#fff" }}>
+              <div className="text-[12px] font-bold" style={{ color: "#fff" }}>
                 {String(job.applied_count ?? 0)}
               </div>
             </div>
@@ -683,9 +683,9 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
           <div className="px-3 py-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Money size={24} variant="Linear" color="var(--jobly-main)" />
+                <Money size={20} variant="Linear" color="var(--jobly-main)" />
                 <div
-                  className="text-[16px] font-semibold"
+                  className="text-[14px] font-semibold"
                   style={{ color: "var(--muted-foreground)" }}
                 >
                   {t("salary")}
@@ -702,7 +702,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
             {jobTypeLabel ? (
               <div className="mt-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Briefcase size={24} variant="Linear" color="var(--jobly-main)" />
+                  <Briefcase size={20} variant="Linear" color="var(--jobly-main)" />
                   <div
                     className="text-[14px] font-semibold"
                     style={{ color: "var(--muted-foreground)" }}
@@ -722,7 +722,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
             {categoryLabel ? (
               <div className="mt-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Element3 size={24} variant="Linear" color="var(--jobly-main)" />
+                  <Element3 size={20} variant="Linear" color="var(--jobly-main)" />
                   <div
                     className="text-[14px] font-semibold"
                     style={{ color: "var(--muted-foreground)" }}
@@ -781,7 +781,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
 
         {job.similar_jobs && job.similar_jobs.length > 0 ? (
           <div className="mt-6">
-            <div className="pb-2 text-center text-[18px] font-semibold text-foreground">
+            <div className="pb-2 text-center text-[16px] font-semibold text-foreground">
               {t("similarJobs")}
             </div>
             <div>
@@ -816,7 +816,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                     <div className="mt-3 grid gap-[10px]">
                       {job.number && job.number.trim() && job.number !== "0" ? (
                         <ContactTile
-                          icon={<Call size={28} variant="Linear" color="#16A34A" />}
+                          icon={<Call size={25} variant="Linear" color="#16A34A" />}
                           title={t("phone")}
                           subtitle={job.number}
                           tint="rgba(34,197,94,0.12)"
@@ -826,7 +826,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
 
                       {job.mail && job.mail.trim() ? (
                         <ContactTile
-                          icon={<Sms size={28} variant="Linear" color="#3B82F6" />}
+                          icon={<Sms size={25} variant="Linear" color="#3B82F6" />}
                           title={t("email")}
                           subtitle={job.mail}
                           tint="rgba(59,130,246,0.12)"
@@ -836,7 +836,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
 
                       {job.apply_link && job.apply_link.trim() ? (
                         <ContactTile
-                          icon={<LinkIcon size={28} variant="Linear" color="#7C3AED" />}
+                          icon={<LinkIcon size={25} variant="Linear" color="#7C3AED" />}
                           title={t("applyLink")}
                           subtitle={job.apply_link.trim()}
                           tint="rgba(168,85,247,0.12)"
@@ -870,7 +870,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                 </div>
 
                 <div
-                  className="mt-3 text-center text-[14px]"
+                  className="mt-3 text-center text-[12px]"
                   style={{ color: "var(--muted-foreground)" }}
                 >
                   {reported

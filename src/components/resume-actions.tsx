@@ -6,6 +6,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Refresh2 } from 'iconsax-react';
 import { useI18n } from '@/lib/i18n/client';
 import { createClient } from '@/lib/supabase/browser';
+import { extractAvatarObjectKey } from '@/lib/r2';
 import { CustomAlertDialog } from '@/components/custom-alert-dialog';
 
 const FlashIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
@@ -291,12 +292,35 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
             const uid = auth.user?.id;
             if (!uid) throw new Error(t('profile_login_required'));
 
+            const { data: resumeRow, error: fetchErr } = await supabase
+              .from('resumes')
+              .select('avatar')
+              .eq('id', resumeId)
+              .eq('user_id', uid)
+              .maybeSingle();
+            if (fetchErr) throw new Error(fetchErr.message);
+
+            const avatarUrl = (resumeRow as any)?.avatar ?? null;
+
             const { error: dErr } = await supabase
               .from('resumes')
               .delete()
               .eq('id', resumeId)
               .eq('user_id', uid);
             if (dErr) throw new Error(dErr.message);
+
+            if (avatarUrl) {
+              const oldKey = extractAvatarObjectKey(avatarUrl);
+              if (oldKey) {
+                await supabase.functions
+                  .invoke('r2-avatar-delete', {
+                    body: { key: oldKey },
+                  })
+                  .catch(() => {
+                    // ignore R2 cleanup errors
+                  });
+              }
+            }
 
             onDelete?.();
             alert(t('resume_deleted_notification'));

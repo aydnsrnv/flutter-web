@@ -80,7 +80,7 @@ function HeaderTopPill({ icon, text }: { icon: ReactNode; text: string }) {
       }}
     >
       {icon}
-      <div className="text-[14px] font-semibold" style={{ color: "#fff" }}>
+      <div className="text-[12px] font-semibold" style={{ color: "#fff" }}>
         {text}
       </div>
     </div>
@@ -99,7 +99,7 @@ function HeaderChip({ icon, text }: { icon: ReactNode; text?: string | null }) {
     >
       {icon}
       <div
-        className="max-w-[260px] truncate text-[14px] font-semibold"
+        className="max-w-[260px] truncate text-[12px] font-semibold"
         style={{ color: "#fff" }}
       >
         {text}
@@ -130,7 +130,7 @@ function CenteredAvatar({
       {url ? (
         <img src={url} alt={fullName} className="h-full w-full object-cover" />
       ) : (
-        <div className="text-[30px] font-bold" style={{ color: "#fff" }}>
+        <div className="text-[26px] font-bold" style={{ color: "#fff" }}>
           {(fullName?.trim()?.[0] ?? "").toUpperCase() ||
             unknownInitial[0]?.toUpperCase() ||
             "?"}
@@ -333,7 +333,7 @@ function SectionHeader({ icon, title }: { icon: ReactNode; title: string }) {
     >
       {icon}
       <div
-        className="text-[17px] font-bold"
+        className="text-[15px] font-bold"
         style={{ color: "var(--jobly-main, #245BEB)" }}
       >
         {title}
@@ -368,11 +368,11 @@ function DetailItem({
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-[14px] font-medium" style={{ color: "#9CA3AF" }}>
+        <div className="text-[12px] font-medium" style={{ color: "#9CA3AF" }}>
           {title}
         </div>
         <div
-          className={`break-words text-[16px] font-semibold text-foreground ${obscure ? "blur-sm select-none" : ""}`}
+          className={`break-words text-[14px] font-semibold text-foreground ${obscure ? "blur-sm select-none" : ""}`}
         >
           {value}
         </div>
@@ -398,7 +398,7 @@ function SoftChips({ items }: { items: string[] }) {
       {items.map((it, idx) => (
         <div
           key={`${it}-${idx}`}
-          className="rounded-full px-[10px] py-[6px] text-[14px] font-semibold"
+          className="rounded-full px-[10px] py-[6px] text-[12px] font-semibold"
           style={{
             backgroundColor: palette[idx % palette.length],
             color: "var(--muted-foreground)",
@@ -442,17 +442,17 @@ function TimelineItem({
       </div>
 
       <div className="min-w-0 flex-1 pb-3">
-        <div className="text-[17px] font-bold" style={{ color: "var(--foreground)" }}>
+        <div className="text-[15px] font-bold" style={{ color: "var(--foreground)" }}>
           {title}
         </div>
         {subtitle ? (
-          <div className="mt-0.5 text-[14px]" style={{ color: "#9CA3AF" }}>
+          <div className="mt-0.5 text-[12px]" style={{ color: "#9CA3AF" }}>
             {subtitle}
           </div>
         ) : null}
         {description ? (
           <div
-            className="mt-1 text-[16px]"
+            className="mt-1 text-[14px]"
             style={{
               color: "var(--muted-foreground)",
               opacity: 0.78,
@@ -1026,7 +1026,7 @@ export function ResumeDetailPanel({
 
                       {!resume.phone && !resume.email ? (
                         <div
-                          className="px-1 py-2 text-center text-[16px]"
+                          className="px-1 py-2 text-center text-[14px]"
                           style={{
                             color: "var(--muted-foreground)",
                             opacity: 0.65,
@@ -1062,7 +1062,7 @@ export function ResumeDetailPanel({
                 </div>
 
                 <div
-                  className="mt-3 text-center text-[14px]"
+                  className="mt-3 text-center text-[12px]"
                   style={{ color: "var(--muted-foreground)", opacity: 0.65 }}
                 >
                   {reported
@@ -1092,14 +1092,14 @@ export function ResumeDetailPanel({
                   <button
                     type="button"
                     onClick={() => setReportOpen(false)}
-                    className="h-11 flex-1 rounded-xl border border-border text-[16px] font-semibold"
+                    className="h-11 flex-1 rounded-xl border border-border text-[14px] font-semibold"
                   >
                     {t("report_dialog_cancel")}
                   </button>
                   <button
                     type="button"
                     onClick={submitReport}
-                    className="h-11 flex-1 rounded-xl text-[16px] font-semibold"
+                    className="h-11 flex-1 rounded-xl text-[14px] font-semibold"
                     style={{
                       backgroundColor: "var(--jobly-main, #245BEB)",
                       color: "#fff",
@@ -1125,14 +1125,14 @@ export function ResumeDetailPanel({
         <div className="relative px-3 pb-4 pt-3">
           <div className="absolute left-3 top-3">
             <HeaderTopPill
-              icon={<Eye size={18} variant="Linear" color="#fff" />}
+              icon={<Eye size={14} variant="Linear" color="#fff" />}
               text={String(resume.view_count ?? 0)}
             />
           </div>
           {resume.resume_number != null ? (
             <div className="absolute right-3 top-3">
               <HeaderTopPill
-                icon={<Barcode size={18} variant="Linear" color="#fff" />}
+                icon={<Barcode size={14} variant="Linear" color="#fff" />}
                 text={String(resume.resume_number)}
               />
             </div>
@@ -1170,11 +1170,11 @@ export function ResumeDetailPanel({
             </div>
             <div className="mt-[10px] flex flex-wrap justify-center gap-2 px-2">
               <HeaderChip
-                icon={<Briefcase size={18} variant="Linear" color="#fff" />}
+                icon={<Briefcase size={14} variant="Linear" color="#fff" />}
                 text={headerExperienceText}
               />
               <HeaderChip
-                icon={<Book size={18} variant="Linear" color="#fff" />}
+                icon={<Book size={14} variant="Linear" color="#fff" />}
                 text={headerEducationText}
               />
             </div>
@@ -1203,13 +1203,13 @@ export function ResumeDetailPanel({
 
         {createdLabel || expirationLabel ? (
           <div
-            className="mt-2 flex items-center justify-between gap-3 text-[14px]"
+            className="mt-2 flex items-center justify-between gap-3 text-[12px]"
             style={{ color: "#9CA3AF" }}
           >
             <div className="min-w-0">
               {createdLabel ? (
                 <div className="inline-flex items-center gap-1">
-                  <Calendar2 size={18} variant="Linear" color="#9CA3AF" />
+                  <Calendar2 size={14} variant="Linear" color="#9CA3AF" />
                   <span>{createdLabel}</span>
                 </div>
               ) : null}
@@ -1217,7 +1217,7 @@ export function ResumeDetailPanel({
             <div className="min-w-0 text-right">
               {expirationLabel ? (
                 <div className="inline-flex items-center justify-end gap-1">
-                  <Calendar2 size={18} variant="Linear" color="#9CA3AF" />
+                  <Calendar2 size={14} variant="Linear" color="#9CA3AF" />
                   <span>{expirationLabel}</span>
                 </div>
               ) : null}
@@ -1230,7 +1230,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <Money
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1239,7 +1239,7 @@ export function ResumeDetailPanel({
             />
             <div className="mt-2 grid gap-6 px-3 pb-3">
               <div
-                className="text-[18px] font-bold"
+                className="text-[16px] font-bold"
                 style={{ color: "var(--foreground)" }}
               >
                 {resume.desired_salary}
@@ -1263,7 +1263,7 @@ export function ResumeDetailPanel({
             <DetailItem
               icon={
                 <Sms
-                  size={22}
+                  size={18}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1281,7 +1281,7 @@ export function ResumeDetailPanel({
             <DetailItem
               icon={
                 <Call
-                  size={22}
+                  size={18}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1327,7 +1327,7 @@ export function ResumeDetailPanel({
             <DetailItem
               icon={
                 <User
-                  size={22}
+                  size={18}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1349,7 +1349,7 @@ export function ResumeDetailPanel({
             <DetailItem
               icon={
                 <Heart
-                  size={22}
+                  size={18}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1373,7 +1373,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <Location
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1381,7 +1381,7 @@ export function ResumeDetailPanel({
               title={t("resumeDetailCity")}
             />
             <div
-              className="px-3 py-3 text-[17px]"
+              className="px-3 py-3 text-[15px]"
               style={{ color: "var(--foreground)" }}
             >
               {t(resume.city!) !== resume.city ? t(resume.city!) : resume.city}
@@ -1394,7 +1394,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <Magicpen
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1412,7 +1412,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <Translate
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1442,7 +1442,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <ProfileCircle
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1450,7 +1450,7 @@ export function ResumeDetailPanel({
               title={t("resumeDetailAbout")}
             />
             <div
-              className="px-3 py-3 text-[16px]"
+              className="px-3 py-3 text-[14px]"
               style={{
                 color: "var(--muted-foreground)",
                 opacity: 0.78,
@@ -1468,7 +1468,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <Briefcase
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1494,7 +1494,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <Book
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
@@ -1520,7 +1520,7 @@ export function ResumeDetailPanel({
             <SectionHeader
               icon={
                 <Award
-                  size={20}
+                  size={16}
                   variant="Linear"
                   color="var(--jobly-main, #245BEB)"
                 />
