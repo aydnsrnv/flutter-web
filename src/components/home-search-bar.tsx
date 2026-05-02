@@ -59,7 +59,7 @@ export function HomeSearchBar({
       }}
     >
       <Input
-        style={{ paddingLeft: 55, paddingRight: 58 }}
+        className="pl-14 pr-[58px]"
         placeholder={t("search_job")}
         value={q}
         onChange={(e) => setQ(e.target.value)}
@@ -70,7 +70,7 @@ export function HomeSearchBar({
         }}
       />
       <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
-        <SearchNormal1 size={21} variant="Linear" color="#6B7280" />
+        <SearchNormal1 size={21} variant="Linear" color="currentColor" className="text-muted-foreground" />
       </div>
       <Link
         href="/filters"
@@ -78,11 +78,8 @@ export function HomeSearchBar({
         className="absolute right-3 top-1/2 -translate-y-1/2"
         prefetch
       >
-        <div
-          className="grid h-9 w-9 place-items-center rounded-[14px]"
-          style={{ backgroundColor: "#245BEB" }}
-        >
-          <Setting3 size={21} variant="Linear" color="#FFFFFF" />
+        <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary">
+          <Setting3 size={21} variant="Linear" color="currentColor" className="text-primary-foreground" />
         </div>
       </Link>
     </form>

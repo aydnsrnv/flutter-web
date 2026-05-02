@@ -3,13 +3,15 @@ import {
   type ResumeListItemData,
 } from "@/components/resume-list-item";
 import { EmptyState } from "@/components/empty-state";
-import { CandidatesSearchBar } from "@/components/candidates-search-bar";
+import { PopularResumeListGroup } from "@/components/popular-resume-list-group";
+import { ResumeListGroup } from "@/components/resume-list-group";
 import {
   ResumePopularItem,
   type ResumePopularItemData,
 } from "@/components/resume-popular-item";
 import { SectionHeader } from "@/components/section-header";
 import { createClient } from "@/lib/supabase/server";
+import { CvFilterForm } from "@/components/cv-filter-form";
 
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocaleFromCookies } from "@/lib/i18n/server";
@@ -269,8 +271,6 @@ export default async function CandidatesPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <CandidatesSearchBar initialQuery={q} />
-
       {popularError || premiumError || latestError ? (
         <div className="rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
           {popularError ? (
@@ -300,58 +300,67 @@ export default async function CandidatesPage({
                 titleKey="home_popular_resumes"
               />
               <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
-                {popularRows.slice(0, 10).map((r) => (
-                  <div key={String(r.id)} className="w-[150px] shrink-0">
-                    <ResumePopularItem resume={toPopular(r)} />
-                  </div>
-                ))}
-              </div>
-              <div className="h-4" />
-            </div>
-          ) : null}
-
-          {!hasActiveResumeFilters && premiumRows.length > 0 ? (
-            <div>
-              <SectionHeader
-                title={t("home_premium_resumes")}
-                titleKey="home_premium_resumes"
-              />
-              <div className="mt-3">
-                {premiumRows.map((r, idx) => {
-                  const isLast = idx === premiumRows.length - 1;
-                  return (
-                    <div key={String(r.id)}>
-                      <ResumeListItem resume={toItem(r)} />
-                      {!isLast ? <div className="h-px bg-border/60" /> : null}
+                <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
+                  {popularRows.slice(0, 10).map((r) => (
+                    <div key={String(r.id)} className="w-[150px] shrink-0">
+                      <ResumePopularItem resume={toPopular(r)} />
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
               <div className="h-4" />
             </div>
           ) : null}
 
-          <SectionHeader
-            title={t("home_latest_resumes")}
-            titleKey="home_latest_resumes"
-            href="/latest-cvs"
-          />
-
-          {latestRows.length === 0 ? (
-            <EmptyState label={t("no_data")} />
-          ) : (
-            <div className="mt-3">
-              {latestRows.slice(0, 10).map((r, idx) => {
-                const isLast = idx === Math.min(latestRows.length, 10) - 1;
-                return (
-                  <div key={String(r.id)}>
-                    <ResumeListItem resume={toItem(r)} />
-                    {!isLast ? <div className="h-px bg-border/60" /> : null}
-                  </div>
-                );
-              })}
+          <div className="lg:flex lg:gap-6">
+            <div className="hidden lg:block lg:w-[280px] lg:shrink-0">
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <CvFilterForm />
+              </div>
             </div>
-          )}
+            <div className="flex-1 flex flex-col gap-4">
+              {!hasActiveResumeFilters && premiumRows.length > 0 ? (
+                <div>
+                  <SectionHeader
+                    title={t("home_premium_resumes")}
+                    titleKey="home_premium_resumes"
+                  />
+                  <div className="mt-3">
+                    <div className="mt-3">
+                      {premiumRows.map((r, idx) => {
+                        const isLast = idx === premiumRows.length - 1;
+                        return (
+                          <div key={String(r.id)}>
+                            <ResumeListItem resume={toItem(r)} />
+                            {!isLast ? <div className="h-px bg-border/60" /> : null}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="h-4" />
+                </div>
+              ) : null}
+
+              <SectionHeader
+                title={t("home_latest_resumes")}
+                titleKey="home_latest_resumes"
+                href="/latest-cvs"
+              />
+
+              {latestRows.length === 0 ? (
+                <EmptyState label={t("no_data")} />
+              ) : (
+                <div className="mt-3">
+                  <ResumeListGroup
+                    resumes={latestRows.map((r) => toItem(r))}
+                    mobileLimit={5}
+                    desktopLimit={10}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </>
       )}
     </div>

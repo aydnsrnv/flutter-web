@@ -46,7 +46,7 @@ export function BottomNav({
       : "fixed inset-x-0 bottom-0 z-[80] mx-auto w-full max-w-md";
 
   return (
-    <nav className={navClassName} data-bottom-nav>
+    <nav id="bottom-nav" className={navClassName} data-bottom-nav>
       <div>
         <div className="overflow-hidden rounded-t-2xl">
           <div
@@ -64,37 +64,29 @@ export function BottomNav({
                   key={it.href}
                   href={it.href}
                   prefetch
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1 px-2 py-2 text-xs",
-                  )}
+                  className="flex flex-col items-center justify-center gap-1 px-2 py-2 text-xs"
                 >
                   <span
-                    className={cn("inline-flex rounded-2xl px-[18px] py-[2px]")}
-                    style={
-                      active
-                        ? { backgroundColor: "rgba(36, 91, 235, 0.10)" }
-                        : { backgroundColor: "transparent" }
-                    }
+                    className={cn(
+                      "inline-flex rounded-2xl px-[18px] py-[2px]",
+                      active && "bg-jobly-soft",
+                    )}
                   >
                     <i
                       className={cn(
                         iconClass,
                         "text-[27px] leading-none",
-                        active
-                          ? ""
-                          : "text-[rgba(0,0,0,0.54)] dark:text-[rgba(255,255,255,0.70)]",
+                        active ? "text-primary" : "text-foreground/75",
                       )}
-                      style={active ? { color: "#245BEB" } : undefined}
                     />
                   </span>
                   <span
                     className={cn(
-                      "leading-none text-[12px]",
+                      "leading-none text-xs",
                       active
-                        ? "font-bold"
-                        : "font-medium text-[rgba(0,0,0,0.54)] dark:text-[rgba(255,255,255,0.70)]",
+                        ? "font-bold text-primary"
+                        : "font-medium text-foreground/75",
                     )}
-                    style={active ? { color: "#245BEB" } : undefined}
                   >
                     {t(it.labelKey)}
                   </span>
@@ -106,22 +98,13 @@ export function BottomNav({
               <button
                 type="button"
                 onClick={() => onMenuOpen?.()}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1 px-2 py-2 text-xs",
-                )}
+                className="flex flex-col items-center justify-center gap-1 px-2 py-2 text-xs"
                 aria-label="Open Menu"
               >
-                <span
-                  className={cn("inline-flex rounded-2xl px-[18px] py-[2px]")}
-                  style={{ backgroundColor: "transparent" }}
-                >
-                  <i className="ri-menu-2-line text-[27px] leading-none" />
+                <span className="inline-flex rounded-2xl px-[18px] py-[2px]">
+                  <i className="ri-menu-2-line text-[27px] leading-none text-foreground/75" />
                 </span>
-                <span
-                  className={cn(
-                    "leading-none text-[12px] font-medium text-[rgba(0,0,0,0.54)] dark:text-[rgba(255,255,255,0.70)]",
-                  )}
-                >
+                <span className="leading-none text-xs font-medium text-foreground/75">
                   Menu
                 </span>
               </button>

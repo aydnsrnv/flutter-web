@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Book, Briefcase, Calendar2 } from "iconsax-react";
 import { ManatIcon } from '@/components/ui/manat-icon';
+import { PremiumBadge } from '@/components/ui/premium-badge';
 
 import { useI18n } from "@/lib/i18n/client";
 
@@ -88,7 +89,6 @@ function withExperienceLabel(rawText: string, t: (key: string) => string) {
   const label = t("resume_experience_label").trim();
   if (!label) return rawText;
 
-  // Flutter logic: if experience is "none" don't append "təcrübə"
   if (t("exp_none") && text === t("exp_none")) return rawText;
   if (text.endsWith(label)) return rawText;
   return `${text} ${label}`;
@@ -127,7 +127,6 @@ function localizedExperienceTextFromKey(
 
   const years = Number.parseInt(raw, 10);
   if (!Number.isFinite(years)) {
-    // Backward compat: exp_* key'leri gelirse yine göster.
     return t(raw);
   }
 
@@ -196,20 +195,11 @@ function formatDateDayMonth(iso: string, t: (key: string) => string) {
 
 function Pill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div
-      className="inline-flex items-center gap-2 rounded-full px-3 py-1"
-      style={{ backgroundColor: "rgba(36, 91, 235, 0.08)" }}
-    >
-      <span
-        className="shrink-0"
-        style={{ color: "var(--jobly-main, #245BEB)" }}
-      >
+    <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 bg-primary/[0.08]">
+      <span className="shrink-0 text-primary">
         {icon}
       </span>
-      <span
-        className="truncate text-[13px] font-semibold"
-        style={{ color: "var(--jobly-main, #245BEB)" }}
-      >
+      <span className="truncate text-sm font-semibold text-primary">
         {text}
       </span>
     </div>
@@ -217,22 +207,10 @@ function Pill({ icon, text }: { icon: React.ReactNode; text: string }) {
 }
 
 function AvatarCircle({ src, alt }: { src?: string | null; alt: string }) {
-  const size = 44;
-
   if (!src) {
     return (
-      <div
-        className="grid place-items-center rounded-full"
-        style={{
-          width: size,
-          height: size,
-          backgroundColor: "rgba(36, 91, 235, 0.12)",
-        }}
-      >
-        <div
-          className="text-[16px] font-bold"
-          style={{ color: "var(--jobly-main, #245BEB)" }}
-        >
+      <div className="grid h-11 w-11 place-items-center rounded-full bg-jobly-soft">
+        <div className="text-base font-bold text-primary">
           {(alt?.trim()?.[0] ?? "?").toUpperCase()}
         </div>
       </div>
@@ -240,10 +218,7 @@ function AvatarCircle({ src, alt }: { src?: string | null; alt: string }) {
   }
 
   return (
-    <div
-      className="overflow-hidden rounded-full"
-      style={{ width: size, height: size }}
-    >
+    <div className="h-11 w-11 overflow-hidden rounded-full">
       <img
         src={src}
         alt={alt}
@@ -260,10 +235,6 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
     resume.resume_number != null
       ? `/cv/${resume.resume_number}`
       : `/cvs/${resume.id}`;
-
-  const manatSymbol = t("currency_azn_symbol");
-
-  const premiumLabel = (t("premium_tag") || "PREMIUM").toUpperCase();
 
   const desiredPosition = resume.desired_position?.trim()
     ? resume.desired_position
@@ -294,37 +265,15 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <div
-                className="truncate text-[19px] font-medium text-foreground"
-                style={{ lineHeight: 1.1 }}
-              >
+              <div className="truncate text-lg font-medium text-foreground leading-tight">
                 {desiredPosition}
               </div>
-              <div
-                className="mt-0.5 truncate text-[14px]"
-                style={{ color: "#6B7280" }}
-              >
+              <div className="mt-0.5 truncate text-sm text-muted-foreground">
                 {subtitle}
               </div>
             </div>
 
-            {resume.is_premium ? (
-              <div
-                className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #FFD700 0%, #FFC107 100%)",
-                }}
-              >
-                <div
-                  className="text-[8px] font-bold"
-                  style={{ color: "#000", letterSpacing: 0.6 }}
-                >
-                  {premiumLabel}
-                </div>
-                <i className="ri-vip-crown-fill text-[10px] text-white" />
-              </div>
-            ) : null}
+            {resume.is_premium ? <PremiumBadge /> : null}
           </div>
 
           <div className="mt-3 flex flex-wrap gap-2">
@@ -333,7 +282,8 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
                 <Briefcase
                   size={14}
                   variant="Linear"
-                  color="var(--jobly-main, #245BEB)"
+                  color="currentColor"
+                  className="text-primary"
                 />
               }
               text={experienceText}
@@ -343,7 +293,8 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
                 <Book
                   size={14}
                   variant="Linear"
-                  color="var(--jobly-main, #245BEB)"
+                  color="currentColor"
+                  className="text-primary"
                 />
               }
               text={educationText}
@@ -354,10 +305,7 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
             <div className="min-w-0 flex-1 truncate">
               <div className="flex items-center gap-4">
                 {resume.desired_salary ? (
-                  <div
-                    className="inline-flex items-center gap-1 text-[18px] font-bold"
-                    style={{ color: "var(--jobly-main, #245BEB)" }}
-                  >
+                  <div className="inline-flex items-center gap-1 text-lg font-bold text-primary">
                     <span>{resume.desired_salary}</span>
                     <span className="shrink-0">
                       <ManatIcon size={18} />
@@ -368,11 +316,8 @@ export function ResumeListItem({ resume }: { resume: ResumeListItemData }) {
             </div>
 
             {createdLabel ? (
-              <div
-                className="shrink-0 inline-flex items-center gap-2 text-[13px]"
-                style={{ color: "#9CA3AF" }}
-              >
-                <Calendar2 size={16} variant="Linear" color="#9CA3AF" />
+              <div className="shrink-0 inline-flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar2 size={16} variant="Linear" color="currentColor" className="text-muted-foreground" />
                 <span>{createdLabel}</span>
               </div>
             ) : null}

@@ -474,7 +474,6 @@
   "city_khojavend": "Xocavənd",
   "city_khudat": "Xudat",
   "city_zangilan": "Zəngilan",
-
   "today": "Bugün",
   "yesterday": "Dünən",
   "statistics": "Statistika",
@@ -484,7 +483,6 @@
   "last7Days": "Son 7 gün",
   "thisWeek": "Bu həftə",
   "thisMonth": "Bu ay",
-
   "updating": "Yenilənir...",
   "update_job": "Vakansiyanı Redaktə Et",
   "change_password": "Şifrəni dəyişdir",
@@ -876,12 +874,10 @@
   "confirm_password_required": "Şifrəni təkrar daxil edin",
   "passwords_not_match": "Şifrələr uyğun deyil",
   "job_details_load_error": "Vakansiya detalları yüklənərkən xəta baş verdi: {error}",
- 
   "no_internet": "İnternet yoxdur",
   "no_internet_title_alt": "İnternet bağlantısı yoxdur",
   "no_internet_message_alt": "Zəhmət olmasa internet bağlantınızı yoxlayın və yenidən cəhd edin",
   "about_us": "Haqqımızda",
-
   "wallet_title": "Pul Kisəsi",
   "wallet_add_balance": "Balans Əlavə",
   "wallet_transaction_history": "Keçmiş",
@@ -984,5 +980,20 @@
   "enterContactInfo": "Ən az bir əlaqə məlumatı daxil edilməlidir",
   "invalidApplyLink": "Düzgün müraciət linki daxil edin",
   "user_type_candidate": "Namizəd",
-  "user_type_employer": "İşəgötürən"
+  "user_type_employer": "İşəgötürən",
+  "step_counter": "Addım {current} / {total}",
+  "selectCompany": "Şirkət seçin",
+  "selectCategory": "Kateqoriya seçin",
+  "jobInfo": "Vakansiya məlumatları",
+  "draft_not_found": "Qaralama tapılmadı",
+  "conversion_rate": "Dönüşüm əmsalı",
+  "per_job": "/elan",
+  "avg_views_per_job": "Ort. baxış/elan",
+  "avg_applied_per_job": "Ort. müraciət/elan",
+  "jobs_posting_trend": "Son 30 gün elan trendi",
+  "city_distribution": "Şəhər bölgüsü",
+  "salary_distribution": "Maaş bölgüsü",
+  "top_viewed_jobs": "Ən çox baxılan elanlar",
+  "top_applied_jobs": "Ən çox müraciət olunan elanlar",
+  "stats_subtitle": "Elan performansınızı və statistikalarınızı izləyin"
 }

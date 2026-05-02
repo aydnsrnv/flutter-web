@@ -10,8 +10,6 @@ import {
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { incrementJobAppliedCount } from "@/app/actions/stats";
-import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
-import type { FlutterJobItemData } from "@/components/flutter-job-item";
 import { useI18n } from "@/lib/i18n/client";
 import {
   ArrowRight2,
@@ -30,6 +28,7 @@ import {
 } from "iconsax-react";
 import { Textarea } from "@/components/ui/textarea";
 import { ManatIcon } from '@/components/ui/manat-icon';
+import { AiMatchFab } from "./ai-match-fab";
 
 export type JobDetailPanelData = {
   id: string;
@@ -57,7 +56,8 @@ export type JobDetailPanelData = {
   apply_link?: string | null;
   request?: string | null;
   about?: string | null;
-  similar_jobs?: FlutterJobItemData[];
+  authUserId?: string | null;
+  authUserType?: string | null;
 };
 
 function formatDateDMY(iso?: string | null) {
@@ -92,7 +92,7 @@ function SalaryText({
       <span>
         {String(min).trim()} - {String(max).trim()}
       </span>
-      <span className="shrink-0" style={{ color: 'var(--jobly-main)' }}>
+      <span className="shrink-0 text-primary">
         <ManatIcon size={20} />
       </span>
     </div>
@@ -121,20 +121,19 @@ function ContactTile({
         backgroundColor: tint,
       }}
     >
-      <div className="shrink-0" style={{ color: 'var(--foreground)' }}>
+      <div className="shrink-0">
         {icon}
       </div>
 
       <div className="min-w-0 flex-1 overflow-hidden text-left">
         <div
-          className="overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-bold"
-          style={{ color: "var(--foreground)" }}
+          className="overflow-hidden text-ellipsis whitespace-nowrap text-base font-bold"
+          
         >
           {title}
         </div>
         <div
-          className="overflow-hidden text-ellipsis whitespace-nowrap text-[14px]"
-          style={{ color: "var(--muted-foreground)" }}
+          className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-muted-foreground"
           title={subtitle}
         >
           {subtitle}
@@ -142,8 +141,7 @@ function ContactTile({
       </div>
 
       <div
-        className="shrink-0"
-        style={{ color: "var(--muted-foreground)", opacity: 0.45 }}
+        className="shrink-0 text-muted-foreground/45"
       >
         <ArrowRight2 size={18} variant="Linear" />
       </div>
@@ -156,14 +154,13 @@ function DetailRow({ title, value }: { title: string; value?: string | null }) {
   return (
     <div className="flex items-start gap-3 py-1">
       <div
-        className="min-w-[44%] text-[16px] font-semibold"
-        style={{ color: "var(--foreground)" }}
+        className="min-w-[44%] text-base font-semibold"
+        
       >
         {title}:
       </div>
       <div
-        className="flex-1 text-[15px]"
-        style={{ color: "var(--muted-foreground)" }}
+        className="flex-1 text-sm text-muted-foreground"
       >
         {value}
       </div>
@@ -196,18 +193,17 @@ function CopyableContactRow({
       onClick={onCopy}
       className="flex w-full items-center gap-2 text-left"
     >
-        <div className="shrink-0" style={{ color: 'var(--foreground)' }}>
+        <div className="shrink-0">
           {icon}
         </div>
       <span
         className="min-w-0 flex-1 truncate font-semibold"
-        style={{ color: "var(--foreground)" }}
+        
       >
         {value}
       </span>
       <span
-        className="shrink-0"
-        style={{ color: "var(--muted-foreground)", opacity: 0.35 }}
+        className="shrink-0 text-muted-foreground/35"
       >
         <Copy size={18} variant="Linear" />
       </span>
@@ -227,14 +223,13 @@ function DetailSection({
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <div
-        className="text-[16px] font-semibold"
-        style={{ color: "var(--foreground)" }}
+        className="text-base font-semibold"
+        
       >
         {title}:
       </div>
       <div
-        className="mt-3 grid gap-2 text-[14px]"
-        style={{ color: "var(--muted-foreground)" }}
+        className="mt-3 grid gap-2 text-sm text-muted-foreground"
       >
         {lines.map((raw, idx) => {
           const trimmed = raw.trim();
@@ -247,8 +242,7 @@ function DetailSection({
             <div key={idx} className="flex items-start gap-2">
               {!startsWithSlash && (
                 <div
-                  className="mt-[6px] h-[6px] w-[6px] rounded-full"
-                  style={{ backgroundColor: "var(--jobly-main)" }}
+                  className="mt-[6px] h-[6px] w-[6px] rounded-full bg-primary"
                 />
               )}
               <div
@@ -284,8 +278,7 @@ function CompanyLogoCircle({ src, alt }: { src?: string | null; alt: string }) {
         <img src={src} alt={alt} className="h-full w-full object-cover" />
       ) : (
         <div
-          className="text-[28px] font-bold"
-          style={{ color: "var(--muted-foreground)" }}
+          className="text-3xl font-bold text-muted-foreground"
         >
           {(alt?.trim()?.[0] ?? "?").toUpperCase()}
         </div>
@@ -298,6 +291,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
   const { t } = useI18n();
 
   const manatSymbol = t("currency_azn_symbol");
+  const isCandidate = (job.authUserType ?? "").toLowerCase() === "candidate";
 
   const [barRect, setBarRect] = useState<{
     left: number;
@@ -587,12 +581,12 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
     <div>
       <div className="relative rounded-t-2xl">
         <div
-          className="h-[140px] w-full overflow-hidden rounded-t-2xl"
+          className="h-[140px] w-full overflow-hidden mx-0"
           style={{
             background: "linear-gradient(135deg, #3a8bff 0%, #5ec6fa 100%)",
           }}
         >
-          <div className="flex justify-end gap-3 p-4">
+          <div className="flex justify-end gap-3 px-4 py-4">
             <button
               type="button"
               className="inline-flex items-center justify-center rounded-lg p-2"
@@ -613,7 +607,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
               style={{ backgroundColor: "rgba(255,255,255,0.20)" }}
             >
               <Eye size={16} variant="Linear" color="#fff" />
-              <div className="text-[14px] font-bold" style={{ color: "#fff" }}>
+              <div className="text-sm font-bold text-white">
                 {String(job.view_count ?? 0)}
               </div>
             </div>
@@ -622,7 +616,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
               style={{ backgroundColor: "rgba(255,255,255,0.20)" }}
             >
               <UserTick size={16} variant="Linear" color="#fff" />
-              <div className="text-[14px] font-bold" style={{ color: "#fff" }}>
+              <div className="text-sm font-bold text-white">
                 {String(job.applied_count ?? 0)}
               </div>
             </div>
@@ -656,7 +650,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
         </div>
       </div>
 
-      <div className="px-0 md:px-4 pb-24 pt-[60px]">
+      <div className="px-4 md:px-4 pb-24 pt-[60px]">
         <button
           type="button"
           onClick={copyTitle}
@@ -664,36 +658,33 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
         >
           <div
             className="text-[22px] font-bold"
-            style={{ color: "var(--foreground)" }}
+            
           >
             {job.title}
           </div>
         </button>
         <div
-          className="mt-1 text-[14px]"
-          style={{ color: "var(--muted-foreground)" }}
+          className="mt-1 text-sm text-muted-foreground"
         >
           {job.company_name}
         </div>
 
         <div
-          className="mt-3 rounded-xl"
-          style={{ backgroundColor: "rgba(36, 91, 235, 0.10)" }}
+          className="mt-3 rounded-xl bg-jobly-soft"
         >
           <div className="px-3 py-3">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Money size={24} variant="Linear" color="var(--jobly-main)" />
                 <div
-                  className="text-[16px] font-semibold"
-                  style={{ color: "var(--muted-foreground)" }}
+                  className="text-base font-semibold text-muted-foreground"
                 >
                   {t("salary")}
                 </div>
               </div>
               <div
-                className="text-[16px] font-bold"
-                style={{ color: "var(--foreground)" }}
+                className="text-base font-bold"
+                
               >
                 {salaryNode ?? t("salaryNotSpecified")}
               </div>
@@ -704,15 +695,14 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                 <div className="flex items-center gap-2">
                   <Briefcase size={24} variant="Linear" color="var(--jobly-main)" />
                   <div
-                    className="text-[14px] font-semibold"
-                    style={{ color: "var(--muted-foreground)" }}
+                    className="text-sm font-semibold text-muted-foreground"
                   >
                     {t("jobType")}
                   </div>
                 </div>
                 <div
-                  className="text-[16px] font-medium"
-                  style={{ color: "var(--foreground)" }}
+                  className="text-base font-medium"
+                  
                 >
                   {jobTypeLabel}
                 </div>
@@ -724,15 +714,14 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                 <div className="flex items-center gap-2">
                   <Element3 size={24} variant="Linear" color="var(--jobly-main)" />
                   <div
-                    className="text-[14px] font-semibold"
-                    style={{ color: "var(--muted-foreground)" }}
+                    className="text-sm font-semibold text-muted-foreground"
                   >
                     {t("category")}
                   </div>
                 </div>
                 <div
-                  className="text-[16px] font-medium"
-                  style={{ color: "var(--foreground)" }}
+                  className="text-base font-medium"
+                  
                 >
                   {categoryLabel}
                 </div>
@@ -779,21 +768,11 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
           <DetailSection title={t("jobAbout")} content={job.about ?? null} />
         </div>
 
-        {job.similar_jobs && job.similar_jobs.length > 0 ? (
-          <div className="mt-6">
-            <div className="pb-2 text-center text-[18px] font-semibold text-foreground">
-              {t("similarJobs")}
-            </div>
-            <div>
-              <FlutterJobListGroup jobs={job.similar_jobs} />
-            </div>
-          </div>
-        ) : null}
       </div>
 
       {portalReady && contactOpen
         ? createPortal(
-            <div className="fixed inset-0" style={{ zIndex: 10000 }}>
+            <div className="fixed inset-0 lg:hidden" style={{ zIndex: 10000 }}>
               <button
                 type="button"
                 className="absolute inset-0"
@@ -807,8 +786,8 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                 >
                   <div className="px-3 pb-3">
                     <div
-                      className="pt-3 text-center text-[16px] font-semibold"
-                      style={{ color: "var(--foreground)" }}
+                      className="pt-3 text-center text-base font-semibold"
+                      
                     >
                       {t("contactInfo")}
                     </div>
@@ -863,15 +842,14 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
               />
               <div className="absolute left-1/2 top-1/2 w-[92%] max-w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-card p-4">
                 <div
-                  className="text-center text-[16px] font-semibold"
-                  style={{ color: "var(--foreground)" }}
+                  className="text-center text-base font-semibold"
+                  
                 >
                   {t("report_dialog_title")}
                 </div>
 
                 <div
-                  className="mt-3 text-center text-[14px]"
-                  style={{ color: "var(--muted-foreground)" }}
+                  className="mt-3 text-center text-sm text-muted-foreground"
                 >
                   {reported
                     ? t("report_already_submitted")
@@ -890,8 +868,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                     />
                     {reportError ? (
                       <div
-                        className="mt-2 text-[12px] font-semibold"
-                        style={{ color: "#EF4444" }}
+                        className="mt-2 text-xs font-semibold text-destructive"
                       >
                         {reportError}
                       </div>
@@ -903,7 +880,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                   <button
                     type="button"
                     onClick={() => setReportOpen(false)}
-                    className="h-11 flex-1 rounded-xl border border-border text-[14px] font-semibold"
+                    className="h-11 flex-1 rounded-xl border border-border text-sm font-semibold"
                   >
                     {t("report_dialog_cancel")}
                   </button>
@@ -912,7 +889,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                     type="button"
                     onClick={submitReport}
                     disabled={reported}
-                    className="h-11 flex-1 rounded-xl text-[14px] font-semibold"
+                    className="h-11 flex-1 rounded-xl text-sm font-semibold"
                     style={{
                       backgroundColor: "var(--jobly-main)",
                       color: "#fff",
@@ -928,47 +905,125 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
           )
         : null}
 
-      <div
-        className="fixed inset-x-0 mx-auto w-full max-w-md z-[60] bottom-0 lg:max-w-none"
-        style={{
-          ...(computedBarStyle ?? null),
-        }}
-      >
-        <div className="pb-[calc(env(safe-area-inset-bottom,0px)+64px)] lg:pb-0">
-                <div
-                  className="px-4 bg-card rounded-2xl shadow-[0_-4px_25px_rgba(0,0,0,0.08)] border-t border-border"
-            style={{ paddingTop: 12, paddingBottom: 12 }}
-          >
-            <div className="flex items-center" style={{ gap: 12 }}>
+      {/* Masaüstü iletişim barı */}
+      {contactOpen && (
+        <div className="hidden lg:flex fixed bottom-6 left-24 right-[calc(96px+24px+320px)] z-[90] items-end justify-center gap-3 px-0">
+          <div className="w-full max-w-[520px] px-4">
+            <div className="flex items-center gap-3">
+              {job.number && job.number.trim() && job.number !== "0" ? (
+                <button
+                  type="button"
+                  className="h-12 flex-1 rounded-full text-base font-semibold"
+                  style={{ backgroundColor: "rgba(34,197,94,0.12)", color: "#16A34A" }}
+                >
+                  {t("phone")}
+                </button>
+              ) : null}
+              {job.mail && job.mail.trim() ? (
+                <button
+                  type="button"
+                  className="h-12 flex-1 rounded-full text-base font-semibold"
+                  style={{ backgroundColor: "rgba(59,130,246,0.12)", color: "#3B82F6" }}
+                >
+                  {t("email")}
+                </button>
+              ) : null}
+              {job.apply_link && job.apply_link.trim() ? (
+                <button
+                  type="button"
+                  className="h-12 flex-1 rounded-full text-base font-semibold"
+                  style={{ backgroundColor: "rgba(168,85,247,0.12)", color: "#7C3AED" }}
+                >
+                  {t("applyLink")}
+                </button>
+              ) : null}
               <button
                 type="button"
-                onClick={toggleFavorite}
-                className="grid h-12 w-12 place-items-center rounded-xl"
-                style={{
-                  backgroundColor: "#F3F4F6",
-                }}
+                onClick={() => setContactOpen(false)}
+                className="grid h-12 w-12 shrink-0 place-items-center rounded-full"
+                style={{ backgroundColor: "var(--secondary)" }}
               >
-                <Archive
-                  size={24}
-                  variant={favorite ? "Bold" : "Linear"}
-                  color={favorite ? "#FFA500" : "var(--muted-foreground)"}
-                />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleContactClick}
-                disabled={!hasContact}
-                className="h-12 flex-1 rounded-full text-[16px] font-semibold"
-                style={{
-                  backgroundColor: "var(--jobly-main, #245BEB)",
-                  color: "#fff",
-                  opacity: hasContact ? 1 : 0.5,
-                }}
-              >
-                {t("apply_job")}
+                <i className="ri-close-line text-xl text-muted-foreground" />
               </button>
             </div>
+          </div>
+          {/* Masaüstü AI FAB - bar'ın sağında, aynı hizada */}
+          <div className="hidden lg:block lg:pb-3">
+            {isCandidate && (
+              <AiMatchFab
+                authUserId={job.authUserId}
+                authUserType={job.authUserType}
+                targetData={job}
+                targetType="job"
+                className="relative"
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className={`fixed bottom-20 left-0 right-0 z-[90] lg:bottom-6 lg:left-24 lg:right-[calc(96px+24px+320px)] ${contactOpen ? 'lg:hidden' : ''}`}>
+        {/* Mobil AI FAB - bar üstünde */}
+        <div className="relative mx-auto max-w-[520px] lg:hidden">
+          {isCandidate && (
+            <AiMatchFab
+              authUserId={job.authUserId}
+              authUserType={job.authUserType}
+              targetData={job}
+              targetType="job"
+              className="absolute z-[60] bottom-full right-2 mb-2"
+            />
+          )}
+        </div>
+        <div className="flex items-end justify-center gap-3 px-0 pb-[env(safe-area-inset-bottom)]">
+          <div id="bottom-action-bar" className="w-full max-w-[520px]">
+            <div
+              className="px-4"
+              style={{ paddingTop: 12, paddingBottom: 12 }}
+            >
+              <div className="flex items-center" style={{ gap: 12 }}>
+                <button
+                  type="button"
+                  onClick={toggleFavorite}
+                  className="grid h-12 w-12 place-items-center rounded-xl"
+                  style={{
+                    backgroundColor: "#F3F4F6",
+                  }}
+                >
+                  <Archive
+                    size={24}
+                    variant={favorite ? "Bold" : "Linear"}
+                    color={favorite ? "#FFA500" : "var(--muted-foreground)"}
+                  />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleContactClick}
+                  disabled={!hasContact}
+                  className="h-12 flex-1 rounded-full text-base font-semibold"
+                  style={{
+                    backgroundColor: "var(--jobly-main, #245BEB)",
+                    color: "#fff",
+                    opacity: hasContact ? 1 : 0.5,
+                  }}
+                >
+                  {t("apply_job")}
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Masaüstü AI FAB - bar'ın sağında, aynı hizada */}
+          <div className="hidden lg:block lg:pb-3">
+            {isCandidate && (
+              <AiMatchFab
+                authUserId={job.authUserId}
+                authUserType={job.authUserType}
+                targetData={job}
+                targetType="job"
+                className="relative"
+              />
+            )}
           </div>
         </div>
       </div>

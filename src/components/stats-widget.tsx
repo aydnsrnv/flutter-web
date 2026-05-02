@@ -36,14 +36,11 @@ function StatCard({ label, value, gradient, icon }: CardProps) {
     >
       <div className="flex items-center gap-2">
         <span className="opacity-90">{icon}</span>
-        <span className="text-[12px] font-semibold leading-tight text-white/90">
+        <span className="text-xs font-semibold leading-tight text-white/90">
           {label}
         </span>
       </div>
-      <div
-        className="mt-3 text-[26px] font-bold text-white"
-        style={{ textShadow: "0 1px 4px rgba(0,0,0,0.15)" }}
-      >
+      <div className="mt-3 text-2xl font-bold text-white" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.15)" }}>
         {value}
       </div>
     </div>
@@ -92,7 +89,7 @@ export function StatsWidget({
     <div className="overflow-hidden rounded-2xl">
       {/* Header */}
       <div className="flex items-center px-4 pt-4 pb-2">
-        <span className="text-[16px] font-bold">{labels.statistics}</span>
+        <span className="text-base font-bold">{labels.statistics}</span>
       </div>
 
       {/* Tabs */}
@@ -103,7 +100,7 @@ export function StatsWidget({
             <button
               key={tabKey}
               type="button"
-              className={`flex-1 rounded-full py-[7px] text-[12px] transition-all duration-200 ${active ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
+              className={`flex-1 rounded-full py-[7px] text-xs transition-all duration-200 ${active ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
               onClick={() => setTab(tabKey)}
             >
               {tabKey === "jobs" ? labels.jobs : labels.resumes}

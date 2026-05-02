@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { useI18n } from '@/lib/i18n/client';
+import { createClient } from '@/lib/supabase/browser';
 
 const EditIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
@@ -47,15 +48,10 @@ type DraftItemProps = {
 };
 
 function CompanyLogo({ src, alt }: { src?: string | null; alt: string }) {
-  const size = 44;
-
   if (!src) {
     return (
-      <div
-        className="grid place-items-center rounded-full"
-        style={{ width: size, height: size, backgroundColor: 'rgba(36, 91, 235, 0.12)' }}
-      >
-        <div className="text-[16px] font-bold" style={{ color: 'var(--jobly-main, #245BEB)' }}>
+      <div className="grid h-11 w-11 place-items-center rounded-full bg-jobly-soft">
+        <div className="text-base font-bold text-primary">
           {(alt?.trim()?.[0] ?? '?').toUpperCase()}
         </div>
       </div>
@@ -63,7 +59,7 @@ function CompanyLogo({ src, alt }: { src?: string | null; alt: string }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-full" style={{ width: size, height: size }}>
+    <div className="h-11 w-11 overflow-hidden rounded-full">
       <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
     </div>
   );
@@ -73,6 +69,7 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
   const { t } = useI18n();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
   const handleEdit = () => {
     if (draftType === 'resume') {
@@ -85,9 +82,16 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
   const handleDelete = async () => {
     if (!confirm(t('deleteDraftConfirm'))) return;
     setLoading(true);
-    // TODO: Implement delete logic
-    console.log('Delete draft:', draft.id);
-    setLoading(false);
+    try {
+      const table = draftType === 'resume' ? 'resume_drafts' : 'job_drafts';
+      const { error } = await supabase.from(table).delete().eq('id', draft.id);
+      if (error) throw new Error(error.message);
+      window.location.reload();
+    } catch (e: any) {
+      alert(e?.message ?? String(e));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const title = draft.title || t('unTitled');
@@ -98,16 +102,15 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
     salaryText = `${draft.min_salary || ''} - ${draft.max_salary || ''} ${t('currency_azn')}`;
   }
 
-  // For resume drafts, show simplified version
   if (draftType === 'resume') {
     return (
       <div className="overflow-hidden rounded-xl bg-background p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="text-[15px] font-semibold text-foreground">{title}</h3>
+            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
             <div className="mt-2 flex items-center gap-2">
               <MapIcon size={16} className="shrink-0 text-primary" />
-              <span className="text-[13px] text-muted-foreground">{city}</span>
+              <span className="text-sm text-muted-foreground">{city}</span>
             </div>
           </div>
           <div className="flex shrink-0 gap-2">
@@ -118,7 +121,7 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
               className="grid h-10 w-10 place-items-center rounded-full bg-card shadow-sm transition-opacity hover:opacity-80 disabled:opacity-50"
               title={t('edit')}
             >
-              <EditIcon size={20} className="text-blue-700" />
+              <EditIcon size={20} className="text-primary" />
             </button>
             <button
               type="button"
@@ -127,7 +130,7 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
               className="grid h-10 w-10 place-items-center rounded-full bg-card shadow-sm transition-opacity hover:opacity-80 disabled:opacity-50"
               title={t('delete')}
             >
-              <TrashIcon size={20} className="text-red-700" />
+              <TrashIcon size={20} className="text-destructive" />
             </button>
           </div>
         </div>
@@ -135,7 +138,6 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
     );
   }
 
-  // For job drafts, show full version with company info
   return (
     <div className="overflow-hidden rounded-xl bg-background p-4">
       <div className="flex items-start gap-3">
@@ -144,9 +146,9 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h3 className="text-[15px] font-semibold text-foreground">{draft.company_name || t('unTitled')}</h3>
+              <h3 className="text-sm font-semibold text-foreground">{draft.company_name || t('unTitled')}</h3>
               <div className="mt-0.5 flex items-center gap-2">
-                <span className="text-[13px] text-muted-foreground">{city}</span>
+                <span className="text-sm text-muted-foreground">{city}</span>
               </div>
             </div>
             <div className="flex shrink-0 flex-col gap-2">
@@ -157,7 +159,7 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
                 className="grid h-10 w-10 place-items-center rounded-full bg-card shadow-sm transition-opacity hover:opacity-80 disabled:opacity-50"
                 title={t('edit')}
               >
-                <EditIcon size={20} className="text-blue-700" />
+                <EditIcon size={20} className="text-primary" />
               </button>
               <button
                 type="button"
@@ -166,20 +168,20 @@ export function DraftItem({ draft, draftType }: DraftItemProps) {
                 className="grid h-10 w-10 place-items-center rounded-full bg-card shadow-sm transition-opacity hover:opacity-80 disabled:opacity-50"
                 title={t('delete')}
               >
-                <TrashIcon size={20} className="text-red-700" />
+                <TrashIcon size={20} className="text-destructive" />
               </button>
             </div>
           </div>
 
           <div className="mt-4">
-            <h4 className="text-[16px] font-bold text-foreground">{title}</h4>
+            <h4 className="text-base font-bold text-foreground">{title}</h4>
           </div>
 
           <div className="mt-4 flex items-center justify-between gap-3">
-            <div className="text-[14px] font-medium text-primary">{salaryText}</div>
+            <div className="text-sm font-medium text-primary">{salaryText}</div>
             <div className="inline-flex items-center gap-1.5 rounded-md bg-orange-500/10 px-2 py-1">
               <DocumentIcon size={16} className="text-orange-500" />
-              <span className="text-[13px] font-semibold text-orange-500">{t('draft')}</span>
+              <span className="text-sm font-semibold text-orange-500">{t('draft')}</span>
             </div>
           </div>
         </div>

@@ -157,7 +157,7 @@ export default async function CategoriesPage() {
               </div>
             ) : null}
             <pre
-              className="mt-2 whitespace-pre-wrap break-words text-[12px] leading-5"
+              className="mt-2 whitespace-pre-wrap break-words text-xs leading-5"
               style={{ opacity: 0.9 }}
             >
               {JSON.stringify(serializedError, null, 2)}
@@ -183,7 +183,7 @@ export default async function CategoriesPage() {
                         style={{
                           width: 60,
                           height: 60,
-                          backgroundColor: "rgba(36, 91, 235, 0.10)",
+                          backgroundColor: "var(--jobly-main-10)",
                         }}
                       >
                         {categoryIcon(listId)}
@@ -191,19 +191,19 @@ export default async function CategoriesPage() {
 
                       <div className="min-w-0 flex-1">
                         <div
-                          className="truncate text-[16px] text-foreground"
+                          className="truncate text-base text-foreground"
                           style={{ fontWeight: 400 }}
                         >
                           {title}
                         </div>
                         {subtitle ? (
-                          <div className="mt-1 truncate text-[13px] text-foreground/60">
+                          <div className="mt-1 truncate text-sm text-foreground/60">
                             {subtitle}
                           </div>
                         ) : null}
                       </div>
 
-                      <div className="shrink-0 text-[15px] font-bold text-foreground/70">
+                      <div className="shrink-0 text-sm font-bold text-foreground/70">
                         {count}
                       </div>
                     </div>

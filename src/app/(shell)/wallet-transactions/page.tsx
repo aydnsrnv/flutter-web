@@ -76,7 +76,7 @@ export default async function WalletTransactionsPage() {
         )}
       </div>
 
-      <div className="pb-2 text-center text-[12px] text-muted-foreground">
+      <div className="pb-2 text-center text-xs text-muted-foreground">
         {footerText}
       </div>
     </div>

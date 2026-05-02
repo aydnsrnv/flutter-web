@@ -132,7 +132,7 @@ export function WalletTransactionsClient({
               </div>
               <div className="w-3 shrink-0" />
               <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-bold text-foreground">
+                <div className="text-sm font-bold text-foreground">
                   {titleText(tx, t)}
                 </div>
                 <div className="mt-1 text-[13.5px] font-medium text-muted-foreground">
@@ -141,10 +141,10 @@ export function WalletTransactionsClient({
               </div>
               <div className="w-3 shrink-0" />
               <div className="shrink-0 text-right">
-                <div className="text-[16px] font-bold" style={{ color: 'rgb(185, 28, 28)' }}>
+                <div className="text-base font-bold" style={{ color: 'rgb(185, 28, 28)' }}>
                   {tx.amount === 0 ? `0 ${t('currency_azn')}` : `- ${amountAbs} ${t('currency_azn')}`}
                 </div>
-                <div className="mt-1 text-[12px] font-medium text-muted-foreground">
+                <div className="mt-1 text-xs font-medium text-muted-foreground">
                   {formatDetailedDate(tx.created_at, t)}
                 </div>
               </div>

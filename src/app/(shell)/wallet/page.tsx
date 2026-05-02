@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n/client";
 import { Input } from "@/components/ui/input";
 
-const mainColor = "#245BEB";
+const mainColor = "var(--jobly-main)";
 const REQUEST_KEY_STORAGE = "jobly_wallet_topup_request_key";
 
 export default function WalletTopUpPage() {
@@ -114,7 +114,7 @@ export default function WalletTopUpPage() {
 
       {error ? (
         <div
-          className="rounded-2xl border border-border px-4 py-3 text-[14px]"
+          className="rounded-2xl border border-border px-4 py-3 text-sm"
           style={{ color: "#EF4444", backgroundColor: "rgba(239,68,68,0.06)" }}
         >
           {error}
@@ -122,12 +122,12 @@ export default function WalletTopUpPage() {
       ) : null}
 
       <div className="rounded-2xl border border-border bg-card p-4">
-        <div className="text-[14px] text-muted-foreground">
+        <div className="text-sm text-muted-foreground">
           {t("add_balance_message")}
         </div>
 
         <div className="mt-4">
-          <div className="text-[13px] font-semibold text-muted-foreground">
+          <div className="text-sm font-semibold text-muted-foreground">
             {t("wallet_amount")}
           </div>
           <div className="mt-2">
@@ -141,7 +141,7 @@ export default function WalletTopUpPage() {
           </div>
 
           <div
-            className="mt-2 text-[13px] font-semibold"
+            className="mt-2 text-sm font-semibold"
             style={{ color: "rgb(21, 128, 61)" }}
           >
             {t("payment_no_commission")}
@@ -152,7 +152,7 @@ export default function WalletTopUpPage() {
           type="button"
           onClick={() => void submit()}
           disabled={loading || redirecting}
-          className="mt-5 h-12 w-full rounded-2xl text-[15px] font-semibold"
+          className="mt-5 h-12 w-full rounded-2xl text-sm font-semibold"
           style={{
             backgroundColor: mainColor,
             color: "#fff",

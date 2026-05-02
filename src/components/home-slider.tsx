@@ -66,12 +66,7 @@ export function HomeSlider({ slides }: { slides: HomeSlide[] }) {
                 type="button"
                 aria-label={t('home_slide_dot_aria').replace('{index}', String(i + 1))}
                 onClick={() => setIndex(i)}
-                className="h-2 rounded-full"
-                style={{
-                  width: derivedIndex === i ? 18 : 8,
-                  backgroundColor:
-                    derivedIndex === i ? '#245BEB' : 'rgba(0,0,0,0.25)',
-                }}
+                className={"h-2 rounded-full transition-all duration-300 " + (derivedIndex === i ? "w-[18px] bg-primary" : "w-2 bg-black/25 dark:bg-white/25")}
               />
             ))}
           </div>

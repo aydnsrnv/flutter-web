@@ -131,6 +131,16 @@ export default async function JobDetailPage({
     redirect(`/job/${job.job_number}`);
   }
 
+  const { data: authData } = await supabase.auth.getUser();
+  const authUserId = authData?.user?.id ?? null;
+  let authUserType = 'candidate';
+  if (authUserId) {
+    const { data: userData } = await supabase.from('users').select('user_type').eq('user_id', authUserId).maybeSingle();
+    if (userData?.user_type) {
+      authUserType = String(userData.user_type).toLowerCase();
+    }
+  }
+
   const panelJob: JobDetailPanelData = {
     id: String(job.id),
     job_number: job.job_number,
@@ -146,6 +156,8 @@ export default async function JobDetailPage({
     max_salary: job.max_salary ?? null,
     request: job.request ?? null,
     about: job.about ?? null,
+    authUserId,
+    authUserType,
   };
 
   return <JobDetailPanel job={panelJob} />;

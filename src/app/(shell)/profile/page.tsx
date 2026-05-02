@@ -6,9 +6,10 @@ import { createClient } from '@/lib/supabase/server';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { getLocaleFromCookies } from '@/lib/i18n/server';
 
-import { Add, ArrowRight2, Briefcase, Edit, Lock, LogoutCurve, User, Wallet2, WalletMinus } from 'iconsax-react';
+import { Add, ArrowRight2, Briefcase, Edit, Lock, LogoutCurve, Wallet2, WalletMinus, Chart2 } from 'iconsax-react';
 import { ManatIcon } from '@/components/ui/manat-icon';
 import { ProfileAvatarUpload } from '@/components/profile-avatar-upload';
+import { cn } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -49,20 +50,21 @@ function MenuRow({
   href?: string;
   danger?: boolean;
 }) {
-  const iconBg = danger ? 'rgba(239, 68, 68, 0.10)' : 'rgba(36, 91, 235, 0.10)';
-  const iconColor = danger ? '#EF4444' : 'var(--jobly-main, #245BEB)';
   const resolvedIcon = isValidElement(icon)
     ? cloneElement(icon as ReactElement<any>, { color: 'currentColor' } as any)
     : icon;
   const row = (
     <div className="flex items-center px-3 py-3">
       <div className="grid h-[60px] w-[60px] place-items-center">
-        <div className="grid h-[60px] w-[60px] place-items-center rounded-full" style={{ backgroundColor: iconBg }}>
-          <span style={{ color: iconColor }}>{resolvedIcon}</span>
+        <div className={cn(
+          "grid h-[60px] w-[60px] place-items-center rounded-full",
+          danger ? "bg-destructive/10" : "bg-jobly-soft"
+        )}>
+          <span className={cn(danger ? "text-destructive" : "text-primary")}>{resolvedIcon}</span>
         </div>
       </div>
       <div className="w-4 shrink-0" />
-      <div className="min-w-0 flex-1 text-[16px] font-normal" style={{ color: danger ? '#EF4444' : 'inherit' }}>
+      <div className={cn("min-w-0 flex-1 text-base font-normal", danger && "text-destructive")}>
         {title}
       </div>
       <div className="shrink-0 text-muted-foreground">
@@ -73,9 +75,9 @@ function MenuRow({
 
   if (href) {
     return (
-      <Link href={href} className="block">
+      <a href={href} className="block">
         {row}
-      </Link>
+      </a>
     );
   }
 
@@ -83,7 +85,7 @@ function MenuRow({
 }
 
 function Separator() {
-  return <div className="h-[0.35px] w-full bg-black/15 dark:bg-white/15" />;
+  return <div className="h-px w-full bg-border/60" />;
 }
 
 export default async function ProfilePage() {
@@ -118,55 +120,25 @@ export default async function ProfilePage() {
   const userType = (userRow?.user_type ?? '').toLowerCase();
   const isCandidate = userType === 'candidate';
 
-  let postedJobsCount = 0;
-  let appliedCount = 0;
-  let totalViewCount = 0;
 
-  if (uid && !isCandidate) {
-    const { data: jobStats, error: statsErr } = await supabase
-      .from('jobs')
-      .select('view_count, applied_count')
-      .eq('creator_id', uid)
-      .eq('status', true)
-      .limit(5000);
-    if (statsErr) {
-      // keep zeros
-    } else {
-      const list = Array.isArray(jobStats) ? (jobStats as Array<any>) : [];
-      postedJobsCount = list.length;
-      for (const j of list) {
-        const v = j?.view_count;
-        const a = j?.applied_count;
-        totalViewCount += typeof v === 'number' ? v : Number(v) || 0;
-        appliedCount += typeof a === 'number' ? a : Number(a) || 0;
-      }
-    }
-  }
-
-  const mainColor = 'var(--jobly-main, #245BEB)';
-  const topSurface = 'var(--card, #ffffff)';
 
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-end">
-
         <div className="flex items-center gap-2">
-          <div
-            className="inline-flex items-center gap-1 rounded-full pl-2 pr-3 py-1.5 text-[14px] font-bold bg-primary/10 text-foreground"
-          >
+          <div className="inline-flex items-center gap-1 rounded-full pl-2 pr-3 py-1.5 text-sm font-bold bg-primary/10 text-foreground">
             <WalletMinus size={16} variant="Outline" color="currentColor" className="mr-1" />
             <span>{wallet}</span>
-            <ManatIcon size={16} color={mainColor} />
+            <ManatIcon size={16} color="currentColor" className="text-primary" />
           </div>
 
           <Link
             href="/wallet"
-            className="grid h-10 w-10 place-items-center rounded-xl"
-            style={{ backgroundColor: 'rgba(36, 91, 235, 0.10)' }}
+            className="grid h-10 w-10 place-items-center rounded-xl bg-jobly-soft"
             aria-label={t('wallet_add_balance')}
           >
-            <div className="grid h-7 w-7 place-items-center rounded-full" style={{ backgroundColor: mainColor }}>
-              <Add size={18} variant="Linear" color="#fff" />
+            <div className="grid h-7 w-7 place-items-center rounded-full bg-primary">
+              <Add size={18} variant="Linear" color="currentColor" className="text-primary-foreground" />
             </div>
           </Link>
         </div>
@@ -178,10 +150,7 @@ export default async function ProfilePage() {
         </div>
       ) : null}
 
-      <div
-        className="w-full overflow-hidden rounded-b-[28px] rounded-t-2xl border border-border"
-        style={{ backgroundColor: topSurface, boxShadow: '0 6px 20px rgba(0,0,0,0.04)' }}
-      >
+      <div className="w-full overflow-hidden rounded-b-3xl rounded-t-2xl border border-border bg-card shadow-sm">
         <div className="px-4 pb-5 pt-5">
           <div className="flex flex-col items-center">
             <ProfileAvatarUpload
@@ -189,15 +158,14 @@ export default async function ProfilePage() {
               fullName={fullName || ''}
               isCandidate={isCandidate}
               userId={user?.id || ''}
-              mainColor={mainColor}
               editable={false}
             />
 
             <div className="mt-3 text-center">
-              <div className="text-[20px] font-bold text-foreground">
+              <div className="text-xl font-bold text-foreground">
                 {fullName}
               </div>
-              <div className="mt-1 text-[16px] text-muted-foreground">
+              <div className="mt-1 text-base text-muted-foreground">
                 {userRow?.email ?? email ?? ''}
               </div>
             </div>
@@ -206,53 +174,19 @@ export default async function ProfilePage() {
               <div className="mt-4 w-full">
                 <Link
                   href="/create/cv/add"
-                  className="block h-12 w-full rounded-xl text-center text-[16px] font-semibold leading-[48px]"
-                  style={{
-                    color: '#fff',
-                    background: 'linear-gradient(90deg, #245BEB, #22C55E, #A855F7)',
-                    boxShadow: '0 10px 18px rgba(36,91,235,0.18)',
-                  }}
+                  className="block h-12 w-full rounded-xl text-center text-base font-semibold leading-[48px] text-white bg-gradient-to-r from-primary via-emerald-500 to-purple-500 shadow-lg shadow-primary/20"
                 >
                   {t('profile_create_cv')}
                 </Link>
               </div>
-            ) : (
-              <div className="mt-4 w-full">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 text-center">
-                    <div className="text-[20px] font-bold text-foreground">
-                      {formatCount(postedJobsCount).replace('{k}', t('number_k_suffix'))}
-                    </div>
-                    <div className="mt-1 text-[13px] text-muted-foreground">
-                      {t('stat_posted')}
-                    </div>
-                  </div>
-                  <div className="flex-1 text-center">
-                    <div className="text-[20px] font-bold text-foreground">
-                      {formatCount(appliedCount).replace('{k}', t('number_k_suffix'))}
-                    </div>
-                    <div className="mt-1 text-[13px] text-muted-foreground">
-                      {t('stat_applied')}
-                    </div>
-                  </div>
-                  <div className="flex-1 text-center">
-                    <div className="text-[20px] font-bold text-foreground">
-                      {formatCount(totalViewCount).replace('{k}', t('number_k_suffix'))}
-                    </div>
-                    <div className="mt-1 text-[13px] text-muted-foreground">
-                      {t('stat_view')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
 
       <div className="px-0">
         <div className="px-2 pb-1">
-          <div className="px-2 text-[13px] font-semibold tracking-[1.2px] text-muted-foreground">
+          <div className="px-2 text-sm font-semibold tracking-widest text-muted-foreground uppercase">
             {t('account_section')}
           </div>
         </div>
@@ -264,6 +198,16 @@ export default async function ProfilePage() {
             href={isCandidate ? '/my/cvs' : '/my/jobs'}
           />
           <Separator />
+          {!isCandidate && (
+            <>
+              <MenuRow
+                title={t('statistics') || 'Statistikalar'}
+                icon={<Chart2 size={34} variant="Linear" />}
+                href="/my/stats"
+              />
+              <Separator />
+            </>
+          )}
           <MenuRow
             title={t('drafts')}
             icon={<Edit size={34} variant="Linear" />}
@@ -284,7 +228,7 @@ export default async function ProfilePage() {
         </div>
 
         <div className="mt-3 px-2 pb-1">
-          <div className="px-2 text-[13px] font-semibold tracking-[1.2px] text-muted-foreground">
+          <div className="px-2 text-sm font-semibold tracking-widest text-muted-foreground uppercase">
             {t('other_section')}
           </div>
         </div>

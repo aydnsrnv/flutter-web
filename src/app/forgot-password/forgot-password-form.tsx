@@ -5,8 +5,7 @@ import { useMemo } from 'react';
 import { useI18n } from '@/lib/i18n/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-
-const mainColor = '#245BEB';
+import { Alert } from '@/components/ui/alert';
 
 export function ForgotPasswordForm({
   action,
@@ -25,21 +24,14 @@ export function ForgotPasswordForm({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="text-xl font-semibold" style={{ color: mainColor }}>
+      <div className="text-xl font-semibold text-primary">
         {t('reset_title')}
       </div>
-      <div className="text-[14px] text-muted-foreground">
+      <div className="text-sm text-muted-foreground">
         {t('reset_info')}
       </div>
 
-      {errorText ? (
-        <div
-          className="rounded-2xl border px-4 py-3 text-[14px]"
-          style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.06)', borderColor: 'rgba(239,68,68,0.22)' }}
-        >
-          {errorText}
-        </div>
-      ) : null}
+      {errorText ? <Alert variant="error">{errorText}</Alert> : null}
 
       <div className="rounded-2xl border border-border bg-card p-4">
         <form action={action} className="grid gap-3">
@@ -52,13 +44,13 @@ export function ForgotPasswordForm({
 
           <Button
             type="submit"
-            className="mt-1 h-12 w-full rounded-2xl text-[16px] font-bold shadow-lg shadow-primary/20"
+            className="mt-1 h-12 w-full rounded-[var(--radius-button)] text-base font-bold shadow-lg shadow-primary/20"
           >
             {t('reset_send')}
           </Button>
 
-          <div className="mt-2 text-center text-[14px] text-muted-foreground">
-            <a href="/login" className="font-semibold" style={{ color: mainColor }}>
+          <div className="mt-2 text-center text-sm text-muted-foreground">
+            <a href="/login" className="font-semibold text-primary">
               {t('login')}
             </a>
           </div>

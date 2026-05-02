@@ -36,6 +36,7 @@ import {
   Magicpen,
   Translate,
 } from "iconsax-react";
+import { AiMatchFab } from "./ai-match-fab";
 
 import { useI18n } from "@/lib/i18n/client";
 import { Textarea } from "@/components/ui/textarea";
@@ -80,7 +81,7 @@ function HeaderTopPill({ icon, text }: { icon: ReactNode; text: string }) {
       }}
     >
       {icon}
-      <div className="text-[14px] font-semibold" style={{ color: "#fff" }}>
+      <div className="text-sm font-semibold text-white">
         {text}
       </div>
     </div>
@@ -99,8 +100,7 @@ function HeaderChip({ icon, text }: { icon: ReactNode; text?: string | null }) {
     >
       {icon}
       <div
-        className="max-w-[260px] truncate text-[14px] font-semibold"
-        style={{ color: "#fff" }}
+        className="max-w-[260px] truncate text-sm font-semibold text-white"
       >
         {text}
       </div>
@@ -130,7 +130,7 @@ function CenteredAvatar({
       {url ? (
         <img src={url} alt={fullName} className="h-full w-full object-cover" />
       ) : (
-        <div className="text-[30px] font-bold" style={{ color: "#fff" }}>
+        <div className="text-[30px] font-bold text-white">
           {(fullName?.trim()?.[0] ?? "").toUpperCase() ||
             unknownInitial[0]?.toUpperCase() ||
             "?"}
@@ -328,8 +328,7 @@ function formatDateDayMonth(iso: string, t: (key: string) => string) {
 function SectionHeader({ icon, title }: { icon: ReactNode; title: string }) {
   return (
     <div
-      className="flex items-center gap-2 rounded-t-xl px-3 py-[10px]"
-      style={{ backgroundColor: "rgba(36, 91, 235, 0.10)" }}
+      className="flex items-center gap-2 rounded-t-xl px-3 py-[10px] bg-jobly-soft"
     >
       {icon}
       <div
@@ -368,11 +367,11 @@ function DetailItem({
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-[14px] font-medium" style={{ color: "#9CA3AF" }}>
+        <div className="text-sm font-medium text-muted-foreground">
           {title}
         </div>
         <div
-          className={`break-words text-[16px] font-semibold text-foreground ${obscure ? "blur-sm select-none" : ""}`}
+          className={`break-words text-base font-semibold text-foreground ${obscure ? "blur-sm select-none" : ""}`}
         >
           {value}
         </div>
@@ -381,28 +380,38 @@ function DetailItem({
   );
 }
 
-function SoftChips({ items }: { items: string[] }) {
+function SoftChips({ items, variant = 'skills' }: { items: string[]; variant?: 'skills' | 'languages' }) {
   if (items.length === 0) return null;
-  const palette = [
-    "rgba(255,228,181,0.85)",
-    "rgba(255,209,220,0.85)",
-    "rgba(204,229,255,0.85)",
-    "rgba(198,246,213,0.85)",
-    "rgba(233,213,255,0.85)",
-    "rgba(255,241,182,0.85)",
-    "rgba(255,215,168,0.85)",
-    "rgba(189,224,254,0.85)",
+  const skillsPalette = [
+    "rgba(255,200,100,1)",
+    "rgba(255,150,180,1)",
+    "rgba(100,180,255,1)",
+    "rgba(80,220,130,1)",
+    "rgba(190,130,255,1)",
+    "rgba(255,220,80,1)",
+    "rgba(255,160,80,1)",
+    "rgba(80,180,255,1)",
   ];
+  const languagesPalette = [
+    "rgba(100,200,255,1)",
+    "rgba(255,140,170,1)",
+    "rgba(140,235,100,1)",
+    "rgba(255,210,100,1)",
+    "rgba(180,140,255,1)",
+    "rgba(100,240,200,1)",
+    "rgba(255,170,120,1)",
+    "rgba(130,150,255,1)",
+  ];
+  const palette = variant === 'languages' ? languagesPalette : skillsPalette;
   return (
     <div className="flex flex-wrap gap-x-2 gap-y-[6px]">
       {items.map((it, idx) => (
         <div
           key={`${it}-${idx}`}
-          className="rounded-full px-[10px] py-[6px] text-[14px] font-semibold"
+          className="rounded-full px-[10px] py-[6px] text-sm font-semibold"
           style={{
             backgroundColor: palette[idx % palette.length],
-            color: "var(--muted-foreground)",
-            opacity: 0.78,
+            color: "var(--foreground)",
           }}
         >
           {it}
@@ -442,17 +451,17 @@ function TimelineItem({
       </div>
 
       <div className="min-w-0 flex-1 pb-3">
-        <div className="text-[17px] font-bold" style={{ color: "var(--foreground)" }}>
+        <div className="text-[17px] font-bold">
           {title}
         </div>
         {subtitle ? (
-          <div className="mt-0.5 text-[14px]" style={{ color: "#9CA3AF" }}>
+          <div className="mt-0.5 text-sm text-muted-foreground">
             {subtitle}
           </div>
         ) : null}
         {description ? (
           <div
-            className="mt-1 text-[16px]"
+            className="mt-1 text-base"
             style={{
               color: "var(--muted-foreground)",
               opacity: 0.78,
@@ -904,7 +913,7 @@ export function ResumeDetailPanel({
     <div>
       {portalReady && contactOpen
         ? createPortal(
-            <div className="fixed inset-0" style={{ zIndex: 10000 }}>
+            <div className="fixed inset-0 lg:hidden" style={{ zIndex: 10000 }}>
               <button
                 type="button"
                 className="absolute inset-0"
@@ -918,14 +927,13 @@ export function ResumeDetailPanel({
                 >
                   <div className="px-3 pb-3">
                     <div
-                      className="pt-3 text-center text-[16px] font-semibold"
-                      style={{ color: "var(--foreground)" }}
+                      className="pt-3 text-center text-base font-semibold"
                     >
                       {t("resumeDetailContactTitle")}
                     </div>
 
                     {!canSeeContact && (
-                      <div className="mt-2 px-4 text-center text-[12px] text-muted-foreground">
+                      <div className="mt-2 px-4 text-center text-xs text-muted-foreground">
                         {t("resume_detail_contact_restricted")}
                       </div>
                     )}
@@ -950,13 +958,12 @@ export function ResumeDetailPanel({
                           </div>
                           <div className="min-w-0 flex-1 text-left">
                             <div
-                              className="truncate text-[16px] font-bold"
-                              style={{ color: "var(--foreground)" }}
+                              className="truncate text-base font-bold"
                             >
                               {t("resumeDetailPhone")}
                             </div>
                             <div
-                              className={`truncate text-[14px] ${!canSeeContact ? "blur-sm select-none" : ""}`}
+                              className={`truncate text-sm ${!canSeeContact ? "blur-sm select-none" : ""}`}
                               style={{
                                 color: "var(--muted-foreground)",
                                 opacity: 0.55,
@@ -969,7 +976,7 @@ export function ResumeDetailPanel({
                           </div>
                           {canSeeContact && (
                             <i
-                              className="ri-arrow-right-s-line text-[20px]"
+                              className="ri-arrow-right-s-line text-xl"
                               style={{
                                 color: "var(--muted-foreground)",
                                 opacity: 0.35,
@@ -987,21 +994,19 @@ export function ResumeDetailPanel({
                             window.open(`mailto:${resume.email}`, "_self");
                             setContactOpen(false);
                           }}
-                          className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity ${!canSeeContact ? "opacity-70" : ""}`}
-                          style={{ backgroundColor: "rgba(36,91,235,0.12)" }}
+                          className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity bg-jobly-soft ${!canSeeContact ? "opacity-70" : ""}`}
                         >
                           <div className="shrink-0">
                             <Sms size={25} variant="Linear" color="#3B82F6" />
                           </div>
                           <div className="min-w-0 flex-1 text-left">
                             <div
-                              className="truncate text-[16px] font-bold"
-                              style={{ color: "var(--foreground)" }}
+                              className="truncate text-base font-bold"
                             >
                               {t("resumeDetailEmail")}
                             </div>
                             <div
-                              className={`truncate text-[14px] ${!canSeeContact ? "blur-sm select-none" : ""}`}
+                              className={`truncate text-sm ${!canSeeContact ? "blur-sm select-none" : ""}`}
                               style={{
                                 color: "var(--muted-foreground)",
                                 opacity: 0.55,
@@ -1014,7 +1019,7 @@ export function ResumeDetailPanel({
                           </div>
                           {canSeeContact && (
                             <i
-                              className="ri-arrow-right-s-line text-[20px]"
+                              className="ri-arrow-right-s-line text-xl"
                               style={{
                                 color: "var(--muted-foreground)",
                                 opacity: 0.35,
@@ -1026,7 +1031,7 @@ export function ResumeDetailPanel({
 
                       {!resume.phone && !resume.email ? (
                         <div
-                          className="px-1 py-2 text-center text-[16px]"
+                          className="px-1 py-2 text-center text-base"
                           style={{
                             color: "var(--muted-foreground)",
                             opacity: 0.65,
@@ -1055,15 +1060,13 @@ export function ResumeDetailPanel({
               />
               <div className="absolute left-1/2 top-1/2 w-[92%] max-w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-card p-4">
                 <div
-                  className="text-center text-[16px] font-semibold"
-                  style={{ color: "var(--foreground)" }}
+                  className="text-center text-base font-semibold"
                 >
                   {t("report_dialog_title_cv")}
                 </div>
 
                 <div
-                  className="mt-3 text-center text-[14px]"
-                  style={{ color: "var(--muted-foreground)", opacity: 0.65 }}
+                  className="mt-3 text-center text-sm text-muted-foreground/65"
                 >
                   {reported
                     ? t("report_already_submitted")
@@ -1079,8 +1082,7 @@ export function ResumeDetailPanel({
                     />
                     {reportError ? (
                       <div
-                        className="mt-2 text-[12px]"
-                        style={{ color: "#EF4444" }}
+                        className="mt-2 text-xs text-destructive"
                       >
                         {reportError}
                       </div>
@@ -1092,14 +1094,14 @@ export function ResumeDetailPanel({
                   <button
                     type="button"
                     onClick={() => setReportOpen(false)}
-                    className="h-11 flex-1 rounded-xl border border-border text-[16px] font-semibold"
+                    className="h-11 flex-1 rounded-xl border border-border text-base font-semibold"
                   >
                     {t("report_dialog_cancel")}
                   </button>
                   <button
                     type="button"
                     onClick={submitReport}
-                    className="h-11 flex-1 rounded-xl text-[16px] font-semibold"
+                    className="h-11 flex-1 rounded-xl text-base font-semibold"
                     style={{
                       backgroundColor: "var(--jobly-main, #245BEB)",
                       color: "#fff",
@@ -1115,7 +1117,7 @@ export function ResumeDetailPanel({
         : null}
 
       <div
-        className="w-full overflow-hidden rounded-t-2xl"
+        className="w-full overflow-hidden mx-0"
         style={{
           background: "linear-gradient(135deg, #3a8bff 0%, #5ec6fa 100%)",
           borderBottomLeftRadius: 18,
@@ -1163,7 +1165,7 @@ export function ResumeDetailPanel({
               ) : null}
             </div>
             <div
-              className="mt-[5px] max-w-full truncate px-4 text-center text-[16px]"
+              className="mt-[5px] max-w-full truncate px-4 text-center text-base"
               style={{ color: "rgba(255,255,255,0.90)" }}
             >
               {age != null ? `${resume.full_name} (${age})` : resume.full_name}
@@ -1182,10 +1184,10 @@ export function ResumeDetailPanel({
         </div>
       </div>
 
-      <div className="px-0 md:px-4 pb-24 pt-3">
+      <div className="px-4 md:px-4 pb-24 pt-3">
         {avatarErrorMsg ? (
           <div
-            className="mb-3 rounded-2xl border border-border px-4 py-3 text-[14px]"
+            className="mb-3 rounded-2xl border border-border px-4 py-3 text-sm"
             style={{
               color: "#EF4444",
               backgroundColor: "rgba(239,68,68,0.06)",
@@ -1195,16 +1197,14 @@ export function ResumeDetailPanel({
           </div>
         ) : null}
         <div
-          className="text-center text-[18px] font-bold"
-          style={{ color: "var(--jobly-main)" }}
+          className="text-center text-lg font-bold text-primary"
         >
           {resume.desired_position ?? "—"}
         </div>
 
         {createdLabel || expirationLabel ? (
           <div
-            className="mt-2 flex items-center justify-between gap-3 text-[14px]"
-            style={{ color: "#9CA3AF" }}
+            className="mt-2 flex items-center justify-between gap-3 text-sm text-muted-foreground"
           >
             <div className="min-w-0">
               {createdLabel ? (
@@ -1239,8 +1239,7 @@ export function ResumeDetailPanel({
             />
             <div className="mt-2 grid gap-6 px-3 pb-3">
               <div
-                className="text-[18px] font-bold"
-                style={{ color: "var(--foreground)" }}
+                className="text-lg font-bold"
               >
                 {resume.desired_salary}
               </div>
@@ -1382,7 +1381,6 @@ export function ResumeDetailPanel({
             />
             <div
               className="px-3 py-3 text-[17px]"
-              style={{ color: "var(--foreground)" }}
             >
               {t(resume.city!) !== resume.city ? t(resume.city!) : resume.city}
             </div>
@@ -1421,6 +1419,7 @@ export function ResumeDetailPanel({
             />
             <div className="px-3 py-3">
               <SoftChips
+                variant="languages"
                 items={parseCsv(resume.languages).map((entry) => {
                   const raw = entry.trim();
                   // Format: "resume_wizard_lang_english (B2)" — extract key before " ("
@@ -1450,10 +1449,9 @@ export function ResumeDetailPanel({
               title={t("resumeDetailAbout")}
             />
             <div
-              className="px-3 py-3 text-[16px]"
+              className="px-3 py-3 text-base"
               style={{
-                color: "var(--muted-foreground)",
-                opacity: 0.78,
+                color: "var(--foreground)",
                 whiteSpace: "pre-wrap",
                 lineHeight: 1.35,
               }}
@@ -1542,61 +1540,123 @@ export function ResumeDetailPanel({
         ) : null}
       </div>
 
-      <div
-        className="fixed inset-x-0 mx-auto w-full max-w-md z-[60] bottom-0 lg:max-w-none"
-        style={{
-          ...(barRect
-            ? { left: barRect.left, width: barRect.width, right: "auto" }
-            : null),
-          ...(typeof window !== "undefined" && window.innerWidth >= 1024
-            ? bottomOffset > 0
-              ? { bottom: bottomOffset }
-              : { bottom: 1 }
-            : null),
-        }}
-      >
-        <div className="pb-[calc(env(safe-area-inset-bottom,0px)+64px)] lg:pb-0">
-          <div
-            className="px-4 bg-card rounded-2xl shadow-[0_-4px_25px_rgba(0,0,0,0.08)] border-t border-border"
-            style={{ paddingTop: 12, paddingBottom: 12 }}
-          >
+      {/* Masaüstü iletişim barı */}
+      {contactOpen && (
+        <div className="hidden lg:flex fixed bottom-6 left-24 right-[calc(96px+24px+320px)] z-[90] items-end justify-center gap-3 px-0">
+          <div className="w-full max-w-[520px] px-4">
             <div className="flex items-center gap-3">
+              {resume.phone ? (
+                <button
+                  type="button"
+                  className={`h-12 flex-1 rounded-full text-base font-semibold ${!canSeeContact ? "opacity-70" : ""}`}
+                  style={{ backgroundColor: "rgba(34,197,94,0.12)", color: "#16A34A" }}
+                >
+                  {canSeeContact ? resume.phone : maskPhone(resume.phone)}
+                </button>
+              ) : null}
+              {resume.email ? (
+                <button
+                  type="button"
+                  className={`h-12 flex-1 rounded-full text-base font-semibold ${!canSeeContact ? "opacity-70" : ""}`}
+                  style={{ backgroundColor: "rgba(59,130,246,0.12)", color: "#3B82F6" }}
+                >
+                  {canSeeContact ? resume.email : maskEmail(resume.email)}
+                </button>
+              ) : null}
               <button
                 type="button"
-                onClick={toggleFavorite}
-                className="grid h-12 w-12 place-items-center rounded-xl"
+                onClick={() => setContactOpen(false)}
+                className="grid h-12 w-12 shrink-0 place-items-center rounded-full"
                 style={{ backgroundColor: "var(--secondary)" }}
               >
-                <Archive
-                  size={24}
-                  variant={favorite ? "Bold" : "Linear"}
-                  color={favorite ? "#FFA500" : "var(--muted-foreground)"}
-                />
-              </button>
-              <button
-                type="button"
-                onClick={handleContactClick}
-                className="h-12 flex-1 rounded-full text-[16px] font-semibold"
-                style={{
-                  backgroundColor: "var(--jobly-main, #245BEB)",
-                  color: "#fff",
-                }}
-              >
-                {t("resumeDetailContactButton")}
-              </button>
-              <button
-                type="button"
-                onClick={openReport}
-                className="grid h-12 w-12 place-items-center rounded-xl"
-                style={{ backgroundColor: "var(--secondary)" }}
-              >
-                <Flag
-                  size={24}
-                  variant="Linear"
-                  color={reported ? "#FFA500" : "var(--jobly-main, #245BEB)"}
-                />
+                <i className="ri-close-line text-xl text-muted-foreground" />
               </button>
             </div>
+          </div>
+          {/* Masaüstü AI FAB - bar'ın sağında, aynı hizada */}
+          <div className="hidden lg:block lg:pb-3">
+            {isEmployer && (
+              <AiMatchFab
+                authUserId={resume.authUserId}
+                authUserType={resume.authUserType}
+                targetData={resume}
+                targetType="resume"
+                className="relative"
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className={`fixed bottom-20 left-0 right-0 z-[90] lg:bottom-6 lg:left-24 lg:right-[calc(96px+24px+320px)] ${contactOpen ? 'lg:hidden' : ''}`}>
+        {/* Mobil AI FAB - bar üstünde */}
+        <div className="relative mx-auto max-w-[520px] lg:hidden">
+          {isEmployer && (
+            <AiMatchFab
+              authUserId={resume.authUserId}
+              authUserType={resume.authUserType}
+              targetData={resume}
+              targetType="resume"
+              className="absolute z-[60] bottom-full right-2 mb-2"
+            />
+          )}
+        </div>
+        <div className="flex items-end justify-center gap-3 px-0 pb-[env(safe-area-inset-bottom)]">
+          <div id="bottom-action-bar" className="w-full max-w-[520px]">
+            <div
+              className="px-4"
+              style={{ paddingTop: 12, paddingBottom: 12 }}
+            >
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={toggleFavorite}
+                  className="grid h-12 w-12 place-items-center rounded-xl"
+                  style={{ backgroundColor: "var(--secondary)" }}
+                >
+                  <Archive
+                    size={24}
+                    variant={favorite ? "Bold" : "Linear"}
+                    color={favorite ? "#FFA500" : "var(--muted-foreground)"}
+                  />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleContactClick}
+                  className="h-12 flex-1 rounded-full text-base font-semibold"
+                  style={{
+                    backgroundColor: "var(--jobly-main, #245BEB)",
+                    color: "#fff",
+                  }}
+                >
+                  {t("resumeDetailContactButton")}
+                </button>
+                <button
+                  type="button"
+                  onClick={openReport}
+                  className="grid h-12 w-12 place-items-center rounded-xl"
+                  style={{ backgroundColor: "var(--secondary)" }}
+                >
+                  <Flag
+                    size={24}
+                    variant="Linear"
+                    color={reported ? "#FFA500" : "var(--jobly-main, #245BEB)"}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Masaüstü AI FAB - bar'ın sağında, aynı hizada */}
+          <div className="hidden lg:block lg:pb-3">
+            {isEmployer && (
+              <AiMatchFab
+                authUserId={resume.authUserId}
+                authUserType={resume.authUserType}
+                targetData={resume}
+                targetType="resume"
+                className="relative"
+              />
+            )}
           </div>
         </div>
       </div>

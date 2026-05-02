@@ -2,6 +2,8 @@
 
 import { ArrowRight3, Location, Bookmark } from 'iconsax-react';
 import { useI18n } from '@/lib/i18n/client';
+import { PremiumBadge } from '@/components/ui/premium-badge';
+import { cn } from '@/lib/utils';
 
 export type JobListItemData = {
   id: string;
@@ -15,18 +17,15 @@ export type JobListItemData = {
 function Logo({ src, alt }: { src: string; alt: string }) {
   if (!src) {
     return (
-      <div
-        className="grid place-items-center rounded-full"
-        style={{ width: 44, height: 44, backgroundColor: 'rgba(0,0,0,0.04)' }}
-      >
-        <div className="text-[16px] font-bold" style={{ color: 'rgba(0,0,0,0.65)' }}>
+      <div className="grid h-11 w-11 place-items-center rounded-full bg-muted">
+        <div className="text-base font-bold text-foreground/65">
           {(alt?.trim()?.[0] ?? '?').toUpperCase()}
         </div>
       </div>
     );
   }
   return (
-    <div className="overflow-hidden rounded-full" style={{ width: 44, height: 44 }}>
+    <div className="h-11 w-11 overflow-hidden rounded-full">
       <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
     </div>
   );
@@ -40,42 +39,30 @@ export function JobListItem({
   premium?: boolean;
 }) {
   const { t } = useI18n();
-  const borderColor = premium ? '#245BEB' : 'transparent';
-  const borderWidth = premium ? 2.5 : 0;
   const cityLabel = job.city ? t(job.city) : '';
-  const premiumLabel = (t('premium_tag') || 'PREMIUM').toUpperCase();
 
   return (
     <div
-      className="rounded-[8px] bg-white"
-      style={{
-        border: borderWidth ? `${borderWidth}px solid ${borderColor}` : undefined,
-      }}
+      className={cn(
+        "rounded-lg",
+        premium ? "border-[2.5px] border-primary" : "border border-transparent"
+      )}
     >
       <div className="py-3">
         <div className="flex items-start gap-3">
           <Logo src={job.company_logo} alt={job.company_name} />
 
           <div className="min-w-0 flex-1">
-            <div
-              className="truncate text-[18px] font-medium text-foreground"
-              style={{ lineHeight: 1.15 }}
-            >
+            <div className="truncate text-lg font-medium text-foreground leading-tight">
               {job.title}
             </div>
-            <div
-              className="mt-1 truncate text-[14px]"
-              style={{ lineHeight: 1.15, color: '#9CA3AF' }}
-            >
+            <div className="mt-1 truncate text-sm leading-tight text-muted-foreground">
               {job.company_name}
             </div>
             {premium ? (
               <div className="mt-1 flex items-center gap-1">
-                <Location size={15} variant="Linear" color="#9CA3AF" />
-                <div
-                  className="truncate text-[13px]"
-                  style={{ color: '#9CA3AF' }}
-                >
+                <Location size={15} variant="Linear" color="currentColor" className="text-muted-foreground" />
+                <div className="truncate text-sm text-muted-foreground">
                   {cityLabel}
                 </div>
               </div>
@@ -84,25 +71,11 @@ export function JobListItem({
 
           {premium ? (
             <div className="flex flex-col items-end gap-2">
-              <div
-                className="flex items-center gap-1 rounded-full px-2 py-1"
-                style={{
-                  background:
-                    'linear-gradient(135deg, #FFD700 0%, #FFC107 100%)',
-                }}
-              >
-                <div
-                  className="text-[8px] font-bold"
-                  style={{ color: '#000', letterSpacing: 0.6 }}
-                >
-                  {premiumLabel}
-                </div>
-                <i className="ri-vip-crown-fill text-[10px] text-white" />
-              </div>
-              <Bookmark size={18} variant="Linear" color="#245BEB" />
+              <PremiumBadge />
+              <Bookmark size={18} variant="Linear" color="currentColor" className="text-primary" />
             </div>
           ) : (
-            <ArrowRight3 size={20} variant="Linear" color="#9CA3AF" />
+            <ArrowRight3 size={20} variant="Linear" color="currentColor" className="text-muted-foreground" />
           )}
         </div>
       </div>

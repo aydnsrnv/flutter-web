@@ -2,11 +2,15 @@ import {
   JobDetailPanel,
   type JobDetailPanelData,
 } from "@/components/job-detail-panel";
+import { FlutterJobItem } from "@/components/flutter-job-item";
+import type { FlutterJobItemData } from "@/components/flutter-job-item";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocaleFromCookies } from "@/lib/i18n/server";
 import { incrementJobViewCount } from "@/app/actions/stats";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Building } from "iconsax-react";
 
 function toSnakeCase(input: string) {
   return input
@@ -175,6 +179,20 @@ export default async function JobByNumberPage({
   incrementJobViewCount(String(job.id));
   job.view_count = (job.view_count || 0) + 1;
 
+  const { data: authData } = await supabase.auth.getUser();
+  const authUserId = authData?.user?.id ?? null;
+  let authUserType = "candidate";
+  if (authUserId) {
+    const { data: userData } = await supabase
+      .from("users")
+      .select("user_type")
+      .eq("user_id", authUserId)
+      .maybeSingle();
+    if (userData?.user_type) {
+      authUserType = String(userData.user_type).toLowerCase();
+    }
+  }
+
   const { data: similarData } = await supabase
     .from("jobs")
     .select(
@@ -214,17 +232,8 @@ export default async function JobByNumberPage({
     number: job.number ?? null,
     mail: job.mail ?? null,
     apply_link: job.apply_link ?? null,
-    similar_jobs: similarJobs.map((j) => ({
-      id: String(j.id),
-      job_number: j.job_number ?? null,
-      title: j.title,
-      company_name: j.company_name,
-      company_logo: j.company_logo,
-      city: j.city,
-      create_time: j.create_time ?? undefined,
-      min_salary: j.min_salary ?? null,
-      max_salary: j.max_salary ?? null,
-    })),
+    authUserId,
+    authUserType,
   };
 
   const base = "https://jobly.az";
@@ -258,6 +267,18 @@ export default async function JobByNumberPage({
       [job.about, job.request].filter(Boolean).join("\n\n") || undefined,
   };
 
+  const similarJobItems: FlutterJobItemData[] = similarJobs.map((j) => ({
+    id: String(j.id),
+    job_number: j.job_number ?? null,
+    title: j.title,
+    company_name: j.company_name,
+    company_logo: j.company_logo,
+    city: j.city,
+    create_time: j.create_time ?? undefined,
+    min_salary: j.min_salary ?? null,
+    max_salary: j.max_salary ?? null,
+  }));
+
   return (
     <>
       <script
@@ -265,7 +286,60 @@ export default async function JobByNumberPage({
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
       />
-      <JobDetailPanel job={panelJob} />
+      <div className="lg:flex lg:gap-6">
+        <div className="min-w-0 flex-1">
+          <JobDetailPanel job={panelJob} />
+        </div>
+        <div className="hidden lg:block lg:w-[320px] lg:shrink-0">
+          <div className="sticky top-6 space-y-4">
+            {job.company_id ? (
+              <Link
+                href={`/company/${encodeURIComponent(String(job.company_id))}`}
+                className="block"
+              >
+                <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/50">
+                  {job.company_logo ? (
+                    <img
+                      src={job.company_logo}
+                      alt={job.company_name}
+                      className="h-12 w-12 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-muted">
+                      <Building size={24} variant="Linear" color="currentColor" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold text-foreground">
+                      {job.company_name}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {t("view_company")}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ) : null}
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <div className="mb-3 text-base font-semibold text-foreground">
+                {t("similar_jobs")}
+              </div>
+              {similarJobItems.length > 0 ? (
+                <div>
+                  {similarJobItems.map((j, i) => (
+                    <div key={j.id}>
+                      <FlutterJobItem job={j} />
+                      {i !== similarJobItems.length - 1 ? (
+                        <div className="h-px bg-border/60" />
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

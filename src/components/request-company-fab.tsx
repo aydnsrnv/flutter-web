@@ -92,7 +92,7 @@ export function RequestCompanyFab() {
       <div className="z-[90] fixed bottom-[85px] right-4 lg:sticky lg:bottom-[95px] lg:self-end lg:h-0 lg:overflow-visible flex justify-end">
         <button
           onClick={() => setIsOpen(true)}
-          className="flex h-14 w-14 lg:absolute lg:bottom-0 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+          className="flex h-14 w-14 lg:absolute lg:bottom-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
           aria-label={t('request_company_title')}
         >
           <Add size={28} color="currentColor" />
@@ -101,7 +101,7 @@ export function RequestCompanyFab() {
 
       {isOpen && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-sm rounded-3xl bg-card p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
             <h2 className="mb-6 text-center text-xl font-bold text-foreground">
               {t('request_company_title')}
             </h2>
@@ -116,7 +116,7 @@ export function RequestCompanyFab() {
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder={t('request_company_name_hint')}
-                  className="w-full rounded-[21px] border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:opacity-50"
+                  className="w-full rounded-[var(--radius-input)] border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:opacity-50"
                   disabled={isSubmitting}
                 />
               </div>
@@ -130,19 +130,19 @@ export function RequestCompanyFab() {
                   value={socialMedia}
                   onChange={(e) => setSocialMedia(e.target.value)}
                   placeholder={t('request_company_social_media_hint')}
-                  className="w-full rounded-[21px] border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:opacity-50"
+                  className="w-full rounded-[var(--radius-input)] border border-border bg-background py-3 pl-12 pr-4 text-sm text-foreground outline-none transition-colors focus:border-primary disabled:opacity-50"
                   disabled={isSubmitting}
                 />
               </div>
 
               {errorText ? (
-                <div className="rounded-lg bg-red-500/10 px-4 py-3 text-sm font-medium text-red-500 text-center">
+                <div className="rounded-lg bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive text-center">
                   {errorText}
                 </div>
               ) : null}
 
               {successText ? (
-                <div className="rounded-lg bg-green-500/10 px-4 py-3 text-sm font-medium text-green-500 text-center">
+                <div className="rounded-lg bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-600 dark:text-emerald-400 text-center">
                   {successText}
                 </div>
               ) : null}
@@ -152,17 +152,17 @@ export function RequestCompanyFab() {
                   type="button"
                   onClick={() => setIsOpen(false)}
                   disabled={isSubmitting}
-                  className="flex-1 rounded-[21px] bg-muted py-3 text-center text-sm font-semibold text-foreground transition-colors hover:bg-muted/80 disabled:opacity-50"
+                  className="flex-1 rounded-[var(--radius-input)] bg-muted py-3 text-center text-sm font-semibold text-foreground transition-colors hover:bg-muted/80 disabled:opacity-50"
                 >
                   {t('report_dialog_cancel') || 'Cancel'}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 rounded-[21px] bg-primary py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 rounded-[var(--radius-input)] bg-primary py-3 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/20 border-t-primary-foreground" />
                   ) : null}
                   {t('report_dialog_send') || 'Send'}
                 </button>

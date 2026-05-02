@@ -181,7 +181,7 @@ export default function CategoryViewPage() {
       <div className="h-5" />
 
       <div className="relative">
-        <i className="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-muted-foreground" />
+        <i className="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground" />
         <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -196,7 +196,7 @@ export default function CategoryViewPage() {
             aria-label={t("clear")}
           >
             <div className="grid h-8 w-8 place-items-center rounded-full bg-muted">
-              <i className="ri-close-line text-[18px] text-muted-foreground" />
+              <i className="ri-close-line text-lg text-muted-foreground" />
             </div>
           </button>
         ) : null}

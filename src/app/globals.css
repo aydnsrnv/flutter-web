@@ -83,6 +83,13 @@
   --sidebar-accent-foreground: #111827;
   --sidebar-border: rgba(17, 24, 39, 0.12);
   --sidebar-ring: #245beb;
+
+  /* ── Design System Token'ları ── */
+  --icon-muted: #9CA3AF;
+  --icon-muted-dark: rgba(255, 255, 255, 0.50);
+  --radius-input: 16px;
+  --radius-button: 10px;
+  --radius-card: 16px;
 }
 
 .dark {
@@ -120,6 +127,9 @@
   --sidebar-accent-foreground: rgba(255, 255, 255, 0.88);
   --sidebar-border: rgba(255, 255, 255, 0.14);
   --sidebar-ring: #245beb;
+
+  /* Dark mode icon muted override */
+  --icon-muted: var(--icon-muted-dark);
 }
 
 @layer base {
@@ -143,7 +153,22 @@
 
 @layer components {
   .jobly-input {
-    @apply h-12 w-full rounded-[21px] border-0 bg-black/5 px-4 text-[14px] text-foreground/80 outline-none dark:bg-black/20;
+    @apply h-12 w-full rounded-[var(--radius-input)] border-0 bg-black/5 px-4 text-sm text-foreground/80 outline-none dark:bg-black/20;
+  }
+
+  /* ── Icon Muted Utility ── */
+  .text-icon-muted {
+    color: var(--icon-muted);
+  }
+
+  /* ── Jobly Soft Background (primary/10) ── */
+  .bg-jobly-soft {
+    background-color: var(--jobly-main-10);
+  }
+
+  /* ── Jobly Text Color ── */
+  .text-jobly {
+    color: var(--jobly-main);
   }
 }
 
@@ -162,4 +187,52 @@
   background-size: 600px 100%;
   animation: shimmer 1.4s infinite linear;
   border-radius: 10px;
+}
+
+/* ── AI Match FAB Animations ── */
+@keyframes ai-fab-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes ai-fab-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(36, 91, 235, 0.35), 0 0 28px rgba(36, 91, 235, 0.15); }
+  50% { box-shadow: 0 0 20px rgba(36, 91, 235, 0.55), 0 0 40px rgba(36, 91, 235, 0.25); }
+}
+
+@keyframes ai-fab-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ai-fab-ring {
+  position: relative;
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, #245BEB, #22C55E, #A855F7, #245BEB);
+  animation: ai-fab-pulse 2.5s ease-in-out infinite, ai-fab-glow 3s ease-in-out infinite;
+}
+
+.ai-fab-ring::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 9999px;
+  background: var(--card);
+}
+
+.ai-fab-icon {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(135deg, #245BEB, #A855F7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Circular Progress ── */
+.ai-score-ring {
+  transform: rotate(-90deg);
+}
+
+.ai-score-ring-circle {
+  transition: stroke-dashoffset 1.2s ease-out;
 }

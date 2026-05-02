@@ -96,12 +96,12 @@ export function PaymentsHistoryClient({
                 </div>
                 <div className="w-3 shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <div className="text-[14px] font-semibold text-foreground/80">
+                  <div className="text-sm font-semibold text-foreground/80">
                     {formatDetailedDate(p.created_at, todayText, yesterdayText)}
                   </div>
                 </div>
                 <div className="w-3 shrink-0" />
-                <div className="shrink-0 text-[16px] font-bold" style={{ color: 'rgb(21, 128, 61)' }}>
+                <div className="shrink-0 text-base font-bold" style={{ color: 'rgb(21, 128, 61)' }}>
                   + {p.amount} {currencyLabel}
                 </div>
               </div>

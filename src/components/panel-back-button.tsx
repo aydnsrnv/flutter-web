@@ -23,10 +23,9 @@ export function PanelBackButton({
         }
         router.push(fallbackHref);
       }}
-      className="grid h-10 w-10 place-items-center rounded-full border border-border"
-      style={{ backgroundColor: 'rgba(0,0,0,0.06)', color: 'rgba(0,0,0,0.70)' }}
+      className="grid h-10 w-10 place-items-center rounded-full border border-border bg-black/[0.06] text-black/70 dark:bg-white/[0.06] dark:text-white/70"
     >
-      <i className="ri-arrow-left-s-line text-[22px] leading-none" />
+      <i className="ri-arrow-left-s-line text-xl leading-none" />
     </button>
   );
 }

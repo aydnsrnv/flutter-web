@@ -282,7 +282,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
         cancelText={t('cancel_button')}
         isDestructive
         icon={<TrashIcon size={22} className="" />}
-        iconColor="rgb(239,68,68)"
+        iconColor="var(--destructive)"
         onCancel={() => setDeleteOpen(false)}
         onConfirm={async () => {
           setDeleteOpen(false);
@@ -339,7 +339,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
         confirmText={t('confirm_button')}
         cancelText={t('cancel_button')}
         icon={<FlashIcon size={22} className="" />}
-        iconColor="rgb(249, 115, 22)"
+        iconColor="var(--warning, #F59E0B)"
         onCancel={() => setPremiumOpen(false)}
         onConfirm={async () => {
           if (!premiumReady) return;
@@ -354,7 +354,7 @@ export function ResumeActions({ resumeId, isActive, isPremium, onDelete }: Resum
         confirmText={t('confirm_button')}
         cancelText={t('cancel_button')}
         icon={<Refresh2 size={22} variant="Linear" color="currentColor" />}
-        iconColor="var(--jobly-main, #245BEB)"
+        iconColor="var(--jobly-main)"
         onCancel={() => setReactivateOpen(false)}
         onConfirm={async () => {
           if (!reactivateReady) return;

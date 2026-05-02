@@ -17,15 +17,11 @@ export function SectionHeader({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="text-[18px] font-bold">{resolvedTitle}</div>
+      <div className="text-lg font-bold">{resolvedTitle}</div>
       {href ? (
         <Link
           href={href}
-          className="rounded-full px-3 py-1 text-[14px] font-semibold"
-          style={{
-            backgroundColor: 'rgba(36, 91, 235, 0.10)',
-            color: '#245BEB',
-          }}
+          className="rounded-full px-3 py-1 text-sm font-semibold bg-jobly-soft text-primary"
         >
           {t('see_all')}
         </Link>

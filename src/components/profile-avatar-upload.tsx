@@ -11,14 +11,12 @@ export function ProfileAvatarUpload({
   fullName,
   isCandidate,
   userId,
-  mainColor,
   editable = true,
 }: {
   avatarUrl?: string | null;
   fullName: string;
   isCandidate: boolean;
   userId: string;
-  mainColor: string;
   editable?: boolean;
 }) {
   const [currentAvatar, setCurrentAvatar] = useState(avatarUrl);
@@ -103,13 +101,13 @@ export function ProfileAvatarUpload({
     <div className="flex flex-col items-center">
       <div className="relative">
         <div
-          className={`grid place-items-center overflow-hidden rounded-full transition-opacity ${isUploading ? 'opacity-50' : ''}`}
-          style={{ width: 110, height: 110, backgroundColor: 'var(--border)', border: '4px solid #fff' }}
+          className={`grid place-items-center overflow-hidden rounded-full border-4 border-background transition-opacity ${isUploading ? 'opacity-50' : ''}`}
+          style={{ width: 110, height: 110, backgroundColor: 'var(--border)' }}
         >
           {currentAvatar ? (
             <img src={currentAvatar} alt={fullName} className="h-full w-full object-cover" />
           ) : (
-            <User size={60} variant="Outline" color="rgba(0,0,0,0.55)" />
+            <User size={60} variant="Outline" color="currentColor" className="text-icon-muted" />
           )}
 
           {isUploading ? (
@@ -121,10 +119,10 @@ export function ProfileAvatarUpload({
 
         {editable ? (
           <label
-            className="absolute -bottom-1 -right-1 grid place-items-center rounded-full cursor-pointer hover:scale-105 transition-transform"
-            style={{ width: 34, height: 34, backgroundColor: mainColor, border: '2px solid #fff' }}
+            className="absolute -bottom-1 -right-1 grid place-items-center rounded-full cursor-pointer hover:scale-105 transition-transform border-2 border-background bg-primary"
+            style={{ width: 34, height: 34 }}
           >
-            <Edit size={16} variant="Linear" color="#fff" />
+            <Edit size={16} variant="Linear" color="currentColor" className="text-primary-foreground" />
             <input
               type="file"
               accept="image/jpeg, image/png, image/webp"
@@ -137,7 +135,7 @@ export function ProfileAvatarUpload({
       </div>
 
       {errorMsg ? (
-        <div className="mt-3 text-[13px] text-red-500 font-medium text-center">
+        <div className="mt-3 text-sm text-destructive font-medium text-center">
           {errorMsg}
         </div>
       ) : null}

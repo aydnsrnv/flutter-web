@@ -246,13 +246,13 @@ export default function FavoritesPage() {
         <div className="flex gap-0 rounded-full border border-border bg-card p-1">
           <Link
             href="/favorites?tab=jobs"
-            className={`flex-1 rounded-full py-2.5 text-center text-[14px] transition-colors ${isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
+            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
           >
             {t("favorites_tab_jobs")}
           </Link>
           <Link
             href="/favorites?tab=resumes"
-            className={`flex-1 rounded-full py-2.5 text-center text-[14px] transition-colors ${!isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
+            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${!isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
           >
             {t("favorites_tab_resumes")}
           </Link>

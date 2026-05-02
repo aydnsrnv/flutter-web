@@ -12,20 +12,18 @@ export default async function PaymentErrorPage() {
   const dict = getDictionary(locale);
   const t = (key: string) => dict[key] ?? key;
 
-  const mainColor = '#245BEB';
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-[520px] flex-col items-center justify-center px-6">
       <div className="w-full rounded-2xl border border-border bg-card p-6 text-center">
-        <div className="text-[18px] font-semibold text-foreground">
+        <div className="text-lg font-semibold text-foreground">
           {t('payment_failed_title')}
         </div>
-        <div className="mt-2 text-[14px] text-muted-foreground">
+        <div className="mt-2 text-sm text-muted-foreground">
           {t('payment_failed_subtitle')}
         </div>
         <Link
           href="/wallet"
-          className="mt-5 inline-block h-12 w-full rounded-2xl text-center text-[15px] font-semibold leading-[48px]"
-          style={{ backgroundColor: mainColor, color: '#fff' }}
+          className="mt-5 inline-block h-12 w-full rounded-2xl text-center text-sm font-semibold leading-[48px] bg-primary text-primary-foreground"
         >
           {t('payment_try_again')}
         </Link>

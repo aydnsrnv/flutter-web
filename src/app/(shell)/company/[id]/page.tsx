@@ -3,7 +3,7 @@
 import { EmptyState } from "@/components/empty-state";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -12,6 +12,7 @@ import { slugify } from '@/lib/utils';
 
 import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
 import type { FlutterJobItemData } from "@/components/flutter-job-item";
+import { CompanyStatsDashboard } from "@/components/company-stats-dashboard";
 import { SectionHeader } from "@/components/section-header";
 import { useI18n } from "@/lib/i18n/client";
 import { createClient } from "@/lib/supabase/browser";
@@ -53,38 +54,17 @@ function formatCount(n: number) {
   return `${formatted.replace(".", ",")}{k}`;
 }
 
-function StatBox({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-}) {
-  return (
-    <div className="flex min-w-0 flex-1 flex-col items-center justify-center">
-      <div className="text-center text-[18px] font-bold text-foreground">
-        {value}
-      </div>
-      <div
-        className="mt-2 grid h-11 w-11 place-items-center rounded-xl"
-        style={{ backgroundColor: "rgba(36, 91, 235, 0.10)" }}
-      >
-        {icon}
-      </div>
-      <div className="mt-2 text-center text-[13px] font-medium text-muted-foreground">
-        {label}
-      </div>
-    </div>
-  );
-}
+
 
 export default function CompanyViewPage() {
   const { t } = useI18n();
   const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+
+  const tab = (searchParams.get("tab") ?? "jobs").toString();
+  const isJobsTab = tab !== "stats";
 
   const companyKey = (params?.id ?? "").toString();
   const isUuid = useMemo(
@@ -117,6 +97,7 @@ export default function CompanyViewPage() {
   const aboutRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const initForIdRef = useRef<string | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   const companyIdForJobs = companyUuid;
 
@@ -248,6 +229,8 @@ export default function CompanyViewPage() {
             create_time: j.create_time,
             min_salary: j.min_salary,
             max_salary: j.max_salary,
+            view_count: j.view_count,
+            applied_count: j.applied_count,
           }),
         );
 
@@ -371,59 +354,14 @@ export default function CompanyViewPage() {
             )}
           </div>
 
-          <div className="mt-4 text-center text-[22px] font-bold text-foreground">
+          <div className="mt-4 text-center text-xl font-bold text-foreground">
             {name}
-          </div>
-
-          <div className="mt-4 flex w-full items-center justify-between">
-            <StatBox
-              icon={
-                <Eye
-                  size={24}
-                  variant="Linear"
-                  color="var(--jobly-main, #245BEB)"
-                />
-              }
-              value={formatCount(totalViews).replace(
-                "{k}",
-                t("number_k_suffix"),
-              )}
-              label={t("company_stats_views")}
-            />
-            <StatBox
-              icon={
-                <UserTick
-                  size={24}
-                  variant="Linear"
-                  color="var(--jobly-main, #245BEB)"
-                />
-              }
-              value={formatCount(totalApplied).replace(
-                "{k}",
-                t("number_k_suffix"),
-              )}
-              label={t("company_stats_applied")}
-            />
-            <StatBox
-              icon={
-                <Briefcase
-                  size={24}
-                  variant="Linear"
-                  color="var(--jobly-main, #245BEB)"
-                />
-              }
-              value={formatCount(Number(jobsCount ?? 0)).replace(
-                "{k}",
-                t("number_k_suffix"),
-              )}
-              label={t("company_stats_jobs")}
-            />
           </div>
 
           <div className="mt-4 w-full rounded-xl bg-card px-3.5 py-3.5">
             <div
               ref={aboutRef}
-              className={`text-center text-[15px] leading-snug text-foreground ${!aboutExpanded ? "line-clamp-2" : ""}`}
+              className={`text-center text-sm leading-snug text-foreground ${!aboutExpanded ? "line-clamp-2" : ""}`}
             >
               {about}
             </div>
@@ -453,31 +391,67 @@ export default function CompanyViewPage() {
         </div>
       </div>
 
-      <div className="mx-0 md:mx-4 mb-2 mt-4">
-        <h2 className="text-[18px] font-bold text-foreground">
-          {t("active_jobs")}
-        </h2>
+      <div className="mx-0 md:mx-4"
+        onTouchStart={(e) => { touchStartX.current = e.changedTouches[0].screenX; }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current === null) return;
+          const diff = touchStartX.current - e.changedTouches[0].screenX;
+          if (Math.abs(diff) > 50) {
+            if (diff > 0 && isJobsTab) {
+              router.push(`/company/${encodeURIComponent(companyKey)}?tab=stats`);
+            } else if (diff < 0 && !isJobsTab) {
+              router.push(`/company/${encodeURIComponent(companyKey)}?tab=jobs`);
+            }
+          }
+          touchStartX.current = null;
+        }}
+      >
+        <div className="flex gap-0 rounded-full border border-border bg-card p-1">
+          <Link
+            href={`/company/${encodeURIComponent(companyKey)}?tab=jobs`}
+            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
+          >
+            {t("active_jobs")}
+          </Link>
+          <Link
+            href={`/company/${encodeURIComponent(companyKey)}?tab=stats`}
+            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${!isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
+          >
+            {t("statistics") || "Statistikalar"}
+          </Link>
+        </div>
       </div>
 
-      <div className="mx-0 md:mx-4 overflow-hidden rounded-lg bg-background">
-        {initialJobsLoading ? null : jobsError ? (
-          <div className="px-4 py-4 text-sm text-muted-foreground">
-            {jobsError}
-          </div>
-        ) : jobs.length === 0 ? (
-          <EmptyState label={t("no_active_job_for_company")} />
-        ) : (
-          <>
-            <FlutterJobListGroup jobs={jobs} />
-            <div ref={sentinelRef} className="h-px w-full" />
-            {jobsLoading && hasMore && jobs.length > 0 ? (
-              <div className="px-4 py-4 text-center text-sm text-muted-foreground">
-                {t("updating")}
-              </div>
-            ) : null}
-          </>
-        )}
-      </div>
+      {isJobsTab ? (
+        <div className="mx-0 md:mx-4 overflow-hidden rounded-lg bg-background">
+          {initialJobsLoading ? null : jobsError ? (
+            <div className="px-4 py-4 text-sm text-muted-foreground">
+              {jobsError}
+            </div>
+          ) : jobs.length === 0 ? (
+            <EmptyState label={t("no_active_job_for_company")} />
+          ) : (
+            <>
+              <FlutterJobListGroup jobs={jobs} />
+              <div ref={sentinelRef} className="h-px w-full" />
+              {jobsLoading && hasMore && jobs.length > 0 ? (
+                <div className="px-4 py-4 text-center text-sm text-muted-foreground">
+                  {t("updating")}
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="mx-0 md:mx-4 mt-2">
+          <CompanyStatsDashboard
+            jobs={jobs}
+            totalViews={totalViews}
+            totalApplied={totalApplied}
+            jobsCount={jobsCount}
+          />
+        </div>
+      )}
     </div>
   );
 }

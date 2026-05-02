@@ -851,11 +851,9 @@
   "auth_unexpected_error": "Произошла непредвиденная ошибка",
   "ok": "OK",
   "job_details_loading": "Загрузка деталей вакансии...",
-  
   "no_internet": "Нет интернету",
   "no_internet_title": "Нет подключения к интернету",
   "no_internet_message": "Пожалуйста, проверьте подключение к интернету и попробуйте снова",
-  
   "wallet_title": "Кошелек",
   "wallet_add_balance": "Пополнить баланс",
   "wallet_transaction_history": "История",
@@ -979,5 +977,20 @@
   "enterContactInfo": "Необходимо ввести хотя бы одну контактную информацию.",
   "invalidApplyLink": "Введите действительную ссылку для заявки",
   "user_type_candidate": "Соискатель",
-  "user_type_employer": "Работодатель"
+  "user_type_employer": "Работодатель",
+  "step_counter": "Шаг {current} / {total}",
+  "selectCompany": "Выберите компанию",
+  "selectCategory": "Выберите категорию",
+  "jobInfo": "Информация о вакансии",
+  "draft_not_found": "Черновик не найден",
+  "conversion_rate": "Конверсия",
+  "per_job": "на вакансию",
+  "avg_views_per_job": "Ср. просмотров/вакансию",
+  "avg_applied_per_job": "Ср. откликов/вакансию",
+  "jobs_posting_trend": "Тренд публикаций (последние 30 дней)",
+  "city_distribution": "Распределение по городам",
+  "salary_distribution": "Распределение зарплат",
+  "top_viewed_jobs": "Самые просматриваемые",
+  "top_applied_jobs": "Самые популярные",
+  "stats_subtitle": "Статистика и эффективность ваших вакансий"
 }

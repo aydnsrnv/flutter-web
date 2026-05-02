@@ -69,13 +69,13 @@ export default async function MyJobsPage({
         <div className="flex gap-0 rounded-full border border-border bg-card p-1">
           <Link
             href="/my/jobs?tab=active"
-            className={`flex-1 rounded-full py-2.5 text-center text-[14px] transition-colors ${isActive ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
+            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${isActive ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
           >
             {t("my_jobs_tab_active")}
           </Link>
           <Link
             href="/my/jobs?tab=inactive"
-            className={`flex-1 rounded-full py-2.5 text-center text-[14px] transition-colors ${!isActive ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
+            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${!isActive ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
           >
             {t("my_jobs_tab_inactive")}
           </Link>
@@ -84,7 +84,7 @@ export default async function MyJobsPage({
 
       <div className="mt-[6px]">
         {error ? (
-          <div className="rounded-lg bg-background px-4 py-6 text-center text-[16px] text-foreground">
+          <div className="rounded-lg bg-background px-4 py-6 text-center text-base text-foreground">
             {error.message}
           </div>
         ) : jobs.length === 0 ? (

@@ -52,7 +52,7 @@ export function MobileMenuDrawer({
               <div className="h-8 w-8 overflow-hidden rounded-full bg-white">
                 <Image src="/jobly_icon.jpg" alt="Jobly" width={32} height={32} />
               </div>
-              <div className="text-[22px] font-bold leading-none" style={{ color: '#245BEB' }}>
+              <div className="text-xl font-bold leading-none text-primary">
                 Jobly
               </div>
             </Link>
@@ -68,7 +68,7 @@ export function MobileMenuDrawer({
             {leftPanel}
             {rightPanel ? (
               <>
-                <div className="my-6 h-[0.35px] w-full bg-black/15 dark:bg-white/15" />
+                <div className="my-6 h-px w-full bg-border/60" />
                 <div>{rightPanel}</div>
               </>
             ) : null}

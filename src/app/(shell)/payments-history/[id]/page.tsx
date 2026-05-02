@@ -53,10 +53,10 @@ function DetailRow({
 }) {
   return (
     <div className="flex items-center justify-between py-3">
-      <div className="text-[14px] text-muted-foreground">
+      <div className="text-sm text-muted-foreground">
         {label}
       </div>
-      <div className="text-[14px] font-semibold" style={{ color: valueColor ?? 'rgba(0,0,0,0.87)' }}>
+      <div className="text-sm font-semibold" style={{ color: valueColor ?? 'rgba(0,0,0,0.87)' }}>
         {value}
       </div>
     </div>
@@ -119,11 +119,11 @@ export default async function PaymentDetailPage({
           <div className="text-[36px] font-bold text-foreground">
             {amountLabel}
           </div>
-          <div className="pb-[6px] text-[28px] font-bold text-foreground">
+          <div className="pb-[6px] text-3xl font-bold text-foreground">
             <ManatIcon size={28} color="var(--jobly-main, #245BEB)" />
           </div>
         </div>
-        <div className="mt-2 text-[16px] text-muted-foreground">
+        <div className="mt-2 text-base text-muted-foreground">
           {t('payment_type')}
         </div>
       </div>

@@ -199,7 +199,7 @@ export default function NotificationsPage() {
                       <Notification
                         size={22}
                         variant={seen ? "Linear" : "Bold"}
-                        color={"#245BEB"}
+                        color={"var(--jobly-main)"}
                       />
                     </div>
 
@@ -212,7 +212,7 @@ export default function NotificationsPage() {
                         {!seen ? (
                           <div
                             className="h-2 w-2 rounded-full"
-                            style={{ backgroundColor: "#245BEB" }}
+                            style={{ backgroundColor: "var(--jobly-main)" }}
                           />
                         ) : null}
                         <div className="min-w-0 flex-1 truncate text-[13.5px] font-medium text-muted-foreground">
@@ -220,7 +220,7 @@ export default function NotificationsPage() {
                             <>
                               <span
                                 className="font-bold"
-                                style={{ color: "#245BEB" }}
+                                style={{ color: "var(--jobly-main)" }}
                               >
                                 #{number}
                               </span>
@@ -233,7 +233,7 @@ export default function NotificationsPage() {
                         </div>
                       </div>
 
-                      <div className="mt-1 text-right text-[12px] font-medium text-muted-foreground">
+                      <div className="mt-1 text-right text-xs font-medium text-muted-foreground">
                         {formatTimeAndPostDate(n.created_at, t)}
                       </div>
                     </div>
@@ -258,7 +258,7 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      <div className="pb-2 text-center text-[12px] text-muted-foreground">
+      <div className="pb-2 text-center text-xs text-muted-foreground">
         {footerText}
       </div>
     </div>

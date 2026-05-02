@@ -9,21 +9,10 @@ export type PopularJobListItemData = {
 };
 
 function LogoSquare({ src, alt }: { src: string; alt: string }) {
-  const size = 74 * 0.6;
-  const radius = 12 * 0.7;
-
   if (!src) {
     return (
-      <div
-        className="grid place-items-center"
-        style={{
-          width: size,
-          height: size,
-          borderRadius: radius,
-          backgroundColor: 'rgba(0,0,0,0.04)',
-        }}
-      >
-        <div className="text-[18px] font-bold" style={{ color: 'rgba(0,0,0,0.65)' }}>
+      <div className="grid h-[44px] w-[44px] place-items-center rounded-lg bg-muted">
+        <div className="text-lg font-bold text-foreground/65">
           {(alt?.trim()?.[0] ?? '?').toUpperCase()}
         </div>
       </div>
@@ -31,10 +20,7 @@ function LogoSquare({ src, alt }: { src: string; alt: string }) {
   }
 
   return (
-    <div
-      className="overflow-hidden"
-      style={{ width: size, height: size, borderRadius: radius, backgroundColor: '#F6F6F6' }}
-    >
+    <div className="h-[44px] w-[44px] overflow-hidden rounded-lg bg-background">
       <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
     </div>
   );
@@ -52,19 +38,16 @@ export function PopularJobListItem({
         <div className="flex items-center gap-3">
           <LogoSquare src={job.company_logo} alt={job.company_name} />
 
-          <div className="min-w-0 flex-1" style={{ height: 74 * 0.6 }}>
-            <div
-              className="truncate text-[18px] font-medium text-foreground"
-              style={{ lineHeight: 1.15 }}
-            >
+          <div className="min-w-0 flex-1 h-[44px]">
+            <div className="truncate text-lg font-medium text-foreground leading-tight">
               {job.title}
             </div>
-            <div className="mt-1 truncate text-[14px]" style={{ lineHeight: 1.15, color: '#9CA3AF' }}>
+            <div className="mt-1 truncate text-sm leading-tight text-muted-foreground">
               {job.company_name}
             </div>
           </div>
 
-          <i className="ri-arrow-right-s-line text-[22px]" style={{ color: '#9CA3AF' }} />
+          <i className="ri-arrow-right-s-line text-xl text-muted-foreground" />
         </div>
       </div>
     </Link>

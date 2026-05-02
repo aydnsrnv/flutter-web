@@ -8,6 +8,7 @@ import { Suspense, useEffect, useState } from "react";
 
 import { createClient } from "@/lib/supabase/browser";
 import { useI18n } from "@/lib/i18n/client";
+import { IconButton } from "@/components/ui/icon-button";
 
 export function AppHeader(props: {
   title?: string;
@@ -92,10 +93,7 @@ function AppHeaderInner({
                   height={28}
                 />
               </div>
-              <div
-                className="text-[30px] font-bold leading-none"
-                style={{ color: "#245BEB" }}
-              >
+              <div className="text-[28px] font-bold leading-none text-primary">
                 {title ?? t("app_name")}
               </div>
             </button>
@@ -113,10 +111,7 @@ function AppHeaderInner({
                   height={28}
                 />
               </div>
-              <div
-                className="text-[22px] font-bold leading-none"
-                style={{ color: "#245BEB" }}
-              >
+              <div className="text-xl font-bold leading-none text-primary">
                 {t("app_name")}
               </div>
             </button>
@@ -128,44 +123,37 @@ function AppHeaderInner({
         {pathname === "/home" || pathname === "/" ? (
           loggedIn ? (
             <>
-              <Link
+              <IconButton
                 href={createHref}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground"
-                aria-label={t("aria_add")}
+                label={t("aria_add")}
               >
                 <AddCircle size={24} variant="Linear" color="currentColor" />
-              </Link>
+              </IconButton>
 
-              <Link
+              <IconButton
                 href="/notifications"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground"
-                aria-label={t("aria_notifications")}
+                label={t("aria_notifications")}
               >
                 <Notification size={24} variant="Linear" color="currentColor" />
-              </Link>
+              </IconButton>
 
-              <Link
+              <IconButton
                 href="/profile"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground"
-                aria-label={t("aria_profile")}
+                label={t("aria_profile")}
               >
                 <User size={24} variant="Linear" color="currentColor" />
-              </Link>
+              </IconButton>
             </>
           ) : (
-            <Link
+            <IconButton
               href="/login"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground"
-              aria-label={t("aria_login")}
+              label={t("aria_login")}
             >
               <Login size={24} variant="Outline" color="currentColor" />
-            </Link>
+            </IconButton>
           )
         ) : (
-          <div
-            className="absolute left-1/2 -translate-x-1/2 text-[18px] font-bold text-center max-w-[60vw] truncate lg:left-1/2 lg:max-w-[60vw] lg:-translate-x-1/2"
-            style={{ color: "var(--jobly-main, #245BEB)" }}
-          >
+          <div className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-center max-w-[60vw] truncate lg:left-1/2 lg:max-w-[60vw] lg:-translate-x-1/2 text-primary">
             {pathname.includes("/candidates")
               ? t("nav_candidates")
               : pathname.includes("/companies")

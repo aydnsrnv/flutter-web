@@ -108,7 +108,7 @@ export default async function Image({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  background: "#245BEB",
+                  background: "var(--jobly-main)",
                   color: "#FFFFFF",
                   fontSize: 76,
                   fontWeight: 800,

@@ -853,7 +853,6 @@
   "auth_login_success": "Login successful",
   "auth_login_error_invalid": "Invalid email address or password",
   "auth_unexpected_error": "An unexpected error occurred",
-  
   "wallet_title": "Wallet",
   "wallet_add_balance": "Add Balance",
   "wallet_transaction_history": "History",
@@ -892,7 +891,6 @@
   "wallet_bank_info_load_error": "Error loading bank account information: {error}",
   "example5": "Example: 5",
   "description_hint_wallet": "Enter your payment description.",
-
   "deep_link_init_error": "Deep link initialization error: {error}",
   "deep_link_listen_error": "Deep link listening error: {error}",
   "deep_link_incoming": "Incoming Link: {uri}",
@@ -910,7 +908,6 @@
   "email_verification_fail": "Email verification failed. Please try again.",
   "email_verification_error": "An error occurred during email verification.",
   "payment_not_found": "Payment not found.",
-  
   "payment_page_created": "Payment page created",
   "invalid_response_token_not_found": "Invalid response format: Token not found",
   "payment_refund_success": "Payment refund successful",
@@ -966,5 +963,20 @@
   "enterContactInfo": "At least one contact information must be entered",
   "invalidApplyLink": "Please enter a valid application link",
   "user_type_candidate": "Candidate",
-  "user_type_employer": "Employer"
+  "user_type_employer": "Employer",
+  "step_counter": "Step {current} / {total}",
+  "selectCompany": "Select Company",
+  "selectCategory": "Select Category",
+  "jobInfo": "Job Information",
+  "draft_not_found": "Draft not found",
+  "conversion_rate": "Conversion rate",
+  "per_job": "per job",
+  "avg_views_per_job": "Avg. views/job",
+  "avg_applied_per_job": "Avg. applications/job",
+  "jobs_posting_trend": "Job posting trend (last 30 days)",
+  "city_distribution": "Jobs by city",
+  "salary_distribution": "Salary distribution",
+  "top_viewed_jobs": "Most viewed jobs",
+  "top_applied_jobs": "Most applied jobs",
+  "stats_subtitle": "View your job performance and statistics"
 }

@@ -2,6 +2,8 @@ import {
   ResumeDetailPanel,
   type ResumeDetailPanelData,
 } from "@/components/resume-detail-panel";
+import { ResumeListGroup } from "@/components/resume-list-group";
+import type { ResumeListItemData } from "@/components/resume-list-item";
 import { createClient } from "@/lib/supabase/server";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocaleFromCookies } from "@/lib/i18n/server";
@@ -121,6 +123,24 @@ type ResumeRow = {
   user_id?: string | null;
 };
 
+type SimilarResumeRow = {
+  id: string | number;
+  resume_number?: number | string | null;
+  full_name: string;
+  desired_position?: string | null;
+  desired_salary?: string | null;
+  city?: string | null;
+  birth_year?: number | null;
+  gender_key?: string | null;
+  experience_key?: string | null;
+  education_key?: string | null;
+  experiences?: unknown;
+  avatar?: string | null;
+  view_count?: number | null;
+  create_time?: string | null;
+  is_premium?: boolean | null;
+};
+
 export default async function ResumeByNumberPage({
   params,
 }: {
@@ -181,6 +201,31 @@ export default async function ResumeByNumberPage({
     }
   }
 
+  const desiredPosition = resume.desired_position ?? "";
+  const similarQuery = desiredPosition.trim().length > 0
+    ? supabase
+        .from("resumes")
+        .select(
+          "id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, experience_key, education_key, experiences, avatar, view_count, create_time, is_premium",
+        )
+        .eq("status", true)
+        .ilike("desired_position", `%${desiredPosition}%`)
+        .neq("id", resume.id)
+        .order("create_time", { ascending: false })
+        .limit(5)
+    : supabase
+        .from("resumes")
+        .select(
+          "id, resume_number, full_name, desired_position, desired_salary, city, birth_year, gender_key, experience_key, education_key, experiences, avatar, view_count, create_time, is_premium",
+        )
+        .eq("status", true)
+        .neq("id", resume.id)
+        .order("create_time", { ascending: false })
+        .limit(5);
+
+  const { data: similarData } = await similarQuery;
+  const similarResumes = (similarData ?? []) as SimilarResumeRow[];
+
   const panelResume: ResumeDetailPanelData = {
     id: String(resume.id),
     resume_number: resume.resume_number ?? null,
@@ -230,6 +275,23 @@ export default async function ResumeByNumberPage({
     description: resume.about ?? undefined,
   };
 
+  const toItem = (r: SimilarResumeRow): ResumeListItemData => ({
+    id: String(r.id),
+    resume_number: r.resume_number,
+    full_name: r.full_name,
+    desired_position: r.desired_position ?? null,
+    desired_salary: r.desired_salary ?? null,
+    city: r.city,
+    birth_year: r.birth_year ?? null,
+    experience_key: r.experience_key ?? null,
+    education_key: r.education_key ?? null,
+    experiences: r.experiences ?? null,
+    avatar: r.avatar,
+    view_count: r.view_count,
+    create_time: r.create_time,
+    is_premium: r.is_premium,
+  });
+
   return (
     <>
       <script
@@ -237,7 +299,27 @@ export default async function ResumeByNumberPage({
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
       />
-      <ResumeDetailPanel resume={panelResume} />
+      <div className="lg:flex lg:gap-6">
+        <div className="min-w-0 flex-1">
+          <ResumeDetailPanel resume={panelResume} />
+        </div>
+        <div className="hidden lg:block lg:w-[320px] lg:shrink-0">
+          <div className="sticky top-6">
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <div className="mb-3 text-base font-semibold text-foreground">
+                {t("similar_jobs")}
+              </div>
+              {similarResumes.length > 0 ? (
+                <ResumeListGroup
+                  resumes={similarResumes.map((r) => toItem(r))}
+                  mobileLimit={5}
+                  desktopLimit={5}
+                />
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

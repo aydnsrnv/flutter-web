@@ -80,7 +80,7 @@ export default async function Image({
               background:
                 "linear-gradient(180deg, rgba(36,91,235,0.10) 0%, rgba(36,91,235,0.04) 100%)",
               padding: "40px",
-              borderRight: "1px solid rgba(36, 91, 235, 0.10)",
+              borderRight: "1px solid var(--jobly-main-10)",
             }}
           >
             <div
@@ -111,7 +111,7 @@ export default async function Image({
                   style={{
                     width: "190px",
                     height: "190px",
-                    background: "#245BEB",
+                    background: "var(--jobly-main)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

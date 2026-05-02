@@ -16,6 +16,8 @@ import {
 import { useI18n } from "@/lib/i18n/client";
 import type { Locale } from "@/lib/i18n/types";
 
+import { cn } from "@/lib/utils";
+
 type ThemeMode = "light" | "dark";
 
 function getInitialTheme(): ThemeMode {
@@ -84,11 +86,8 @@ export function DesktopLeftPanel() {
     [t],
   );
 
-  const iconBg = "rgba(36,91,235,0.10)";
-  const iconColor = "var(--jobly-main, #245BEB)";
-
-  function Separator() {
-    return <div className="h-[0.35px] w-full bg-black/15 dark:bg-white/15" />;
+  function Divider() {
+    return <div className="h-px w-full bg-border/60" />;
   }
 
   function RowContainer({
@@ -107,15 +106,12 @@ export function DesktopLeftPanel() {
     const content = (
       <div className="flex w-full items-center px-3 py-3">
         <div className="grid h-[60px] w-[60px] place-items-center">
-          <div
-            className="grid h-[60px] w-[60px] place-items-center rounded-full"
-            style={{ backgroundColor: iconBg }}
-          >
+          <div className="grid h-[60px] w-[60px] place-items-center rounded-full bg-jobly-soft">
             {icon}
           </div>
         </div>
         <div className="w-4 shrink-0" />
-        <div className="min-w-0 flex-1 text-[16px] font-normal">{title}</div>
+        <div className="min-w-0 flex-1 text-base font-normal">{title}</div>
         {trailing ? <div className="shrink-0">{trailing}</div> : null}
       </div>
     );
@@ -159,8 +155,7 @@ export function DesktopLeftPanel() {
         href={href}
         target="_blank"
         rel="noreferrer"
-        className="grid h-[50px] w-[50px] place-items-center rounded-full text-[14px] font-semibold"
-        style={{ backgroundColor: iconBg, color: iconColor }}
+        className="grid h-[50px] w-[50px] place-items-center rounded-full text-sm font-semibold bg-jobly-soft text-primary"
       >
         {icon}
       </a>
@@ -174,9 +169,9 @@ export function DesktopLeftPanel() {
           <RowContainer
             icon={
               theme === "dark" ? (
-                <Sun1 size={34} variant="Linear" color={iconColor} />
+                <Sun1 size={34} variant="Linear" color="currentColor" className="text-primary" />
               ) : (
-                <Moon size={34} variant="Linear" color={iconColor} />
+                <Moon size={34} variant="Linear" color="currentColor" className="text-primary" />
               )
             }
             title={theme === "dark" ? t("menuLightMode") : t("menuDarkMode")}
@@ -188,82 +183,67 @@ export function DesktopLeftPanel() {
                     e.stopPropagation();
                     toggleTheme();
                   }}
-                  className="relative h-6 w-11 rounded-full"
-                  style={{
-                    backgroundColor:
-                      theme === "dark"
-                        ? "var(--jobly-main, #245BEB)"
-                        : "rgba(0,0,0,0.20)",
-                  }}
+                  className={cn(
+                    "relative h-6 w-11 rounded-full",
+                    theme === "dark" ? "bg-primary" : "bg-black/20",
+                  )}
                   aria-label={t("toggle_theme")}
                 >
                   <span
-                    className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-[left]"
-                    style={{
-                      left: theme === "dark" ? 22 : 2,
-                    }}
+                    className={cn(
+                      "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-[left]",
+                      theme === "dark" ? "left-[22px]" : "left-[2px]",
+                    )}
                   />
                 </button>
               </div>
             }
             onClick={undefined}
           />
-          <Separator />
+          <Divider />
 
           <RowContainer
-            icon={<Global size={34} variant="Linear" color={iconColor} />}
+            icon={<Global size={34} variant="Linear" color="currentColor" className="text-primary" />}
             title={t("changeLanguage")}
             trailing={
-              <i
-                className="ri-arrow-right-s-line text-[22px]"
-                style={{ color: "#9CA3AF" }}
-              />
+              <i className="ri-arrow-right-s-line text-[22px] text-icon-muted" />
             }
             onClick={() => setLangOpen(true)}
           />
-          <Separator />
+          <Divider />
 
           <RowContainer
-            icon={<Archive size={34} variant="Linear" color={iconColor} />}
+            icon={<Archive size={34} variant="Linear" color="currentColor" className="text-primary" />}
             title={t("menuFavorites")}
             trailing={
-              <i
-                className="ri-arrow-right-s-line text-[22px]"
-                style={{ color: "#9CA3AF" }}
-              />
+              <i className="ri-arrow-right-s-line text-[22px] text-icon-muted" />
             }
             href="/favorites"
           />
-          <Separator />
+          <Divider />
 
           <RowContainer
-            icon={<InfoCircle size={34} variant="Linear" color={iconColor} />}
+            icon={<InfoCircle size={34} variant="Linear" color="currentColor" className="text-primary" />}
             title={t("aboutUs")}
             trailing={
-              <i
-                className="ri-arrow-right-s-line text-[22px]"
-                style={{ color: "#9CA3AF" }}
-              />
+              <i className="ri-arrow-right-s-line text-[22px] text-icon-muted" />
             }
             href="/about-us"
           />
-          <Separator />
+          <Divider />
 
           <RowContainer
-            icon={<SecuritySafe size={34} variant="Linear" color={iconColor} />}
+            icon={<SecuritySafe size={34} variant="Linear" color="currentColor" className="text-primary" />}
             title={t("privacyPolicyTitle")}
             trailing={
-              <i
-                className="ri-arrow-right-s-line text-[22px]"
-                style={{ color: "#9CA3AF" }}
-              />
+              <i className="ri-arrow-right-s-line text-[22px] text-icon-muted" />
             }
             href="/privacy-policy"
           />
         </div>
 
         <div className="mt-3 rounded-2xl px-4 py-5">
-          <div className="text-center text-[18px] font-medium">
+          <div className="text-center text-lg font-medium">
             {t("social_media_title")}
           </div>
           <div className="mt-4 flex items-center justify-center gap-6">
@@ -302,14 +282,13 @@ export function DesktopLeftPanel() {
         <div className="fixed inset-0 z-[10001]">
           <button
             type="button"
-            className="absolute inset-0"
+            className="absolute inset-0 bg-black/55"
             onClick={() => setLangOpen(false)}
-            style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
           />
           <div className="absolute left-0 right-0 top-1/2 mx-auto w-full max-w-[360px] -translate-y-1/2 px-4">
             <div className="rounded-2xl border border-border bg-card shadow-2xl">
               <div className="flex items-center justify-between px-4 py-3">
-                <div className="text-[16px] font-semibold">
+                <div className="text-base font-semibold">
                   {t("selectLang")}
                 </div>
                 <button
@@ -320,11 +299,12 @@ export function DesktopLeftPanel() {
                   <CloseCircle
                     size={22}
                     variant="Linear"
-                    color="rgba(0,0,0,0.55)"
+                    color="currentColor"
+                    className="text-icon-muted"
                   />
                 </button>
               </div>
-              <div className="h-[0.35px] w-full bg-black/15 dark:bg-white/15" />
+              <Divider />
 
               <div className="p-2">
                 {locales.map((l) => {
@@ -333,13 +313,13 @@ export function DesktopLeftPanel() {
                     <button
                       key={l.value}
                       type="button"
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left"
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-xl px-3 py-3 text-left",
+                        selected && "bg-jobly-soft",
+                      )}
                       onClick={() => {
                         setLocale(l.value);
                         setLangOpen(false);
-                      }}
-                      style={{
-                        backgroundColor: selected ? iconBg : "transparent",
                       }}
                     >
                       <div className="flex items-center gap-3">
@@ -351,19 +331,19 @@ export function DesktopLeftPanel() {
                           />
                         </div>
                         <div
-                          className="text-[16px]"
-                          style={{
-                            color: selected ? iconColor : "inherit",
-                            fontWeight: selected ? 700 : 400,
-                          }}
+                          className={cn(
+                            "text-base",
+                            selected
+                              ? "font-bold text-primary"
+                              : "font-normal",
+                          )}
                         >
                           {l.label}
                         </div>
                       </div>
                       {selected ? (
                         <i
-                          className="ri-checkbox-circle-fill text-[21px]"
-                          style={{ color: iconColor }}
+                          className="ri-checkbox-circle-fill text-[21px] text-primary"
                           aria-hidden="true"
                         />
                       ) : null}

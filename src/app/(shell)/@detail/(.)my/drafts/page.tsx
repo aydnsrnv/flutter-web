@@ -69,7 +69,7 @@ export default async function MyDraftsInterceptPage() {
     <div className="flex flex-col">
       <div className="mt-4">
         {error ? (
-          <div className="rounded-lg bg-background px-4 py-6 text-center text-[16px] text-foreground">
+          <div className="rounded-lg bg-background px-4 py-6 text-center text-base text-foreground">
             {error.message}
           </div>
         ) : drafts.length === 0 ? (
@@ -88,7 +88,7 @@ export default async function MyDraftsInterceptPage() {
       </div>
 
       <div className="mt-4 text-center">
-        <p className="text-[12px] text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           {t("draftsInfoFooter")}
         </p>
       </div>

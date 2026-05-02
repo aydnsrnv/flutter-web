@@ -123,24 +123,22 @@ export default async function PaymentSuccessPage({
     ? await finalizeWalletTopUpByTransactionCode(tid)
     : { ok: true };
 
-  const mainColor = "#245BEB";
   const showError = !finalizeResult.ok;
 
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-[520px] flex-col items-center justify-center px-6">
       <div className="w-full rounded-2xl border border-border bg-card p-6 text-center">
-        <div className="text-[18px] font-semibold text-foreground">
+        <div className="text-lg font-semibold text-foreground">
           {showError ? t("payment_failed_title") : t("payment_success_title")}
         </div>
-        <div className="mt-2 text-[14px] text-muted-foreground">
+        <div className="mt-2 text-sm text-muted-foreground">
           {showError
             ? finalizeResult.message || t("payment_failed_subtitle")
             : t("payment_success_subtitle")}
         </div>
         <Link
           href={showError ? "/wallet" : "/profile"}
-          className="mt-5 inline-block h-12 w-full rounded-2xl text-center text-[15px] font-semibold leading-[48px]"
-          style={{ backgroundColor: mainColor, color: "#fff" }}
+          className="mt-5 inline-block h-12 w-full rounded-2xl text-center text-sm font-semibold leading-[48px] bg-primary text-primary-foreground"
         >
           {showError ? t("payment_try_again") : t("payment_back_to_profile")}
         </Link>

@@ -1,15 +1,13 @@
-import { HomeSearchBar } from "@/components/home-search-bar";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeader } from "@/components/section-header";
 import { createClient } from "@/lib/supabase/server";
-import {
-  PopularCompanyCard,
-  type PopularCompany,
-} from "@/components/popular-company-card";
+import { type PopularCompany } from "@/components/popular-company-card";
+import { PopularCompanyListGroup } from "@/components/popular-company-list-group";
 import { PopularJobListGroup } from "@/components/popular-job-list-group";
 import type { PopularJobListItemData } from "@/components/popular-job-list-item";
 import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
 import type { FlutterJobItemData } from "@/components/flutter-job-item";
+import { JobFilterForm } from "@/components/job-filter-form";
 
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocaleFromCookies } from "@/lib/i18n/server";
@@ -80,7 +78,7 @@ export default async function HomeTabPage({
       .from("companies")
       .select("id, slug, company_name, company_logo, job_count")
       .order("job_count", { ascending: false })
-      .limit(7),
+      .limit(14),
     supabase
       .from("jobs")
       .select(
@@ -173,23 +171,28 @@ export default async function HomeTabPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="px-0">
-        <HomeSearchBar initialQuery={rawQuery} />
-      </div>
-
       {isSearching ? (
         <>
-          {searchError ? (
-            <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">
-              {searchError.message}
+          <div className="lg:flex lg:gap-6">
+            <div className="hidden lg:block lg:w-[280px] lg:shrink-0">
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <JobFilterForm />
+              </div>
             </div>
-          ) : searchRows.length === 0 ? (
-            <EmptyState label={t("no_data")} />
-          ) : (
-            <div className="rounded-2xl">
-              <FlutterJobListGroup jobs={searchRows.map(toFlutterJobItem)} />
+            <div className="flex-1 flex flex-col gap-4">
+              {searchError ? (
+                <div className="rounded-xl border border-border bg-card px-4 py-4 text-sm text-muted-foreground">
+                  {searchError.message}
+                </div>
+              ) : searchRows.length === 0 ? (
+                <EmptyState label={t("no_data")} />
+              ) : (
+                <div className="rounded-2xl">
+                  <FlutterJobListGroup jobs={searchRows.map(toFlutterJobItem)} />
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </>
       ) : (
         <>
@@ -224,76 +227,82 @@ export default async function HomeTabPage({
                 title={t("popular_companies")}
                 titleKey="popular_companies"
               />
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {companyCards.length > 0
-                  ? companyCards.map((c) => (
-                      <PopularCompanyCard key={c.id} company={c} />
-                    ))
-                  : Array.from({ length: 6 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-[103px] w-[99px] shrink-0 rounded-[14px] border border-border bg-card"
+              <PopularCompanyListGroup
+                companies={companyCards}
+                mobileLimit={7}
+                desktopLimit={14}
+              />
+
+              <div className="lg:flex lg:gap-6">
+                <div className="hidden lg:block lg:w-[280px] lg:shrink-0">
+                  <div className="rounded-2xl border border-border bg-card p-4">
+                    <JobFilterForm />
+                  </div>
+                </div>
+                <div className="flex-1 flex flex-col gap-4">
+                  {premium.length > 0 ? (
+                    <>
+                      <SectionHeader
+                        title={t("premium_jobs")}
+                        titleKey="premium_jobs"
                       />
-                    ))}
-              </div>
+                      <FlutterJobListGroup
+                        jobs={premium.map(toFlutterJobItem)}
+                        premium
+                      />
+                    </>
+                  ) : null}
 
-              {premium.length > 0 ? (
-                <>
                   <SectionHeader
-                    title={t("premium_jobs")}
-                    titleKey="premium_jobs"
+                    title={t("popular_jobs")}
+                    titleKey="popular_jobs"
                   />
-                  <FlutterJobListGroup
-                    jobs={premium.slice(0, 3).map(toFlutterJobItem)}
-                    premium
+                  {popular.length > 0 ? (
+                    <PopularJobListGroup
+                      jobs={popular.map(toPopularJobItem)}
+                      mobileLimit={5}
+                      desktopLimit={10}
+                    />
+                  ) : (
+                    <div className="rounded-2xl">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="px-4 py-4">
+                          <div className="h-4 w-2/3 rounded bg-muted" />
+                          <div className="mt-2 h-3 w-1/2 rounded bg-muted" />
+                          {i < 4 ? (
+                            <div className="mt-4 h-px bg-border/60" />
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <SectionHeader
+                    title={t("latest_vacancies_title")}
+                    titleKey="latest_vacancies_title"
+                    href="/latest"
                   />
-                </>
-              ) : null}
-
-              <SectionHeader
-                title={t("popular_jobs")}
-                titleKey="popular_jobs"
-              />
-              {popular.length > 0 ? (
-                <PopularJobListGroup
-                  jobs={popular.slice(0, 5).map(toPopularJobItem)}
-                />
-              ) : (
-                <div className="rounded-2xl">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="px-4 py-4">
-                      <div className="h-4 w-2/3 rounded bg-muted" />
-                      <div className="mt-2 h-3 w-1/2 rounded bg-muted" />
-                      {i < 4 ? (
-                        <div className="mt-4 h-px bg-border/60" />
-                      ) : null}
+                  {latest.length > 0 ? (
+                    <FlutterJobListGroup
+                      jobs={latest.map(toFlutterJobItem)}
+                      mobileLimit={5}
+                      desktopLimit={10}
+                    />
+                  ) : (
+                    <div className="rounded-2xl">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="px-4 py-4">
+                          <div className="h-4 w-2/3 rounded bg-muted" />
+                          <div className="mt-2 h-3 w-1/2 rounded bg-muted" />
+                          {i < 4 ? (
+                            <div className="mt-4 h-px bg-border/60" />
+                          ) : null}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-
-              <SectionHeader
-                title={t("latest_vacancies_title")}
-                titleKey="latest_vacancies_title"
-                href="/latest"
-              />
-              {latest.length > 0 ? (
-                <FlutterJobListGroup
-                  jobs={latest.slice(0, 5).map(toFlutterJobItem)}
-                />
-              ) : (
-                <div className="rounded-2xl">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="px-4 py-4">
-                      <div className="h-4 w-2/3 rounded bg-muted" />
-                      <div className="mt-2 h-3 w-1/2 rounded bg-muted" />
-                      {i < 4 ? (
-                        <div className="mt-4 h-px bg-border/60" />
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              )}
+              </div>
             </>
           )}
         </>

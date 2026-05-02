@@ -152,7 +152,7 @@ export default function CompaniesPage() {
                         style={{
                           width: 60,
                           height: 60,
-                          backgroundColor: "rgba(36, 91, 235, 0.10)",
+                          backgroundColor: "var(--jobly-main-10)",
                           border: `1px solid ${dividerColor}`,
                         }}
                       >
@@ -164,7 +164,7 @@ export default function CompaniesPage() {
                             loading="lazy"
                           />
                         ) : (
-                          <div className="text-[18px] font-bold text-foreground/80">
+                          <div className="text-lg font-bold text-foreground/80">
                             {(name?.[0] ?? "?").toUpperCase()}
                           </div>
                         )}
@@ -172,14 +172,14 @@ export default function CompaniesPage() {
 
                       <div className="min-w-0 flex-1">
                         <div
-                          className="truncate text-[16px] text-foreground"
+                          className="truncate text-base text-foreground"
                           style={{ fontWeight: 400 }}
                         >
                           {name || "—"}
                         </div>
                       </div>
 
-                      <div className="shrink-0 text-[15px] font-bold text-foreground/70">
+                      <div className="shrink-0 text-sm font-bold text-foreground/70">
                         {count}
                       </div>
                     </div>
