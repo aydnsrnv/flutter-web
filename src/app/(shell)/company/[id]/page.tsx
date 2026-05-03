@@ -7,16 +7,16 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { ArrowDown2, Building, Eye, UserTick, Briefcase } from "iconsax-react";
+import { Building, Eye, UserTick, Briefcase, TrendUp, CloseCircle, InfoCircle } from "iconsax-react";
 import { slugify } from '@/lib/utils';
 
 import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
 import type { FlutterJobItemData } from "@/components/flutter-job-item";
 import { CompanyStatsDashboard } from "@/components/company-stats-dashboard";
-import { SectionHeader } from "@/components/section-header";
 import { useI18n } from "@/lib/i18n/client";
 import { createClient } from "@/lib/supabase/browser";
 import { PageShimmer } from "@/components/page-shimmer";
+import { JobFilterForm } from "@/components/job-filter-form";
 
 type CompanyRow = {
   id: string | number;
@@ -25,6 +25,9 @@ type CompanyRow = {
   company_logo?: string | null;
   job_count?: number | null;
   about?: string | null;
+  instagram?: string | null;
+  linkedin?: string | null;
+  website?: string | null;
 };
 
 type JobRow = {
@@ -41,9 +44,12 @@ type JobRow = {
   applied_count?: number | null;
 };
 
-function safeParseNumber(v: unknown) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
+function firstValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function trimValue(value: string | string[] | undefined) {
+  return (firstValue(value) ?? "").trim();
 }
 
 function formatCount(n: number) {
@@ -54,7 +60,12 @@ function formatCount(n: number) {
   return `${formatted.replace(".", ",")}{k}`;
 }
 
-
+function normalizeUrl(raw?: string | null) {
+  const v = (raw ?? "").trim();
+  if (!v) return null;
+  if (v.startsWith("http://") || v.startsWith("https://")) return v;
+  return `https://${v}`;
+}
 
 export default function CompanyViewPage() {
   const { t } = useI18n();
@@ -62,9 +73,8 @@ export default function CompanyViewPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
-
-  const tab = (searchParams.get("tab") ?? "jobs").toString();
-  const isJobsTab = tab !== "stats";
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   const companyKey = (params?.id ?? "").toString();
   const isUuid = useMemo(
@@ -92,22 +102,42 @@ export default function CompanyViewPage() {
   const [totalViews, setTotalViews] = useState(0);
   const [totalApplied, setTotalApplied] = useState(0);
 
-  const [aboutExpanded, setAboutExpanded] = useState(false);
-  const [aboutOverflows, setAboutOverflows] = useState(false);
-  const aboutRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const initForIdRef = useRef<string | null>(null);
-  const touchStartX = useRef<number | null>(null);
 
   const companyIdForJobs = companyUuid;
+
+  const filters = useMemo(() => {
+    const sp = searchParams;
+    return {
+      q: trimValue(sp.get("q") ?? undefined),
+      city: trimValue(sp.get("city") ?? undefined),
+      categoryKey: trimValue(sp.get("categoryKey") ?? undefined),
+      companyName: "", // forced by company_id
+      jobType: trimValue(sp.get("jobType") ?? undefined),
+      experience: trimValue(sp.get("experience") ?? undefined),
+      education: trimValue(sp.get("education") ?? undefined),
+      gender: trimValue(sp.get("gender") ?? undefined),
+      premiumOnly: trimValue(sp.get("premiumOnly") ?? undefined) === "1",
+      minAge: trimValue(sp.get("minAge") ?? undefined),
+      maxAge: trimValue(sp.get("maxAge") ?? undefined),
+      minSalary: trimValue(sp.get("minSalary") ?? undefined),
+      maxSalary: trimValue(sp.get("maxSalary") ?? undefined),
+      positionContains: trimValue(sp.get("positionContains") ?? undefined),
+    };
+  }, [searchParams]);
+
+  const filtersKey = useMemo(() => {
+    return JSON.stringify(filters);
+  }, [filters]);
 
   const loadCompany = useCallback(async () => {
     setCompanyLoading(true);
     setCompanyError(null);
     try {
-      const query = supabase
-        .from("companies")
-        .select("id, slug, company_name, company_logo, job_count, about");
+      const query = supabase.from("companies").select(
+        "id, slug, company_name, company_logo, job_count, about, instagram, linkedin, website",
+      );
 
       const { data, error } = isUuid
         ? await query.eq("id", companyKey as any).maybeSingle()
@@ -121,7 +151,9 @@ export default function CompanyViewPage() {
       if (!row && !isUuid) {
         const { data: candidates } = await supabase
           .from("companies")
-          .select("id, slug, company_name, company_logo, job_count, about")
+          .select(
+            "id, slug, company_name, company_logo, job_count, about, instagram, linkedin, website",
+          )
           .not("slug", "is", null)
           .limit(1000);
 
@@ -203,13 +235,31 @@ export default function CompanyViewPage() {
       setJobsLoading(true);
       setJobsError(null);
       try {
-        const { data, error } = await supabase
+        let q = supabase
           .from("jobs")
           .select(
             "id, job_number, title, company_id, company_name, company_logo, city, create_time, min_salary, max_salary, view_count, applied_count",
           )
           .eq("status", true)
-          .eq("company_id", companyIdForJobs as any)
+          .eq("company_id", companyIdForJobs as any);
+
+        if (filters.q) q = q.filter("title", "ilike", `%${filters.q}%`);
+        if (filters.positionContains)
+          q = q.filter("title", "ilike", `%${filters.positionContains}%`);
+        if (filters.city) q = q.eq("city", filters.city);
+        if (filters.categoryKey) q = q.eq("category_name", filters.categoryKey);
+        if (filters.jobType) q = q.eq("job_type", filters.jobType);
+        if (filters.experience) q = q.eq("experience", filters.experience);
+        if (filters.education) q = q.eq("education", filters.education);
+        if (filters.gender) q = q.eq("gender", filters.gender);
+        if (filters.premiumOnly) q = q.eq("is_premium", true);
+        if (filters.minAge) q = q.gte("min_age", filters.minAge);
+        if (filters.maxAge) q = q.lte("max_age", filters.maxAge);
+        if (filters.minSalary) q = q.gte("min_salary", filters.minSalary);
+        if (filters.maxSalary) q = q.lte("max_salary", filters.maxSalary);
+
+        const { data, error } = await q
+          .order("is_premium", { ascending: false })
           .order("create_time", { ascending: false })
           // Fetch pageSize + 1 to determine if there is a next page.
           .range(nextOffset, nextOffset + pageSize);
@@ -250,7 +300,7 @@ export default function CompanyViewPage() {
         setInitialJobsLoading(false);
       }
     },
-    [companyIdForJobs, hasMore, jobsLoading, pageSize, supabase, t],
+    [companyIdForJobs, filters, hasMore, jobsLoading, pageSize, supabase, t],
   );
 
   useEffect(() => {
@@ -265,21 +315,24 @@ export default function CompanyViewPage() {
     setOffset(0);
     setHasMore(true);
     setJobsError(null);
-    setAboutExpanded(false);
   }, [companyKey, loadCompany]);
 
   useEffect(() => {
     if (!companyIdForJobs) return;
-    void loadStats();
+    setJobs([]);
+    setOffset(0);
+    setHasMore(true);
+    setJobsError(null);
+    setInitialJobsLoading(true);
     void loadMoreJobs(0);
-  }, [companyIdForJobs, loadMoreJobs, loadStats]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyIdForJobs, filtersKey]);
 
   useEffect(() => {
-    if (aboutRef.current && company) {
-      const el = aboutRef.current;
-      setAboutOverflows(el.scrollHeight > el.clientHeight);
-    }
-  }, [company, aboutExpanded]);
+    if (!companyIdForJobs) return;
+    void loadStats();
+    // jobs load handled by filters effect
+  }, [companyIdForJobs, loadMoreJobs, loadStats]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -301,6 +354,19 @@ export default function CompanyViewPage() {
     obs.observe(el);
     return () => obs.disconnect();
   }, [offset, hasMore, jobsLoading, loadMoreJobs]);
+
+  const instagramUrl = useMemo(
+    () => normalizeUrl(company?.instagram ?? null),
+    [company?.instagram],
+  );
+  const linkedinUrl = useMemo(
+    () => normalizeUrl(company?.linkedin ?? null),
+    [company?.linkedin],
+  );
+  const websiteUrl = useMemo(
+    () => normalizeUrl(company?.website ?? null),
+    [company?.website],
+  );
 
   if (companyLoading) {
     return <PageShimmer />;
@@ -332,98 +398,187 @@ export default function CompanyViewPage() {
       : jobs.length;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="mx-0 md:mx-4 mt-4 mb-7 rounded-3xl border border-border bg-card px-3.5 py-3.5">
-        <div className="flex flex-col items-center">
-          <div className="mx-auto h-[88px] w-[88px] overflow-hidden rounded-full bg-muted">
-            {logo ? (
-              <img
-                src={logo}
-                alt={name}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="grid h-full w-full place-items-center">
-                <Building
-                  size={44}
-                  variant="Linear"
-                  className="text-muted-foreground"
+    <div className="flex w-full flex-col gap-4">
+      <div className="mt-4 mb-7 w-full rounded-3xl border border-border bg-card p-4 sm:p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+          <div className="mx-auto h-[124px] w-[124px] shrink-0 overflow-hidden rounded-3xl bg-muted sm:mx-0 sm:h-[136px] sm:w-[136px]">
+              {logo ? (
+                <img
+                  src={logo}
+                  alt={name}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
                 />
+              ) : (
+                <div className="grid h-full w-full place-items-center">
+                  <Building
+                    size={58}
+                    variant="Linear"
+                    className="text-muted-foreground"
+                  />
+                </div>
+              )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[30px] font-extrabold tracking-tight text-foreground sm:text-[34px]">
+              {name}
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full bg-jobly-soft px-4 py-2 text-sm font-extrabold text-primary sm:px-5 sm:text-base">
+                <Briefcase size={21} variant="Linear" color="currentColor" />
+                {t("active_jobs")}: {formatCount(jobsCount)}
               </div>
-            )}
+              <div className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-semibold text-foreground/80 sm:px-5 sm:text-base">
+                <Eye size={20} variant="Linear" color="currentColor" />
+                {formatCount(totalViews)}
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-semibold text-foreground/80 sm:px-5 sm:text-base">
+                <UserTick size={20} variant="Linear" color="currentColor" />
+                {formatCount(totalApplied)}
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center gap-3">
+              <a
+                href={instagramUrl ?? "#"}
+                onClick={(e) => {
+                  if (!instagramUrl) e.preventDefault();
+                }}
+                target={instagramUrl ? "_blank" : undefined}
+                rel={instagramUrl ? "noreferrer" : undefined}
+                className={`grid h-12 w-12 place-items-center rounded-2xl transition-colors sm:h-14 sm:w-14 ${instagramUrl ? "bg-[#E1306C]/15 text-[#E1306C] hover:bg-[#E1306C]/20" : "cursor-not-allowed bg-muted text-muted-foreground/50"}`}
+                aria-label="Instagram"
+              >
+                <i className="ri-instagram-fill text-[24px] sm:text-[28px]" />
+              </a>
+              <a
+                href={linkedinUrl ?? "#"}
+                onClick={(e) => {
+                  if (!linkedinUrl) e.preventDefault();
+                }}
+                target={linkedinUrl ? "_blank" : undefined}
+                rel={linkedinUrl ? "noreferrer" : undefined}
+                className={`grid h-12 w-12 place-items-center rounded-2xl transition-colors sm:h-14 sm:w-14 ${linkedinUrl ? "bg-[#0A66C2]/15 text-[#0A66C2] hover:bg-[#0A66C2]/20" : "cursor-not-allowed bg-muted text-muted-foreground/50"}`}
+                aria-label="LinkedIn"
+              >
+                <i className="ri-linkedin-fill text-[24px] sm:text-[28px]" />
+              </a>
+              <a
+                href={websiteUrl ?? "#"}
+                onClick={(e) => {
+                  if (!websiteUrl) e.preventDefault();
+                }}
+                target={websiteUrl ? "_blank" : undefined}
+                rel={websiteUrl ? "noreferrer" : undefined}
+                className={`grid h-12 w-12 place-items-center rounded-2xl transition-colors sm:h-14 sm:w-14 ${websiteUrl ? "bg-primary/15 text-primary hover:bg-primary/20" : "cursor-not-allowed bg-muted text-muted-foreground/50"}`}
+                aria-label="Website"
+              >
+                <i className="ri-global-line text-[24px] sm:text-[28px]" />
+              </a>
+            </div>
           </div>
 
-          <div className="mt-4 text-center text-xl font-bold text-foreground">
-            {name}
-          </div>
-
-          <div className="mt-4 w-full rounded-xl bg-card px-3.5 py-3.5">
-            <div
-              ref={aboutRef}
-              className={`text-center text-sm leading-snug text-foreground ${!aboutExpanded ? "line-clamp-2" : ""}`}
+          <div className="ml-auto flex flex-row justify-end gap-3 sm:flex-col sm:items-end sm:justify-center">
+            <button
+              type="button"
+              onClick={() => setStatsOpen(true)}
+              className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400 transition-colors sm:h-14 sm:w-14"
+              aria-label={t("statistics")}
             >
+              <TrendUp size={24} variant="Linear" color="currentColor" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setAboutOpen(true)}
+              className="grid h-12 w-12 place-items-center rounded-2xl bg-violet-500/15 text-violet-600 hover:bg-violet-500/20 dark:text-violet-400 transition-colors sm:h-14 sm:w-14"
+              aria-label={t("about_us")}
+            >
+              <InfoCircle size={24} variant="Linear" color="currentColor" />
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {statsOpen ? (
+        <div
+          className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/55 p-3 lg:items-center"
+          onClick={() => setStatsOpen(false)}
+        >
+          <div
+            className="w-full max-w-[960px] overflow-hidden rounded-3xl border border-border bg-background shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="text-base font-semibold text-foreground">
+                {t("statistics")}
+              </div>
+              <button
+                type="button"
+                onClick={() => setStatsOpen(false)}
+                className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-muted-foreground"
+                aria-label={t("close")}
+              >
+                <CloseCircle size={20} variant="Linear" color="currentColor" />
+              </button>
+            </div>
+            <div className="max-h-[75vh] overflow-auto p-4">
+              <CompanyStatsDashboard
+                jobs={jobs}
+                totalViews={totalViews}
+                totalApplied={totalApplied}
+                jobsCount={jobsCount}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {aboutOpen ? (
+        <div
+          className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/55 p-3 lg:items-center"
+          onClick={() => setAboutOpen(false)}
+        >
+          <div
+            className="w-full max-w-[760px] overflow-hidden rounded-3xl border border-border bg-background shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="text-base font-semibold text-foreground">
+                {t("about_us") || "Haqqında"}
+              </div>
+              <button
+                type="button"
+                onClick={() => setAboutOpen(false)}
+                className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-muted-foreground"
+                aria-label={t("close")}
+              >
+                <CloseCircle size={20} variant="Linear" color="currentColor" />
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-auto p-4 text-sm leading-relaxed text-foreground">
               {about}
             </div>
-            {aboutOverflows && (
-              <div className="mt-2 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setAboutExpanded((v) => !v)}
-                  className="p-2.5"
-                  aria-label={t("aria_toggle")}
-                >
-                  <ArrowDown2
-                    size={22}
-                    variant="Linear"
-                    color="var(--jobly-main, #245BEB)"
-                    style={{
-                      transform: aboutExpanded
-                        ? "rotate(180deg)"
-                        : "rotate(0deg)",
-                      transition: "transform 160ms ease",
-                    }}
-                  />
-                </button>
-              </div>
-            )}
           </div>
         </div>
-      </div>
+      ) : null}
 
-      <div className="mx-0 md:mx-4"
-        onTouchStart={(e) => { touchStartX.current = e.changedTouches[0].screenX; }}
-        onTouchEnd={(e) => {
-          if (touchStartX.current === null) return;
-          const diff = touchStartX.current - e.changedTouches[0].screenX;
-          if (Math.abs(diff) > 50) {
-            if (diff > 0 && isJobsTab) {
-              router.push(`/company/${encodeURIComponent(companyKey)}?tab=stats`);
-            } else if (diff < 0 && !isJobsTab) {
-              router.push(`/company/${encodeURIComponent(companyKey)}?tab=jobs`);
-            }
-          }
-          touchStartX.current = null;
-        }}
-      >
-        <div className="flex gap-0 rounded-full border border-border bg-card p-1">
-          <Link
-            href={`/company/${encodeURIComponent(companyKey)}?tab=jobs`}
-            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
-          >
-            {t("active_jobs")}
-          </Link>
-          <Link
-            href={`/company/${encodeURIComponent(companyKey)}?tab=stats`}
-            className={`flex-1 rounded-full py-2.5 text-center text-sm transition-colors ${!isJobsTab ? "bg-primary/12 font-bold text-primary" : "font-semibold text-foreground"}`}
-          >
-            {t("statistics") || "Statistikalar"}
-          </Link>
+      <div className="lg:flex lg:gap-6">
+        <div className="hidden lg:block lg:w-[280px] lg:shrink-0">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            {/* Company-scoped filters: same UI, different target route */}
+            <div key={filtersKey}>
+              <JobFilterForm basePath={`/company/${encodeURIComponent(companyKey)}`} />
+            </div>
+            <div className="mt-2 text-xs text-muted-foreground">
+              {t("active_jobs")}: {name}
+            </div>
+          </div>
         </div>
-      </div>
 
-      {isJobsTab ? (
-        <div className="mx-0 md:mx-4 overflow-hidden rounded-lg bg-background">
+        <div className="flex-1 overflow-hidden rounded-lg bg-background">
           {initialJobsLoading ? null : jobsError ? (
             <div className="px-4 py-4 text-sm text-muted-foreground">
               {jobsError}
@@ -442,16 +597,7 @@ export default function CompanyViewPage() {
             </>
           )}
         </div>
-      ) : (
-        <div className="mx-0 md:mx-4 mt-2">
-          <CompanyStatsDashboard
-            jobs={jobs}
-            totalViews={totalViews}
-            totalApplied={totalApplied}
-            jobsCount={jobsCount}
-          />
-        </div>
-      )}
+      </div>
     </div>
   );
 }

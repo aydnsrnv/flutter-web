@@ -9,7 +9,11 @@ import { Input } from "@/components/ui/input";
 
 type Opt = { value: string; label: string };
 
-export function JobFilterForm() {
+export function JobFilterForm({
+  basePath = "/filter-results",
+}: {
+  basePath?: string;
+}) {
   const router = useRouter();
   const { t } = useI18n();
 
@@ -182,7 +186,7 @@ export function JobFilterForm() {
     if (maxSalary.trim()) params.set("maxSalary", maxSalary.trim());
 
     const qs = params.toString();
-    router.push(qs ? `/filter-results?${qs}` : "/filter-results");
+    router.push(qs ? `${basePath}?${qs}` : basePath);
   }
 
   function clearAll() {

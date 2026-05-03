@@ -224,6 +224,10 @@ export function DesktopTopNav({ aside }: { aside?: React.ReactNode }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!dropdownOpen) setLangOpen(false);
+  }, [dropdownOpen]);
+
   const toggleTheme = useCallback(() => {
     const next: ThemeMode = theme === "dark" ? "light" : "dark";
     setTheme(next);
@@ -557,10 +561,92 @@ export function DesktopTopNav({ aside }: { aside?: React.ReactNode }) {
                 </div>
               </div>
               {aside ? (
-                  <div className="flex w-[380px] shrink-0 items-center justify-center border-l border-border bg-muted/30 p-4">
-                    <div className="w-full">{aside}</div>
+                <div className="flex w-[380px] shrink-0 items-start justify-center border-l border-border bg-muted/30 p-4">
+                  <div className="w-full">
+                    {langOpen ? (
+                      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <button
+                            type="button"
+                            onClick={() => setLangOpen(false)}
+                            className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
+                            aria-label={t("back")}
+                          >
+                            <i className="ri-arrow-left-s-line text-lg" />
+                            {t("selectLang")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLangOpen(false);
+                              setDropdownOpen(false);
+                            }}
+                            aria-label={t("close")}
+                            className="text-foreground/60 hover:text-foreground"
+                          >
+                            <CloseCircle
+                              size={22}
+                              variant="Linear"
+                              color="currentColor"
+                            />
+                          </button>
+                        </div>
+                        <div className="h-px w-full bg-border/60" />
+
+                        <div className="p-2">
+                          {locales.map((l) => {
+                            const selected = l.value === locale;
+                            return (
+                              <button
+                                key={l.value}
+                                type="button"
+                                className={cn(
+                                  "flex w-full items-center justify-between rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted/40",
+                                  selected && "bg-jobly-soft hover:bg-jobly-soft",
+                                )}
+                                onClick={() => {
+                                  setLocale(l.value);
+                                  router.refresh();
+                                  setLangOpen(false);
+                                  setDropdownOpen(false);
+                                }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="overflow-hidden rounded-md">
+                                    <img
+                                      src={l.flagSrc}
+                                      alt={l.label}
+                                      className="h-[30px] w-[30px] object-cover"
+                                    />
+                                  </div>
+                                  <div
+                                    className={cn(
+                                      "text-base",
+                                      selected
+                                        ? "font-bold text-primary"
+                                        : "font-normal",
+                                    )}
+                                  >
+                                    {l.label}
+                                  </div>
+                                </div>
+                                {selected ? (
+                                  <i
+                                    className="ri-checkbox-circle-fill text-[21px] text-primary"
+                                    aria-hidden="true"
+                                  />
+                                ) : null}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full">{aside}</div>
+                    )}
                   </div>
-                ) : null}
+                </div>
+              ) : null}
               </div>
             )}
           </div>
@@ -568,79 +654,6 @@ export function DesktopTopNav({ aside }: { aside?: React.ReactNode }) {
       </div>
 
     </header>
-    {langOpen && (
-      <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/55 px-4" onClick={() => setLangOpen(false)}>
-        <div className="relative w-full max-w-[360px]" onClick={(e) => e.stopPropagation()}>
-          <div className="rounded-2xl border border-border bg-card shadow-2xl">
-            <div className="flex items-center justify-between px-4 py-3">
-              <div className="text-base font-semibold">
-                {t("selectLang")}
-              </div>
-              <button
-                type="button"
-                onClick={() => setLangOpen(false)}
-                aria-label={t("close")}
-              >
-                <CloseCircle
-                  size={22}
-                  variant="Linear"
-                  color="currentColor"
-                  className="text-foreground/60"
-                />
-              </button>
-            </div>
-            <div className="h-px w-full bg-border/60" />
-
-            <div className="p-2">
-              {locales.map((l) => {
-                const selected = l.value === locale;
-                return (
-                  <button
-                    key={l.value}
-                    type="button"
-                    className={cn(
-                      "flex w-full items-center justify-between rounded-xl px-3 py-3 text-left transition-colors",
-                      selected && "bg-jobly-soft",
-                    )}
-                    onClick={() => {
-                      setLocale(l.value);
-                      setLangOpen(false);
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="overflow-hidden rounded-md">
-                        <img
-                          src={l.flagSrc}
-                          alt={l.label}
-                          className="h-[30px] w-[30px] object-cover"
-                        />
-                      </div>
-                      <div
-                        className={cn(
-                          "text-base",
-                          selected
-                            ? "font-bold text-primary"
-                            : "font-normal",
-                        )}
-                      >
-                        {l.label}
-                      </div>
-                    </div>
-                    {selected ? (
-                      <i
-                        className="ri-checkbox-circle-fill text-[21px] text-primary"
-                        aria-hidden="true"
-                      />
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
     </>
   );
 }

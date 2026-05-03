@@ -50,7 +50,9 @@ export function ShellLayoutClient({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className={`mx-auto w-full pb-20 pt-4 lg:max-w-none lg:px-0 lg:pb-6 ${isDetailPage ? 'max-w-none' : 'max-w-md'} ${isGradientHeaderPage ? 'px-0' : 'px-4'}`}>
+      <div
+        className={`mx-auto w-full pb-20 lg:max-w-none lg:px-0 lg:pb-6 ${isDetailPage ? "max-w-none" : "max-w-md"} ${isGradientHeaderPage ? "px-0 pt-0" : "px-4 pt-4"}`}
+      >
         <div className="hidden lg:grid lg:grid-cols-[1fr] lg:gap-6">
           <main className="min-w-0">
             <DesktopTopNav aside={aside} />

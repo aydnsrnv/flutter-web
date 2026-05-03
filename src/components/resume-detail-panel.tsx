@@ -488,6 +488,7 @@ export function ResumeDetailPanel({
   const [reportReason, setReportReason] = useState("");
   const [contactOpen, setContactOpen] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
+  const [copiedText, setCopiedText] = useState<string | null>(null);
 
   const [currentAvatar, setCurrentAvatar] = useState(resume.avatar ?? null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -498,6 +499,59 @@ export function ResumeDetailPanel({
     !!authUserId && !!resume.user_id && authUserId === resume.user_id;
   const isEmployer = (resume.authUserType ?? "").toLowerCase() === "employer";
   const canSeeContact = isOwner || isEmployer;
+
+  useEffect(() => {
+    if (!copiedText) return;
+    const id = window.setTimeout(() => setCopiedText(null), 1400);
+    return () => window.clearTimeout(id);
+  }, [copiedText]);
+
+  const copyAndNotify = useCallback(
+    async (raw?: string | null) => {
+      const v = raw?.trim();
+      if (!v) return;
+      const legacyCopy = () => {
+        try {
+          const el = document.createElement("textarea");
+          el.value = v;
+          el.setAttribute("readonly", "");
+          el.style.position = "fixed";
+          el.style.left = "-9999px";
+          el.style.top = "0";
+          document.body.appendChild(el);
+          el.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(el);
+          return ok;
+        } catch {
+          return false;
+        }
+      };
+
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(v);
+          setCopiedText(t("copied"));
+          return;
+        }
+      } catch {
+        // fall back
+      }
+
+      if (legacyCopy()) {
+        setCopiedText(t("copied"));
+      }
+    },
+    [t],
+  );
+
+  const copyContactIfAllowed = useCallback(
+    (raw?: string | null) => {
+      if (!canSeeContact) return;
+      copyAndNotify(raw);
+    },
+    [canSeeContact, copyAndNotify],
+  );
 
   useEffect(() => {
     setCurrentAvatar(resume.avatar ?? null);
@@ -943,11 +997,7 @@ export function ResumeDetailPanel({
                         <button
                           type="button"
                           onClick={() => {
-                            if (!canSeeContact) return;
-                            window.open(
-                              `tel:${String(resume.phone).replace(/\s+/g, "")}`,
-                              "_self",
-                            );
+                            copyContactIfAllowed(resume.phone);
                             setContactOpen(false);
                           }}
                           className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity ${!canSeeContact ? "opacity-70" : ""}`}
@@ -990,8 +1040,7 @@ export function ResumeDetailPanel({
                         <button
                           type="button"
                           onClick={() => {
-                            if (!canSeeContact) return;
-                            window.open(`mailto:${resume.email}`, "_self");
+                            copyContactIfAllowed(resume.email);
                             setContactOpen(false);
                           }}
                           className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity bg-jobly-soft ${!canSeeContact ? "opacity-70" : ""}`}
@@ -1259,42 +1308,49 @@ export function ResumeDetailPanel({
             title={t("resumeDetailSectionContact")}
           />
           <div className="px-3 py-2">
-            <DetailItem
-              icon={
-                <Sms
-                  size={22}
-                  variant="Linear"
-                  color="var(--jobly-main, #245BEB)"
+            {resume.email ? (
+              <button
+                type="button"
+                onClick={() => copyContactIfAllowed(resume.email)}
+                className="block w-full text-left"
+                disabled={!canSeeContact}
+              >
+                <DetailItem
+                  icon={
+                    <Sms
+                      size={22}
+                      variant="Linear"
+                      color="var(--jobly-main, #245BEB)"
+                    />
+                  }
+                  title={t("resumeDetailEmail")}
+                  value={canSeeContact ? resume.email : maskEmail(resume.email)}
+                  obscure={!canSeeContact}
                 />
-              }
-              title={t("resumeDetailEmail")}
-              value={
-                canSeeContact
-                  ? (resume.email ?? null)
-                  : resume.email
-                    ? maskEmail(resume.email)
-                    : null
-              }
-              obscure={!canSeeContact && !!resume.email}
-            />
-            <DetailItem
-              icon={
-                <Call
-                  size={22}
-                  variant="Linear"
-                  color="var(--jobly-main, #245BEB)"
+              </button>
+            ) : null}
+
+            {resume.phone ? (
+              <button
+                type="button"
+                onClick={() => copyContactIfAllowed(resume.phone)}
+                className="block w-full text-left"
+                disabled={!canSeeContact}
+              >
+                <DetailItem
+                  icon={
+                    <Call
+                      size={22}
+                      variant="Linear"
+                      color="var(--jobly-main, #245BEB)"
+                    />
+                  }
+                  title={t("resumeDetailPhone")}
+                  value={canSeeContact ? resume.phone : maskPhone(resume.phone)}
+                  obscure={!canSeeContact}
                 />
-              }
-              title={t("resumeDetailPhone")}
-              value={
-                canSeeContact
-                  ? (resume.phone ?? null)
-                  : resume.phone
-                    ? maskPhone(resume.phone)
-                    : null
-              }
-              obscure={!canSeeContact && !!resume.phone}
-            />
+              </button>
+            ) : null}
           </div>
         </CardWrap>
 
@@ -1542,12 +1598,16 @@ export function ResumeDetailPanel({
 
       {/* Masaüstü iletişim barı */}
       {contactOpen && (
-        <div className="hidden lg:flex fixed bottom-6 left-24 right-[calc(96px+24px+320px)] z-[90] items-end justify-center gap-3 px-0">
+        <div className="hidden lg:flex fixed bottom-3 left-24 right-[calc(96px+24px+320px)] z-[90] items-end justify-center gap-3 px-0">
           <div className="w-full max-w-[520px] px-4">
             <div className="flex items-center gap-3">
               {resume.phone ? (
                 <button
                   type="button"
+                  onClick={() => {
+                    if (!canSeeContact) return;
+                    copyAndNotify(resume.phone);
+                  }}
                   className={`h-12 flex-1 rounded-full text-base font-semibold ${!canSeeContact ? "opacity-70" : ""}`}
                   style={{ backgroundColor: "rgba(34,197,94,0.12)", color: "#16A34A" }}
                 >
@@ -1557,6 +1617,10 @@ export function ResumeDetailPanel({
               {resume.email ? (
                 <button
                   type="button"
+                  onClick={() => {
+                    if (!canSeeContact) return;
+                    copyAndNotify(resume.email);
+                  }}
                   className={`h-12 flex-1 rounded-full text-base font-semibold ${!canSeeContact ? "opacity-70" : ""}`}
                   style={{ backgroundColor: "rgba(59,130,246,0.12)", color: "#3B82F6" }}
                 >
@@ -1588,7 +1652,18 @@ export function ResumeDetailPanel({
         </div>
       )}
 
-      <div className={`fixed bottom-20 left-0 right-0 z-[90] lg:bottom-6 lg:left-24 lg:right-[calc(96px+24px+320px)] ${contactOpen ? 'lg:hidden' : ''}`}>
+      {copiedText ? (
+        <div className="pointer-events-none fixed bottom-24 left-0 right-0 z-[95] flex justify-center px-4">
+          <div className="rounded-full bg-black/75 px-4 py-2 text-sm font-semibold text-white">
+            {copiedText}
+          </div>
+        </div>
+      ) : null}
+
+      <div
+        className={`fixed left-0 right-0 z-[90] lg:bottom-3 lg:left-24 lg:right-[calc(96px+24px+320px)] ${contactOpen ? "lg:hidden" : ""}`}
+        style={{ bottom: bottomOffset ? Math.max(bottomOffset - 1, 0) : 0 }}
+      >
         {/* Mobil AI FAB - bar üstünde */}
         <div className="relative mx-auto max-w-[520px] lg:hidden">
           {isEmployer && (
@@ -1611,13 +1686,12 @@ export function ResumeDetailPanel({
                 <button
                   type="button"
                   onClick={toggleFavorite}
-                  className="grid h-12 w-12 place-items-center rounded-xl"
-                  style={{ backgroundColor: "var(--secondary)" }}
+                  className="grid h-12 w-12 place-items-center rounded-xl bg-secondary text-muted-foreground"
                 >
                   <Archive
                     size={24}
                     variant={favorite ? "Bold" : "Linear"}
-                    color={favorite ? "#FFA500" : "var(--muted-foreground)"}
+                    color={favorite ? "#FFA500" : "currentColor"}
                   />
                 </button>
                 <button
@@ -1634,13 +1708,12 @@ export function ResumeDetailPanel({
                 <button
                   type="button"
                   onClick={openReport}
-                  className="grid h-12 w-12 place-items-center rounded-xl"
-                  style={{ backgroundColor: "var(--secondary)" }}
+                  className="grid h-12 w-12 place-items-center rounded-xl bg-secondary text-muted-foreground"
                 >
                   <Flag
                     size={24}
                     variant="Linear"
-                    color={reported ? "#FFA500" : "var(--jobly-main, #245BEB)"}
+                    color={reported ? "#FFA500" : "currentColor"}
                   />
                 </button>
               </div>

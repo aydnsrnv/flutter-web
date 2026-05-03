@@ -171,26 +171,19 @@ function DetailRow({ title, value }: { title: string; value?: string | null }) {
 function CopyableContactRow({
   icon,
   value,
+  onCopy,
 }: {
   icon: ReactNode;
   value?: string | null;
+  onCopy: (v: string) => void;
 }) {
-  const onCopy = useCallback(async () => {
-    const v = value?.trim();
-    if (!v) return;
-    try {
-      await navigator.clipboard.writeText(v);
-    } catch {
-      // ignore
-    }
-  }, [value]);
-
   if (!value || !value.trim()) return null;
+  const v = value.trim();
 
   return (
     <button
       type="button"
-      onClick={onCopy}
+      onClick={() => onCopy(v)}
       className="flex w-full items-center gap-2 text-left"
     >
         <div className="shrink-0">
@@ -328,6 +321,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
   );
 
   const [contactOpen, setContactOpen] = useState(false);
+  const [copiedText, setCopiedText] = useState<string | null>(null);
   const [favorite, setFavorite] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
@@ -339,6 +333,52 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
     setContactOpen(true);
     incrementJobAppliedCount(job.id).catch(() => {});
   }, [job.id]);
+
+  useEffect(() => {
+    if (!copiedText) return;
+    const id = window.setTimeout(() => setCopiedText(null), 1400);
+    return () => window.clearTimeout(id);
+  }, [copiedText]);
+
+  const copyAndNotify = useCallback(
+    async (raw?: string | null) => {
+      const v = raw?.trim();
+      if (!v) return;
+
+      const legacyCopy = () => {
+        try {
+          const el = document.createElement("textarea");
+          el.value = v;
+          el.setAttribute("readonly", "");
+          el.style.position = "fixed";
+          el.style.left = "-9999px";
+          el.style.top = "0";
+          document.body.appendChild(el);
+          el.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(el);
+          return ok;
+        } catch {
+          return false;
+        }
+      };
+
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(v);
+          setCopiedText(t("copied"));
+          return;
+        }
+      } catch {
+        // fall back
+      }
+
+      if (legacyCopy()) {
+        setCopiedText(t("copied"));
+      }
+    },
+    [t],
+  );
 
   const copyTitle = useCallback(async () => {
     try {
@@ -544,23 +584,26 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
     }
   }, [reportKey, reportReason, reportOpen, reported, t]);
 
-  const openTel = useCallback((phone: string) => {
-    const cleaned = phone.replace(/\s+/g, "");
-    window.location.href = `tel:${cleaned}`;
-  }, []);
+  const openTel = useCallback(
+    (phone: string) => {
+      copyAndNotify(phone);
+    },
+    [copyAndNotify],
+  );
 
-  const openMail = useCallback((mail: string) => {
-    window.location.href = `mailto:${mail}`;
-  }, []);
+  const openMail = useCallback(
+    (mail: string) => {
+      copyAndNotify(mail);
+    },
+    [copyAndNotify],
+  );
 
-  const openApplyLink = useCallback((url: string) => {
-    let link = url.trim();
-    if (!link) return;
-    if (!link.startsWith("http://") && !link.startsWith("https://")) {
-      link = `https://${link}`;
-    }
-    window.open(link, "_blank", "noopener,noreferrer");
-  }, []);
+  const openApplyLink = useCallback(
+    (url: string) => {
+      copyAndNotify(url);
+    },
+    [copyAndNotify],
+  );
 
   const salaryNode = (
     <SalaryText
@@ -749,10 +792,12 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
             <CopyableContactRow
               icon={<Sms size={18} variant="Linear" color="currentColor" />}
               value={job.mail ?? null}
+            onCopy={(v) => copyAndNotify(v)}
             />
             <CopyableContactRow
               icon={<Call size={18} variant="Linear" color="currentColor" />}
               value={job.number ?? null}
+            onCopy={(v) => copyAndNotify(v)}
             />
           </div>
         </div>
@@ -907,30 +952,33 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
 
       {/* Masaüstü iletişim barı */}
       {contactOpen && (
-        <div className="hidden lg:flex fixed bottom-6 left-24 right-[calc(96px+24px+320px)] z-[90] items-end justify-center gap-3 px-0">
+        <div className="hidden lg:flex fixed bottom-3 left-24 right-[calc(96px+24px+320px)] z-[90] items-end justify-center gap-3 px-0">
           <div className="w-full max-w-[520px] px-4">
             <div className="flex items-center gap-3">
               {job.number && job.number.trim() && job.number !== "0" ? (
                 <button
                   type="button"
+                  onClick={() => copyAndNotify(job.number)}
                   className="h-12 flex-1 rounded-full text-base font-semibold"
                   style={{ backgroundColor: "rgba(34,197,94,0.12)", color: "#16A34A" }}
                 >
-                  {t("phone")}
+                  {job.number}
                 </button>
               ) : null}
               {job.mail && job.mail.trim() ? (
                 <button
                   type="button"
+                  onClick={() => copyAndNotify(job.mail)}
                   className="h-12 flex-1 rounded-full text-base font-semibold"
                   style={{ backgroundColor: "rgba(59,130,246,0.12)", color: "#3B82F6" }}
                 >
-                  {t("email")}
+                  {job.mail}
                 </button>
               ) : null}
               {job.apply_link && job.apply_link.trim() ? (
                 <button
                   type="button"
+                  onClick={() => copyAndNotify(job.apply_link)}
                   className="h-12 flex-1 rounded-full text-base font-semibold"
                   style={{ backgroundColor: "rgba(168,85,247,0.12)", color: "#7C3AED" }}
                 >
@@ -962,7 +1010,15 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
         </div>
       )}
 
-      <div className={`fixed bottom-20 left-0 right-0 z-[90] lg:bottom-6 lg:left-24 lg:right-[calc(96px+24px+320px)] ${contactOpen ? 'lg:hidden' : ''}`}>
+      {copiedText ? (
+        <div className="pointer-events-none fixed bottom-24 left-0 right-0 z-[95] flex justify-center px-4">
+          <div className="rounded-full bg-black/75 px-4 py-2 text-sm font-semibold text-white">
+            {copiedText}
+          </div>
+        </div>
+      ) : null}
+
+      <div className={`fixed left-0 right-0 z-[90] lg:bottom-3 lg:left-24 lg:right-[calc(96px+24px+320px)] ${contactOpen ? 'lg:hidden' : ''}`} style={{ bottom: bottomOffset ? Math.max(bottomOffset - 1, 0) : 0 }}>
         {/* Mobil AI FAB - bar üstünde */}
         <div className="relative mx-auto max-w-[520px] lg:hidden">
           {isCandidate && (
@@ -985,15 +1041,12 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                 <button
                   type="button"
                   onClick={toggleFavorite}
-                  className="grid h-12 w-12 place-items-center rounded-xl"
-                  style={{
-                    backgroundColor: "#F3F4F6",
-                  }}
+                  className="grid h-12 w-12 place-items-center rounded-xl bg-secondary text-muted-foreground"
                 >
                   <Archive
                     size={24}
                     variant={favorite ? "Bold" : "Linear"}
-                    color={favorite ? "#FFA500" : "var(--muted-foreground)"}
+                    color={favorite ? "#FFA500" : "currentColor"}
                   />
                 </button>
 
