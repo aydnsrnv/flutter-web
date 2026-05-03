@@ -421,7 +421,7 @@ export default function CompanyViewPage() {
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="truncate text-[30px] font-extrabold tracking-tight text-foreground sm:text-[34px]">
+            <div className="truncate text-center text-[30px] font-extrabold tracking-tight text-foreground sm:text-left sm:text-[34px]">
               {name}
             </div>
 
