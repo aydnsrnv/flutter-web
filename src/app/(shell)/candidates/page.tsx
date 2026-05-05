@@ -12,6 +12,7 @@ import {
 import { SectionHeader } from "@/components/section-header";
 import { createClient } from "@/lib/supabase/server";
 import { CvFilterForm } from "@/components/cv-filter-form";
+import { CandidatesSearchBar } from "@/components/candidates-search-bar";
 
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocaleFromCookies } from "@/lib/i18n/server";
@@ -271,6 +272,9 @@ export default async function CandidatesPage({
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="lg:hidden">
+        <CandidatesSearchBar initialQuery={q} />
+      </div>
       {popularError || premiumError || latestError ? (
         <div className="rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
           {popularError ? (

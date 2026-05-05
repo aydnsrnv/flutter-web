@@ -428,7 +428,7 @@ export default function CompanyViewPage() {
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <div className="inline-flex items-center gap-2 rounded-full bg-jobly-soft px-4 py-2 text-sm font-extrabold text-primary sm:px-5 sm:text-base">
                 <Briefcase size={21} variant="Linear" color="currentColor" />
-                {t("active_jobs")}: {formatCount(jobsCount)}
+                Vakansiya: {formatCount(jobsCount)}
               </div>
               <div className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-semibold text-foreground/80 sm:px-5 sm:text-base">
                 <Eye size={20} variant="Linear" color="currentColor" />

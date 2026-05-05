@@ -517,6 +517,7 @@
   "job_requirements": "Tələblər",
   "job_about": "İş barədə məlumat",
   "similar_jobs": "Bənzər Vakansiyalar",
+  "similar_resumes": "Bənzər CVlər",
   "phone_app_error": "Telefon tətbiqi açıla bilmədi",
   "email_app_error": "E-poçt tətbiqi açıla bilmədi",
   "age": "Yaş",
@@ -995,5 +996,7 @@
   "salary_distribution": "Maaş bölgüsü",
   "top_viewed_jobs": "Ən çox baxılan elanlar",
   "top_applied_jobs": "Ən çox müraciət olunan elanlar",
-  "stats_subtitle": "Elan performansınızı və statistikalarınızı izləyin"
+  "stats_subtitle": "Elan performansınızı və statistikalarınızı izləyin",
+  "show_more_filters": "Aşağı genişlət",
+  "show_less_filters": "Yuxarı daralt"
 }

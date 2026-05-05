@@ -8,6 +8,7 @@ import type { PopularJobListItemData } from "@/components/popular-job-list-item"
 import { FlutterJobListGroup } from "@/components/flutter-job-list-group";
 import type { FlutterJobItemData } from "@/components/flutter-job-item";
 import { JobFilterForm } from "@/components/job-filter-form";
+import { HomeSearchBar } from "@/components/home-search-bar";
 
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocaleFromCookies } from "@/lib/i18n/server";
@@ -171,6 +172,9 @@ export default async function HomeTabPage({
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="lg:hidden">
+        <HomeSearchBar initialQuery={searchQuery} />
+      </div>
       {isSearching ? (
         <>
           <div className="lg:flex lg:gap-6">

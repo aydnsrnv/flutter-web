@@ -48,6 +48,8 @@
 }
 
 :root {
+  --desktop-inline-gutter: clamp(32px, 7.8vw, 128px);
+  --mainColorOpacity: rgba(36, 91, 235, 0.45);
   --background: #f6f6f6;
   --foreground: #111827;
   --card: #ffffff;
@@ -92,7 +94,14 @@
   --radius-card: 16px;
 }
 
+@media (min-width: 1024px) {
+  html {
+    font-size: 130%;
+  }
+}
+
 .dark {
+  --mainColorOpacity: rgba(36, 91, 235, 0.55);
   --background: #181828;
   --foreground: rgba(255, 255, 255, 0.88);
   --card: #222231;
@@ -235,4 +244,23 @@
 
 .ai-score-ring-circle {
   transition: stroke-dashoffset 1.2s ease-out;
+}
+
+/* Global scrollbar color */
+* {
+  scrollbar-color: var(--mainColorOpacity) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--mainColorOpacity);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
 }

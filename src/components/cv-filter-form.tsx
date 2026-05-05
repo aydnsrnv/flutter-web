@@ -37,7 +37,11 @@ function normalizeTokenList(value: string) {
   return tokens.join(", ");
 }
 
-export function CvFilterForm() {
+export function CvFilterForm({
+  showExpandToggle = true,
+}: {
+  showExpandToggle?: boolean;
+}) {
   const router = useRouter();
   const { t } = useI18n();
 
@@ -53,6 +57,7 @@ export function CvFilterForm() {
   const [skills, setSkills] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [pendingLanguageName, setPendingLanguageName] = useState("");
+  const [expanded, setExpanded] = useState(false);
 
   const cityOptions: Opt[] = useMemo(() => {
     const keys = [
@@ -286,145 +291,173 @@ export function CvFilterForm() {
         />
       </div>
 
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("experience")}
-        </div>
-        <SingleSelectDropdown
-          value={experience}
-          onChange={setExperience}
-          placeholder={t("select_experience")}
-          options={experienceOptions}
-        />
-      </div>
+      {showExpandToggle && !expanded && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="flex items-center justify-center gap-1 py-2 text-sm font-semibold text-primary transition-colors hover:opacity-80"
+        >
+          {t("show_more_filters")}
+          <i className="ri-arrow-down-s-line text-lg transition-transform duration-300" />
+        </button>
+      )}
 
-      <div>
-        <div className="mb-1 text-sm font-semibold">{t("gender")}</div>
-        <div className="grid grid-cols-2 gap-3">
-          {genderOptions.map((opt) => {
-            const selected = gender === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setGender(opt.value)}
-                className="h-12 rounded-[16px] border text-sm font-semibold transition-colors"
-                style={{
-                  borderColor: selected ? "var(--jobly-main)" : "var(--border)",
-                  backgroundColor: selected
-                    ? "var(--jobly-main-10)"
-                    : "transparent",
-                  color: selected ? "var(--jobly-main)" : "var(--foreground)",
-                }}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("filters_age_range")}
-        </div>
-        <div className="flex gap-3">
-          <Input
-            placeholder={t("filters_min_short")}
-            value={minAge}
-            onChange={(e) => setMinAge(e.target.value)}
-            inputMode="numeric"
-          />
-          <Input
-            placeholder={t("filters_max_short")}
-            value={maxAge}
-            onChange={(e) => setMaxAge(e.target.value)}
-            inputMode="numeric"
-          />
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("filters_salary_range_azn")}
-        </div>
-        <div className="flex gap-3">
-          <Input
-            placeholder={t("filters_min_short")}
-            value={minSalary}
-            onChange={(e) => setMinSalary(e.target.value)}
-            inputMode="numeric"
-          />
-          <Input
-            placeholder={t("filters_max_short")}
-            value={maxSalary}
-            onChange={(e) => setMaxSalary(e.target.value)}
-            inputMode="numeric"
-          />
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("filters_skills_comma_separated")}
-        </div>
-        <Input
-          value={skills}
-          onChange={(e) => setSkills(e.target.value)}
-          placeholder={t("filters_skills_hint")}
-        />
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("filters_languages")}
-        </div>
-        <div className="grid gap-3">
-          <SingleSelectDropdown
-            value={pendingLanguageName}
-            onChange={setPendingLanguageName}
-            placeholder={t("filters_select_language")}
-            options={languageOptions}
-          />
-
-          {pendingLanguageName ? (
-            <SingleSelectDropdown
-              value=""
-              onChange={(level) => {
-                if (!pendingLanguageName || !level) return;
-                addLanguageWithLevel(pendingLanguageName, level);
-              }}
-              placeholder={t("filters_select_level")}
-              options={languageLevelOptions}
-            />
-          ) : null}
-
-          {selectedLanguages.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {selectedLanguages.map((entry) => (
-                <div
-                  key={entry}
-                  className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
-                  style={{
-                    backgroundColor: "var(--jobly-main-10)",
-                    color: "var(--jobly-main)",
-                  }}
-                >
-                  <span>{entry}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeLanguage(entry)}
-                    className="leading-none"
-                    aria-label={t("clear")}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showExpandToggle ? (expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]") : "grid-rows-[1fr]"}`}
+      >
+        <div className="overflow-hidden flex flex-col gap-3">
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("experience")}
             </div>
-          ) : null}
+            <SingleSelectDropdown
+              value={experience}
+              onChange={setExperience}
+              placeholder={t("select_experience")}
+              options={experienceOptions}
+            />
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">{t("gender")}</div>
+            <div className="grid grid-cols-2 gap-3">
+              {genderOptions.map((opt) => {
+                const selected = gender === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setGender(opt.value)}
+                    className="h-12 rounded-[16px] border text-sm font-semibold transition-colors"
+                    style={{
+                      borderColor: selected ? "var(--jobly-main)" : "var(--border)",
+                      backgroundColor: selected
+                        ? "var(--jobly-main-10)"
+                        : "transparent",
+                      color: selected ? "var(--jobly-main)" : "var(--foreground)",
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("filters_age_range")}
+            </div>
+            <div className="flex gap-3">
+              <Input
+                placeholder={t("filters_min_short")}
+                value={minAge}
+                onChange={(e) => setMinAge(e.target.value)}
+                inputMode="numeric"
+              />
+              <Input
+                placeholder={t("filters_max_short")}
+                value={maxAge}
+                onChange={(e) => setMaxAge(e.target.value)}
+                inputMode="numeric"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("filters_salary_range_azn")}
+            </div>
+            <div className="flex gap-3">
+              <Input
+                placeholder={t("filters_min_short")}
+                value={minSalary}
+                onChange={(e) => setMinSalary(e.target.value)}
+                inputMode="numeric"
+              />
+              <Input
+                placeholder={t("filters_max_short")}
+                value={maxSalary}
+                onChange={(e) => setMaxSalary(e.target.value)}
+                inputMode="numeric"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("filters_skills_comma_separated")}
+            </div>
+            <Input
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+              placeholder={t("filters_skills_hint")}
+            />
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("filters_languages")}
+            </div>
+            <div className="grid gap-3">
+              <SingleSelectDropdown
+                value={pendingLanguageName}
+                onChange={setPendingLanguageName}
+                placeholder={t("filters_select_language")}
+                options={languageOptions}
+              />
+
+              {pendingLanguageName ? (
+                <SingleSelectDropdown
+                  value=""
+                  onChange={(level) => {
+                    if (!pendingLanguageName || !level) return;
+                    addLanguageWithLevel(pendingLanguageName, level);
+                  }}
+                  placeholder={t("filters_select_level")}
+                  options={languageLevelOptions}
+                />
+              ) : null}
+
+              {selectedLanguages.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {selectedLanguages.map((entry) => (
+                    <div
+                      key={entry}
+                      className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
+                      style={{
+                        backgroundColor: "var(--jobly-main-10)",
+                        color: "var(--jobly-main)",
+                      }}
+                    >
+                      <span>{entry}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeLanguage(entry)}
+                        className="leading-none"
+                        aria-label={t("clear")}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
         </div>
       </div>
+
+      {showExpandToggle && expanded && (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="flex items-center justify-center gap-1 py-2 text-sm font-semibold text-primary transition-colors hover:opacity-80"
+        >
+          {t("show_less_filters")}
+          <i className="ri-arrow-down-s-line text-lg transition-transform duration-300 rotate-180" />
+        </button>
+      )}
 
 <div className="flex gap-3 pt-2">
         <button

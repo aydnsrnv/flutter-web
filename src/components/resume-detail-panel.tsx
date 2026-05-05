@@ -1001,7 +1001,7 @@ export function ResumeDetailPanel({
                             setContactOpen(false);
                           }}
                           className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity ${!canSeeContact ? "opacity-70" : ""}`}
-                          style={{ backgroundColor: "rgba(34,197,94,0.12)" }}
+                          style={{ backgroundColor: "rgba(34,197,94,0.24)" }}
                         >
                           <div className="shrink-0">
                             <Call size={25} variant="Linear" color="#16A34A" />
@@ -1043,7 +1043,8 @@ export function ResumeDetailPanel({
                             copyContactIfAllowed(resume.email);
                             setContactOpen(false);
                           }}
-                          className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity bg-jobly-soft ${!canSeeContact ? "opacity-70" : ""}`}
+                          className={`flex h-[60px] w-full items-center gap-[10px] rounded-xl px-3 transition-opacity ${!canSeeContact ? "opacity-70" : ""}`}
+                          style={{ backgroundColor: "rgba(59,130,246,0.24)" }}
                         >
                           <div className="shrink-0">
                             <Sms size={25} variant="Linear" color="#3B82F6" />
@@ -1609,7 +1610,7 @@ export function ResumeDetailPanel({
                     copyAndNotify(resume.phone);
                   }}
                   className={`h-12 flex-1 rounded-full text-base font-semibold ${!canSeeContact ? "opacity-70" : ""}`}
-                  style={{ backgroundColor: "rgba(34,197,94,0.12)", color: "#16A34A" }}
+                  style={{ backgroundColor: "rgba(34,197,94,0.24)", color: "#16A34A" }}
                 >
                   {canSeeContact ? resume.phone : maskPhone(resume.phone)}
                 </button>
@@ -1622,7 +1623,7 @@ export function ResumeDetailPanel({
                     copyAndNotify(resume.email);
                   }}
                   className={`h-12 flex-1 rounded-full text-base font-semibold ${!canSeeContact ? "opacity-70" : ""}`}
-                  style={{ backgroundColor: "rgba(59,130,246,0.12)", color: "#3B82F6" }}
+                  style={{ backgroundColor: "rgba(59,130,246,0.24)", color: "#3B82F6" }}
                 >
                   {canSeeContact ? resume.email : maskEmail(resume.email)}
                 </button>

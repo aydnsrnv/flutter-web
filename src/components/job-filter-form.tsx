@@ -11,8 +11,10 @@ type Opt = { value: string; label: string };
 
 export function JobFilterForm({
   basePath = "/filter-results",
+  showExpandToggle = true,
 }: {
   basePath?: string;
+  showExpandToggle?: boolean;
 }) {
   const router = useRouter();
   const { t } = useI18n();
@@ -28,6 +30,7 @@ export function JobFilterForm({
   const [maxAge, setMaxAge] = useState("");
   const [minSalary, setMinSalary] = useState("");
   const [maxSalary, setMaxSalary] = useState("");
+  const [expanded, setExpanded] = useState(false);
 
   const cityOptions: Opt[] = useMemo(() => {
     const keys = [
@@ -239,103 +242,131 @@ export function JobFilterForm({
         />
       </div>
 
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("job_type")}
+      {showExpandToggle && !expanded && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="flex items-center justify-center gap-1 py-2 text-sm font-semibold text-primary transition-colors hover:opacity-80"
+        >
+          {t("show_more_filters")}
+          <i className="ri-arrow-down-s-line text-lg transition-transform duration-300" />
+        </button>
+      )}
+
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showExpandToggle ? (expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]") : "grid-rows-[1fr]"}`}
+      >
+        <div className="overflow-hidden flex flex-col gap-3">
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("job_type")}
+            </div>
+            <SingleSelectDropdown
+              value={jobType}
+              onChange={setJobType}
+              placeholder={t("select_job_type")}
+              options={jobTypeOptions}
+            />
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("experience")}
+            </div>
+            <SingleSelectDropdown
+              value={experience}
+              onChange={setExperience}
+              placeholder={t("select_experience")}
+              options={experienceOptions}
+            />
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("education")}
+            </div>
+            <SingleSelectDropdown
+              value={education}
+              onChange={setEducation}
+              placeholder={t("select_education")}
+              options={educationOptions}
+            />
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">{t("gender")}</div>
+            <div className="grid grid-cols-2 gap-3">
+              {genderOptions.map((opt) => {
+                const selected = gender === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setGender(opt.value)}
+                    className="h-12 rounded-[16px] border text-sm font-semibold transition-colors"
+                    style={{
+                      borderColor: selected ? "var(--jobly-main)" : "var(--border)",
+                      backgroundColor: selected
+                        ? "var(--jobly-main-10)"
+                        : "transparent",
+                      color: selected ? "var(--jobly-main)" : "var(--foreground)",
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("filters_age_range")}
+            </div>
+            <div className="flex gap-3">
+              <Input
+                placeholder={t("filters_min_short")}
+                value={minAge}
+                onChange={(e) => setMinAge(e.target.value)}
+              />
+              <Input
+                placeholder={t("filters_max_short")}
+                value={maxAge}
+                onChange={(e) => setMaxAge(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-1 text-sm font-semibold">
+              {t("filters_salary_range_azn")}
+            </div>
+            <div className="flex gap-3">
+              <Input
+                placeholder={t("filters_min_short")}
+                value={minSalary}
+                onChange={(e) => setMinSalary(e.target.value)}
+              />
+              <Input
+                placeholder={t("filters_max_short")}
+                value={maxSalary}
+                onChange={(e) => setMaxSalary(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
-        <SingleSelectDropdown
-          value={jobType}
-          onChange={setJobType}
-          placeholder={t("select_job_type")}
-          options={jobTypeOptions}
-        />
       </div>
 
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("experience")}
-        </div>
-        <SingleSelectDropdown
-          value={experience}
-          onChange={setExperience}
-          placeholder={t("select_experience")}
-          options={experienceOptions}
-        />
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("education")}
-        </div>
-        <SingleSelectDropdown
-          value={education}
-          onChange={setEducation}
-          placeholder={t("select_education")}
-          options={educationOptions}
-        />
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">{t("gender")}</div>
-        <div className="grid grid-cols-2 gap-3">
-          {genderOptions.map((opt) => {
-            const selected = gender === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setGender(opt.value)}
-                className="h-12 rounded-[16px] border text-sm font-semibold transition-colors"
-                style={{
-                  borderColor: selected ? "var(--jobly-main)" : "var(--border)",
-                  backgroundColor: selected
-                    ? "var(--jobly-main-10)"
-                    : "transparent",
-                  color: selected ? "var(--jobly-main)" : "var(--foreground)",
-                }}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("filters_age_range")}
-        </div>
-        <div className="flex gap-3">
-          <Input
-            placeholder={t("filters_min_short")}
-            value={minAge}
-            onChange={(e) => setMinAge(e.target.value)}
-          />
-          <Input
-            placeholder={t("filters_max_short")}
-            value={maxAge}
-            onChange={(e) => setMaxAge(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-1 text-sm font-semibold">
-          {t("filters_salary_range_azn")}
-        </div>
-        <div className="flex gap-3">
-          <Input
-            placeholder={t("filters_min_short")}
-            value={minSalary}
-            onChange={(e) => setMinSalary(e.target.value)}
-          />
-          <Input
-            placeholder={t("filters_max_short")}
-            value={maxSalary}
-            onChange={(e) => setMaxSalary(e.target.value)}
-          />
-        </div>
-      </div>
+      {showExpandToggle && expanded && (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="flex items-center justify-center gap-1 py-2 text-sm font-semibold text-primary transition-colors hover:opacity-80"
+        >
+          {t("show_less_filters")}
+          <i className="ri-arrow-down-s-line text-lg transition-transform duration-300 rotate-180" />
+        </button>
+      )}
 
 <div className="flex gap-3 pt-2">
         <button

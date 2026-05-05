@@ -84,7 +84,9 @@ function TopNavSearch() {
   const isCandidates = pathname === "/candidates";
   const isJobDetail = pathname.startsWith("/job/");
   const isCvDetail = pathname.startsWith("/cv/");
-  const hasSearch = isHome || isCandidates || isJobDetail || isCvDetail;
+  const isLatest = pathname === "/latest";
+  const isLatestCvs = pathname === "/latest-cvs";
+  const hasSearch = isHome || isCandidates || isJobDetail || isCvDetail || isLatest || isLatestCvs;
 
   const currentQ = (searchParams.get("q") ?? "").trim();
   const [q, setQ] = useState(currentQ);
@@ -118,12 +120,12 @@ function TopNavSearch() {
   }, [q, hasSearch, pathname, router, searchParams]);
 
   if (!hasSearch) {
-    return null;
+    return <div className="relative hidden md:block h-9 w-[200px] lg:h-11 lg:w-[240px]" />;
   }
 
-  const searchBasePath = isCandidates || isCvDetail ? "/candidates" : "/home";
+  const searchBasePath = isCandidates || isCvDetail || isLatestCvs ? "/candidates" : "/home";
   const placeholder =
-    isHome || isJobDetail
+    isHome || isJobDetail || isLatest
       ? t("search_job")
       : t("search_cv_placeholder");
   return (
@@ -134,7 +136,7 @@ function TopNavSearch() {
       }}
     >
       <Input
-        className="h-9 w-[200px] lg:h-11 lg:w-[240px] rounded-full border-border bg-muted/50 pl-10 pr-10 lg:pl-12 lg:pr-12 text-sm focus-visible:bg-background"
+        className="h-9 w-[200px] lg:h-11 lg:w-[240px] rounded-full border border-border bg-muted/50 pl-10 pr-10 lg:pl-12 lg:pr-12 text-sm focus-visible:bg-background"
         placeholder={placeholder}
         value={q}
         onChange={(e) => setQ(e.target.value)}
@@ -263,7 +265,7 @@ export function DesktopTopNav({ aside }: { aside?: React.ReactNode }) {
   return (
     <>
       <header className="sticky top-0 z-[70] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="flex h-[60px] lg:h-[72px] items-center justify-between gap-4 px-4 lg:px-24 border-b border-border mb-5">
+      <div className="flex h-[60px] lg:h-[72px] items-center justify-between gap-4 border-b border-border mb-5 px-4 lg:[padding-inline:var(--desktop-inline-gutter)]">
         {/* Left: Logo + Search */}
         <div className="flex items-center gap-4">
           <Link href="/home" className="flex items-center gap-2 shrink-0">

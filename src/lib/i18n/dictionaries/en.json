@@ -499,6 +499,7 @@
   "job_requirements": "Requirements",
   "job_about": "About the Job",
   "similar_jobs": "Similar Jobs",
+  "similar_resumes": "Similar Resumes",
   "phone_app_error": "Could not open phone app",
   "email_app_error": "Could not open email app",
   "age": "Age",
@@ -978,5 +979,7 @@
   "salary_distribution": "Salary distribution",
   "top_viewed_jobs": "Most viewed jobs",
   "top_applied_jobs": "Most applied jobs",
-  "stats_subtitle": "View your job performance and statistics"
+  "stats_subtitle": "View your job performance and statistics",
+  "show_more_filters": "Expand down",
+  "show_less_filters": "Collapse up"
 }

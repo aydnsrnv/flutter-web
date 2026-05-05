@@ -843,7 +843,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                           icon={<Call size={28} variant="Linear" color="#16A34A" />}
                           title={t("phone")}
                           subtitle={job.number}
-                          tint="rgba(34,197,94,0.12)"
+                          tint="rgba(34,197,94,0.24)"
                           onClick={() => openTel(job.number!)}
                         />
                       ) : null}
@@ -853,7 +853,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                           icon={<Sms size={28} variant="Linear" color="#3B82F6" />}
                           title={t("email")}
                           subtitle={job.mail}
-                          tint="rgba(59,130,246,0.12)"
+                          tint="rgba(59,130,246,0.24)"
                           onClick={() => openMail(job.mail!)}
                         />
                       ) : null}
@@ -863,7 +863,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                           icon={<LinkIcon size={28} variant="Linear" color="#7C3AED" />}
                           title={t("applyLink")}
                           subtitle={job.apply_link.trim()}
-                          tint="rgba(168,85,247,0.12)"
+                          tint="rgba(168,85,247,0.24)"
                           onClick={() => openApplyLink(job.apply_link!.trim())}
                         />
                       ) : null}
@@ -960,7 +960,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                   type="button"
                   onClick={() => copyAndNotify(job.number)}
                   className="h-12 flex-1 rounded-full text-base font-semibold"
-                  style={{ backgroundColor: "rgba(34,197,94,0.12)", color: "#16A34A" }}
+                  style={{ backgroundColor: "rgba(34,197,94,0.24)", color: "#16A34A" }}
                 >
                   {job.number}
                 </button>
@@ -970,7 +970,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                   type="button"
                   onClick={() => copyAndNotify(job.mail)}
                   className="h-12 flex-1 rounded-full text-base font-semibold"
-                  style={{ backgroundColor: "rgba(59,130,246,0.12)", color: "#3B82F6" }}
+                  style={{ backgroundColor: "rgba(59,130,246,0.24)", color: "#3B82F6" }}
                 >
                   {job.mail}
                 </button>
@@ -980,7 +980,7 @@ export function JobDetailPanel({ job }: { job: JobDetailPanelData }) {
                   type="button"
                   onClick={() => copyAndNotify(job.apply_link)}
                   className="h-12 flex-1 rounded-full text-base font-semibold"
-                  style={{ backgroundColor: "rgba(168,85,247,0.12)", color: "#7C3AED" }}
+                  style={{ backgroundColor: "rgba(168,85,247,0.24)", color: "#7C3AED" }}
                 >
                   {t("applyLink")}
                 </button>

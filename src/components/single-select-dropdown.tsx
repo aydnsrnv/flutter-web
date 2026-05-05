@@ -112,7 +112,7 @@ export function SingleSelectDropdown({
         id={id}
         type="button"
         onClick={() => setOpen(true)}
-        className={`flex h-12 w-full items-center justify-between gap-2 rounded-[21px] border border-input bg-black/5 px-4 text-[14px] outline-none dark:bg-white/5 ${value ? "text-foreground/80" : "text-foreground/50"}`}
+        className={`flex h-12 w-full items-center justify-between gap-2 rounded-[21px] bg-black/5 px-4 text-[14px] outline-none dark:bg-white/5 ${value ? "text-foreground/80" : "text-foreground/50"}`}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {value && selectedOption?.image ? (

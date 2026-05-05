@@ -152,65 +152,7 @@ function AppHeaderInner({
               <Login size={24} variant="Outline" color="currentColor" />
             </IconButton>
           )
-        ) : (
-          <div className="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-center max-w-[60vw] truncate lg:left-1/2 lg:max-w-[60vw] lg:-translate-x-1/2 text-primary">
-            {pathname.includes("/candidates")
-              ? t("nav_candidates")
-              : pathname.includes("/companies")
-                ? t("nav_companies")
-                : pathname.includes("/categories")
-                  ? t("nav_categories")
-                  : pathname.includes("/category/")
-                    ? t("nav_categories")
-                    : pathname.includes("/favorites")
-                      ? t("nav_favorites")
-                      : pathname.includes("/latest-cvs")
-                        ? t("home_latest_resumes")
-                        : pathname.includes("/my/cvs")
-                          ? t("profile_my_cvs")
-                          : pathname.includes("/cvs")
-                            ? t("menu_tab_cvs")
-                            : pathname.includes("/my/jobs")
-                              ? t("menu_my_jobs")
-                              : pathname.includes("/jobs")
-                                ? t("jobs_title")
-                                : pathname.includes("/my/drafts")
-                                  ? t("drafts")
-                                  : pathname.includes("/payments-history")
-                                    ? t("menu_payments_history")
-                                    : pathname.includes("/wallet-transactions")
-                                      ? t("spendings_title")
-                                      : pathname.includes("/notifications")
-                                        ? t("notifications_title")
-                                        : pathname.endsWith("/cv/add") ||
-                                            pathname.endsWith("/cv")
-                                          ? isEditMode
-                                            ? t("edit_resume")
-                                            : t("resume_wizard_title")
-                                          : pathname.endsWith("/job/add")
-                                            ? isEditMode
-                                              ? t("edit_job")
-                                              : t("add_job")
-                                            : pathname.includes("/latest")
-                                              ? t("latest_vacancies_title")
-                                              : pathname.includes("/filters") ||
-                                                  pathname.includes(
-                                                    "/cv-filters",
-                                                  ) ||
-                                                  pathname.includes(
-                                                    "/filter-results",
-                                                  ) ||
-                                                  pathname.includes(
-                                                    "/cv-filter-results",
-                                                  )
-                                                ? t("detailed_search")
-                                                : pathname.includes("/profile")
-                                                  ? t("profile_title")
-                                                  : pathname.includes("/create")
-                                                    ? t("add")
-                                                    : ""}
-          </div>
-        )}
+        ) : null}
       </div>
     </header>
   );

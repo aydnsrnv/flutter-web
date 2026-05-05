@@ -307,7 +307,7 @@ export default async function ResumeByNumberPage({
           <div className="sticky top-6">
             <div className="rounded-2xl border border-border bg-card p-4">
               <div className="mb-3 text-base font-semibold text-foreground">
-                {t("similar_jobs")}
+                {t("similar_resumes")}
               </div>
               {similarResumes.length > 0 ? (
                 <ResumeListGroup

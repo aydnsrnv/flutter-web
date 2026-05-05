@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
+import { SearchNormal1 } from 'iconsax-react';
 
 import { InfiniteScrollSentinel } from '@/components/infinite-scroll-sentinel';
 import { ResumeListItem, type ResumeListItemData } from '@/components/resume-list-item';
 import { createClient } from '@/lib/supabase/browser';
+import { Input } from '@/components/ui/input';
 
 type ResumeRow = {
   id: string | number;
@@ -55,6 +57,16 @@ export function LatestResumesClient({
   const [items, setItems] = useState<ResumeListItemData[]>(initialItems);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredItems = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter((r) =>
+      r.full_name.toLowerCase().includes(q) ||
+      (r.desired_position ?? '').toLowerCase().includes(q)
+    );
+  }, [items, searchQuery]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore) return;
@@ -79,11 +91,27 @@ export function LatestResumesClient({
   }, [hasMore, items.length, limit, loadingMore, supabase]);
 
   return (
-    <div className="grid gap-3">
-      {items.map((r) => (
-        <ResumeListItem key={r.id} resume={r} />
-      ))}
-      <InfiniteScrollSentinel onVisible={() => void loadMore()} disabled={!hasMore || loadingMore} className="h-10" />
+    <div className="flex flex-col gap-4">
+      <form
+        className="relative lg:hidden"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <Input
+          className="pl-14"
+          placeholder="Axtar..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
+          <SearchNormal1 size={21} variant="Linear" color="currentColor" className="text-muted-foreground" />
+        </div>
+      </form>
+      <div className="grid gap-3">
+        {filteredItems.map((r) => (
+          <ResumeListItem key={r.id} resume={r} />
+        ))}
+        <InfiniteScrollSentinel onVisible={() => void loadMore()} disabled={!hasMore || loadingMore} className="h-10" />
+      </div>
     </div>
   );
 }
